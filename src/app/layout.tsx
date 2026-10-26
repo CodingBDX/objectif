@@ -18,7 +18,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
   const { data: cs } = await sb.from("profiles").select("city,more").eq("paused", false);
   const cities = Array.from(new Set((cs || []).flatMap((c: any) => [c.city, ...(c.more || [])]).filter(Boolean))).sort((a: any, b: any) => a.localeCompare(b, "fr")) as string[];
   return (
-    <html lang="fr">
+    <html lang="fr" data-theme="light">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" />
