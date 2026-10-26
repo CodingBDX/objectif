@@ -9,6 +9,7 @@ import Heart from "@/components/Heart";
 import Slider from "@/components/Slider";
 import OwnerBar from "@/components/OwnerBar";
 import CopyBtn from "@/components/CopyBtn";
+import Comments from "@/components/Comments";
 
 export const dynamic = "force-dynamic";
 const get = async (id: string) => { const { data } = await supabaseServer().from("profiles").select("*").eq("id", id).maybeSingle(); return data as Profile | null; };
@@ -48,6 +49,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             {p.video && <div className="video"><video controls playsInline src={p.video} /></div>}
             <h2 className="sec">Portfolio</h2>
             <Slider imgs={p.photos} vip={p.vip} />
+            {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer">▶ Rejoindre le live</a></p>}
             <div className="panel pi">
               <div className="top"><h2 className="pn">{p.name}</h2>
                 {p.genre && <span className="gchip">{CATS[p.genre]}</span>}
@@ -60,6 +62,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
                 {p.site && /^https?:\/\//.test(p.site) && <a className="btn ghost" href={p.site} target="_blank" rel="noopener noreferrer">Site web</a>}</div>
             </div>
+            <Comments profileId={p.id} ownerId={p.id} />
           </div>
           <aside className="pside" aria-label="Villes, déplacements et disponibilités">
             <section className="bsec"><h3 className="ph"><Ic n="pin" s={18} />Villes</h3><div className="bub">

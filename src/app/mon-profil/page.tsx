@@ -16,6 +16,7 @@ export default function MyProfile() {
   const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
+  const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
   useEffect(() => { (async () => {
@@ -23,7 +24,9 @@ export default function MyProfile() {
     if (!user) { location.href = "/connexion"; return; }
     setUid(user.id);
     const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
-    if (data) { setIsNewP(false); setOk18(true);
+    const { data: mem } = await sb.from("members").select("pseudo").eq("id", user.id).maybeSingle();
+    if (mem) { setIsMember(true); setPseudo(mem.pseudo); }
+    if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
       setBio(data.bio); setMore([...(data.more || []), "", "", ""].slice(0, 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
       setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
@@ -52,15 +55,22 @@ export default function MyProfile() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault(); setMsg(null);
-    if (!f.genre) { setMsg({ t: "Choisis ton profil (obligatoire)." }); return; }
+    const genre = kind === "livecam" ? "livecam" : f.genre;
+    if (!genre) { setMsg({ t: "Choisis ton profil (obligatoire)." }); return; }
+    if (kind === "livecam" && !/^https?:\/\//.test(vlink)) { setMsg({ t: "Indique le lien de ton live (https://…)." }); return; }
     if (photos.length < 3) { setMsg({ t: "Ajoute au moins 3 photos." }); return; }
     setBusy(true);
-    const row = { name: f.name, genre: f.genre, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
+    const row = { name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
       specialties: spec, photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     setBusy(false);
     if (error) setMsg({ t: error.message }); else { location.href = `/profil/${uid}`; }
+  }
+  async function saveMember(e: React.FormEvent) {
+    e.preventDefault(); setBusy(true); setMsg(null);
+    const { error } = await sb.from("members").insert({ id: uid, pseudo: pseudo.trim() });
+    setBusy(false); if (error) setMsg({ t: error.message }); else location.href = "/";
   }
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });
   const setTrip = (i: number, k: keyof Trip, v: string) => setTrips(trips.map((t, j) => (j === i ? { ...t, [k]: v } : t)));
@@ -75,11 +85,29 @@ export default function MyProfile() {
           {!isNewP && <div className="acts" style={{ marginBottom: 12 }}>
             <button type="button" className="btn ghost" onClick={async () => { await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
             <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link></div>}
-          <form onSubmit={save}><fieldset className="fs">
+          {isNewP && (<>
+            <p className="note">Choisis le type de profil qui te correspond.</p>
+            <div className="kinds" role="radiogroup" aria-label="Type de profil">
+              <label className={`kind${kind === "createur" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "createur"} onChange={() => setKind("createur")} /><b>📷 Profil photographe</b><span>Photographe, vidéaste ou artiste : ton portfolio, ta vidéo, ton contact.</span></label>
+              <label className={`kind${kind === "livecam" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "livecam"} onChange={() => setKind("livecam")} /><b>🔴 Profil livecam</b><span>Tu animes des lives créatifs (dessin, musique, cuisine, atelier). Catégorie à part.</span></label>
+              {!isMember && <label className={`kind${kind === "membre" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "membre"} onChange={() => setKind("membre")} /><b>💬 Profil membre</b><span>Pour laisser des commentaires sous les profils. Rien d’autre.</span></label>}
+            </div>
+            {!kind && <p className="note" style={{ textAlign: "center", margin: 0 }}>👆 Clique sur un profil pour afficher le formulaire correspondant.</p>}
+          </>)}
+          {kind === "membre" && (
+            <form onSubmit={saveMember}><fieldset className="fs">
+              <label className="f">Pseudo<input value={pseudo} onChange={(e) => setPseudo(e.target.value)} required minLength={2} maxLength={30} autoComplete="nickname" /></label>
+              <label className="chk"><input type="checkbox" required /> <span>Je suis majeur·e et je m’engage à rester respectueux·se (pas de propos haineux ni à caractère sexuel).</span></label>
+              <p className="note">Un profil membre ne peut pas publier de photos ni de vidéos : seulement des commentaires.</p>
+              {msg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
+              <button className="btn" type="submit" disabled={busy}>Créer mon profil membre</button>
+            </fieldset></form>)}
+          {(kind === "createur" || kind === "livecam") && <form onSubmit={save}><fieldset className="fs">
+            {kind === "livecam" && <p className="note">Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).</p>}
             <div className="row2">
               <label className="f">Nom ou nom de studio<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
-              <label className="f">Profil (obligatoire)<select value={f.genre} onChange={set("genre")} required>
-                <option value="" disabled>Choisir…</option><option value="fille">Fille</option><option value="homme">Homme</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></label>
+              {kind === "createur" && <label className="f">Profil (obligatoire)<select value={f.genre} onChange={set("genre")} required>
+                <option value="" disabled>Choisir…</option><option value="fille">Fille</option><option value="homme">Homme</option><option value="trans">Trans</option></select></label>}
             </div>
             <div className="f"><span style={L}>Spécialités (jusqu’à 6) <span style={{ fontWeight: 600 }}>{spec.length}/6</span></span>
               <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
@@ -113,6 +141,7 @@ export default function MyProfile() {
             </div>
             <div className="panel igp"><b>📸 Photos Instagram</b><p className="note" style={{ margin: "4px 0 8px" }}>Instagram ne permet pas d’importer automatiquement tes photos. Enregistre-les d’abord sur ton téléphone ou ton ordinateur, puis choisis-les ici.</p></div>
             {photos.length < 6 && <label className="f"><span>Ajouter des photos (minimum 3, maximum 6 · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
+            {kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => addVideo(e.target.files?.[0])} /></label>
             {video && <label className="chk"><input type="checkbox" onChange={(e) => e.target.checked && setVideo(null)} /> <span>🎬 Vidéo actuelle : cocher pour la supprimer</span></label>}
 
@@ -127,7 +156,7 @@ export default function MyProfile() {
             <label className="chk"><input type="checkbox" required checked={ok18} onChange={(e) => setOk18(e.target.checked)} /> <span>Je suis majeur·e, je détiens les droits sur ces contenus et ils sont professionnels (aucun contenu à caractère sexuel).</span></label>
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
             <button className="btn" type="submit" disabled={busy}>{busy ? "Patiente…" : isNewP ? "Publier mon profil" : "Enregistrer"}</button>
-          </fieldset></form>
+          </fieldset></form>}
         </div>
       </div>
     </section>
