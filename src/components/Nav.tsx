@@ -1,0 +1,47 @@
+"use client";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import Ic from "./Ic";
+import { useFavs } from "@/lib/favs";
+import { supabaseBrowser } from "@/lib/supabase/client";
+
+type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; cities: string[] };
+
+function Inner({ loggedIn, hasProfile, vip, name, userId, cities }: P) {
+  const [open, setOpen] = useState(false);
+  const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
+  const close = () => setOpen(false);
+  return (
+    <>
+      <nav className={`nav${open ? " open" : ""}`} aria-label="Navigation principale"><div className="gut">
+        <Link className="logo" href="/" aria-label="Objectif, retour à l’annuaire" onClick={close}>
+          <svg className="ic" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M14 7c3.5 0 6 3 5 7.5-1.2 5-6 7.5-13.5 5.5 4-1 6.300-3 7.300-6 .8-2.300.4-4.500 1.200-7z" /><path d="M14 7c-.2-2 1-3.600 3.200-4" /></svg>objectif
+        </Link>
+        <button className="burger" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
+          <svg className="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <div className="navmenu" onClick={(e) => { if ((e.target as HTMLElement).closest("a,button")) close(); }}>
+          <Link className={`nl${!sp.get("fav") ? " on" : ""}`} href="/"><Ic n="grid" />Annuaire</Link>
+          <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1"><Ic n="heart" />Favoris <span className="cn">{favs.length}</span></Link>
+          <Link className="nl" href="/contact" aria-label="Nous contacter" title="Nous contacter">
+            <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">Contact</span>
+          </Link>
+          {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
+          <div className="sp"><Ic n="pin" />
+            <select aria-label="Choisir une ville" value={sp.get("ville") || ""} onChange={(e) => r.push(e.target.value ? `/?ville=${encodeURIComponent(e.target.value)}` : "/")}>
+              <option value="">Choisir une ville</option>{cities.map((c) => <option key={c}>{c}</option>)}
+            </select></div>
+          {loggedIn ? (<>
+            <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>
+            <button className="nl" onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}>👤 {name || "Moi"} · Quitter</button>
+          </>) : (<>
+            <Link className="nl" href="/connexion">Se connecter</Link>
+            <Link className="btn" href="/connexion?inscription=1">Créer mon profil</Link>
+          </>)}
+        </div>
+      </div></nav>
+    </>
+  );
+}
+export default function Nav(p: P) { return <Suspense fallback={<nav className="nav" />}><Inner {...p} /></Suspense>; }

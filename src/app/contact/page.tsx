@@ -1,24 +1,37 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
-export default function Contact() {
+
+function Form() {
+  const vip = useSearchParams().get("s") === "vip";
   const [done, setDone] = useState(false); const [err, setErr] = useState("");
   async function send(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); const f = new FormData(e.currentTarget);
-    const { error } = await supabaseBrowser().from("messages").insert({ name: f.get("name"), contact: f.get("contact"), subject: f.get("subject"), body: f.get("body") });
+    const { error } = await supabaseBrowser().from("messages").insert({ name: f.get("n"), contact: f.get("e"), subject: f.get("s"), body: f.get("m") });
     if (error) setErr("Envoi impossible, réessaie."); else setDone(true);
   }
-  const vip = typeof window !== "undefined" && new URLSearchParams(location.search).get("s") === "vip";
-  return done ? <p className="panel ok">Message envoyé, merci !</p> : (
-    <form className="panel" style={{ maxWidth: 560, margin: "0 auto" }} onSubmit={send}>
-      <h1 style={{ marginTop: 0 }}>Nous contacter</h1>
-      <label className="f">Nom<input name="name" required maxLength={80} /></label>
-      <label className="f">Ton e-mail ou téléphone<input name="contact" required maxLength={120} /></label>
-      <label className="f">Sujet<select name="subject" defaultValue={vip ? "Devenir VIP" : "Une question"}>
-        {["Une question", "Signaler un profil", "Demande de vérification", "Devenir VIP", "Autre"].map((s) => <option key={s}>{s}</option>)}</select></label>
-      <label className="f">Message<textarea name="body" required maxLength={3000} /></label>
-      {err && <p className="err">{err}</p>}
-      <button className="btn">Envoyer</button>
-    </form>
+  return (
+    <section id="con" className="gut">
+      <div className="pbar"><Link className="btn ghost" href="/">← Retour à l’annuaire</Link></div>
+      <div className="pfc" style={{ maxWidth: 640 }}>
+        <div className="panel regp">
+          <h1 style={{ font: "700 clamp(28px,5vw,38px)/1.1 var(--fd)", color: "var(--pink)", margin: "0 0 6px" }}>Nous contacter</h1>
+          <p className="note" style={{ margin: "0 0 16px" }}>Une question, un profil à signaler, une demande de vérification ou de VIP ? Écris-nous.</p>
+          {done ? <p className="note" role="status"><b>Message envoyé, merci !</b> Nous te répondons dès que possible.</p> : (
+            <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={send}>
+              <div className="row2"><label className="f">Nom<input name="n" required maxLength={60} autoComplete="name" /></label>
+                <label className="f">Adresse e-mail pour te répondre<input name="e" type="email" required maxLength={120} autoComplete="email" /></label></div>
+              <label className="f">Sujet<select name="s" required defaultValue={vip ? "Devenir VIP" : ""}><option value="" disabled>Choisir…</option>
+                {["Une question", "Signaler un profil", "Demande de vérification", "Devenir VIP", "Autre"].map((s) => <option key={s}>{s}</option>)}</select></label>
+              <label className="f">Message<textarea name="m" required minLength={10} maxLength={1500} rows={6} placeholder="Écris ton message ici…" /></label>
+              {err && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{err}</p>}
+              <button className="btn" type="submit">Envoyer le message</button>
+            </form>)}
+        </div>
+      </div>
+    </section>
   );
 }
+export default function Page() { return <Suspense><Form /></Suspense>; }

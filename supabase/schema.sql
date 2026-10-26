@@ -4,6 +4,7 @@ create table public.profiles (
   name text not null check (char_length(name) between 2 and 40),
   genre text not null check (genre in ('fille','homme','trans','livecam')),
   city text not null,
+  more text[] not null default '{}' check (cardinality(more) <= 3),
   specialties text[] not null default '{}' check (cardinality(specialties) <= 6),
   bio text not null default '' check (char_length(bio) <= 2000),
   phone text, instagram text, snapchat text, tiktok text, site text,
@@ -32,7 +33,7 @@ create policy "supprimer son profil" on public.profiles
 
 -- Un membre ne peut JAMAIS s'attribuer vip / verified : colonnes réservées à l'admin
 revoke update on public.profiles from authenticated;
-grant update (name, genre, city, specialties, bio, phone, instagram, snapchat, tiktok, site,
+grant update (name, genre, city, more, specialties, bio, phone, instagram, snapchat, tiktok, site,
               h24, hours, trips, photos, video, paused) on public.profiles to authenticated;
 
 create table public.messages (

@@ -2,17 +2,20 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { GENRES, SPECIALTIES, Trip } from "@/lib/types";
+import { SPECIALTIES, Trip } from "@/lib/types";
+import { DAYL } from "@/lib/avail";
 
-const DAYS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 type Hours = Record<string, [string, string] | null>;
+const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
 
 export default function MyProfile() {
   const sb = supabaseBrowser();
   const [uid, setUid] = useState(""); const [loaded, setLoaded] = useState(false); const [isNewP, setIsNewP] = useState(true);
-  const [f, setF] = useState({ name: "", genre: "", city: "", bio: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
+  const [f, setF] = useState({ name: "", genre: "", city: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
+  const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
-  const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([]); const [paused, setPaused] = useState(false);
+  const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
+  const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
   useEffect(() => { (async () => {
@@ -20,9 +23,13 @@ export default function MyProfile() {
     if (!user) { location.href = "/connexion"; return; }
     setUid(user.id);
     const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
-    if (data) { setIsNewP(false);
-      setF({ name: data.name, genre: data.genre, city: data.city, bio: data.bio, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
-      setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video); setH24(data.h24); setHours(data.hours || {}); setTrips(data.trips || []); setPaused(data.paused); }
+    if (data) { setIsNewP(false); setOk18(true);
+      setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
+      setBio(data.bio); setMore([...(data.more || []), "", "", ""].slice(0, 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
+      setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
+      setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
+      if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); }
+    }
     setLoaded(true);
   })(); }, []);
 
@@ -33,84 +40,96 @@ export default function MyProfile() {
   }
   async function addPhotos(files: FileList | null) {
     if (!files) return; setBusy(true); setMsg(null);
-    try { const next = [...photos];
-      for (const file of Array.from(files)) { if (next.length >= 6) break; next.push(await up(file)); }
-      setPhotos(next);
-    } catch (e: any) { setMsg({ t: e.message }); } setBusy(false);
+    try { const next = [...photos]; for (const file of Array.from(files)) { if (next.length >= 6) break; next.push(await up(file)); } setPhotos(next); }
+    catch (e: any) { setMsg({ t: e.message }); } setBusy(false);
   }
   async function addVideo(file?: File) {
     if (!file) return;
     if (file.size > 15 * 1024 * 1024) { setMsg({ t: "La vidéo dépasse 15 Mo." }); return; }
-    setBusy(true); try { setVideo(await up(file)); } catch (e: any) { setMsg({ t: e.message }); } setBusy(false);
+    setBusy(true); setMsg(null); try { setVideo(await up(file)); } catch (e: any) { setMsg({ t: e.message }); } setBusy(false);
   }
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
 
   async function save(e: React.FormEvent) {
     e.preventDefault(); setMsg(null);
-    if (!f.genre) { setMsg({ t: "Choisis ton genre (obligatoire)." }); return; }
+    if (!f.genre) { setMsg({ t: "Choisis ton profil (obligatoire)." }); return; }
     if (photos.length < 3) { setMsg({ t: "Ajoute au moins 3 photos." }); return; }
     setBusy(true);
-    const row = { ...f, phone: f.phone || null, instagram: f.instagram || null, snapchat: f.snapchat || null, tiktok: f.tiktok || null, site: f.site || null,
-      specialties: spec, photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from && t.to), paused };
+    const row = { name: f.name, genre: f.genre, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
+      phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
+      specialties: spec, photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     setBusy(false);
-    if (error) setMsg({ t: error.message }); else { setIsNewP(false); setMsg({ t: "Profil enregistré ✔", ok: true }); }
+    if (error) setMsg({ t: error.message }); else { location.href = `/profil/${uid}`; }
   }
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });
-  if (!loaded) return <p>Chargement…</p>;
+  const setTrip = (i: number, k: keyof Trip, v: string) => setTrips(trips.map((t, j) => (j === i ? { ...t, [k]: v } : t)));
+  if (!loaded) return <section className="gut"><p className="note">Chargement…</p></section>;
 
   return (
-    <form className="panel" onSubmit={save} style={{ maxWidth: 760, margin: "0 auto" }}>
-      <h1 style={{ marginTop: 0 }}>{isNewP ? "Créer mon profil" : "Modifier mon profil"}</h1>
-      {!isNewP && <p>{paused ? <b className="err">⏸ Ton annonce est en pause. </b> : null}
-        <button type="button" className="btn ghost" onClick={() => setPaused(!paused)}>{paused ? "Réactiver" : "Mettre en pause"}</button>{" "}
-        <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link></p>}
-      <label className="f">Nom ou pseudo<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
-      <label className="f">Genre (obligatoire)<select value={f.genre} onChange={set("genre")} required>
-        <option value="" disabled>Choisir…</option>{GENRES.map((g) => <option key={g.id} value={g.id}>{g.icon} {g.label.replace(/s$/, "")}</option>)}</select></label>
-      <div className="f">Spécialités ({spec.length}/6)
-        <div className="chips">{SPECIALTIES.map((s) => { const on = spec.includes(s); return (
-          <button type="button" key={s} className={`chip ${on ? "on" : ""}`} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < 6 ? [...spec, s] : spec)}>{s}</button>); })}</div></div>
-      <label className="f">Ville<input value={f.city} onChange={set("city")} required /></label>
-      <label className="f">Présentation<textarea value={f.bio} onChange={set("bio")} maxLength={2000} /></label>
-      <label className="f">Téléphone<input value={f.phone} onChange={set("phone")} inputMode="tel" /></label>
-      <label className="f">Instagram<input value={f.instagram} onChange={set("instagram")} placeholder="@pseudo" /></label>
-      <label className="f">Snapchat<input value={f.snapchat} onChange={set("snapchat")} /></label>
-      <label className="f">TikTok<input value={f.tiktok} onChange={set("tiktok")} /></label>
-      <label className="f">Site web<input value={f.site} onChange={set("site")} placeholder="https://" /></label>
+    <section id="reg" className="gut">
+      <div className="pbar"><Link className="btn ghost" href="/">← Retour à l’annuaire</Link></div>
+      <div className="pfc" style={{ maxWidth: 760 }}>
+        <div className="panel regp">
+          <h1 className="regh">{isNewP ? "Créer mon profil" : "Modifier mon profil"}</h1>
+          {!isNewP && <div className="acts" style={{ marginBottom: 12 }}>
+            <button type="button" className="btn ghost" onClick={async () => { await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
+            <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link></div>}
+          <form onSubmit={save}><fieldset className="fs">
+            <div className="row2">
+              <label className="f">Nom ou nom de studio<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
+              <label className="f">Profil (obligatoire)<select value={f.genre} onChange={set("genre")} required>
+                <option value="" disabled>Choisir…</option><option value="fille">Fille</option><option value="homme">Homme</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></label>
+            </div>
+            <div className="f"><span style={L}>Spécialités (jusqu’à 6) <span style={{ fontWeight: 600 }}>{spec.length}/6</span></span>
+              <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
+                return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < 6 ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
+            <label className="f">Ville<input value={f.city} onChange={set("city")} required maxLength={40} autoComplete="off" /></label>
+            <div className="f"><span style={L}>Villes supplémentaires (jusqu’à 3, optionnel)</span>
+              <div className="row3">{more.map((m, i) => <input key={i} value={m} maxLength={40} placeholder={`Ville ${i + 2}`} aria-label={`Ville supplémentaire ${i + 1}`} onChange={(e) => setMore(more.map((x, j) => (j === i ? e.target.value : x)))} />)}</div></div>
+            <div className="f"><span style={L}>Prochains déplacements (calendrier, optionnel)</span>
+              {trips.map((t, i) => <div className="trow" key={i}>
+                <input placeholder="Ville visitée" maxLength={40} value={t.city} onChange={(e) => setTrip(i, "city", e.target.value)} aria-label={`Ville du déplacement ${i + 1}`} />
+                <input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} />
+                <input type="date" value={t.to} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></div>)}
+              <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>
+            <label className="f">Présentation<textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={2000} rows={5} /></label>
+            <div className="row2"><label className="f">Site ou réseau (optionnel)<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
+            <label className="f">Numéro de téléphone (optionnel)<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
+            <div className="f"><span style={L}>Réseaux sociaux (optionnel, ton pseudo sans @)</span>
+              <div className="row3"><input maxLength={31} placeholder="Instagram" aria-label="Pseudo Instagram" value={f.instagram} onChange={set("instagram")} />
+                <input maxLength={31} placeholder="Snapchat" aria-label="Pseudo Snapchat" value={f.snapchat} onChange={set("snapchat")} />
+                <input maxLength={31} placeholder="TikTok" aria-label="Pseudo TikTok" value={f.tiktok} onChange={set("tiktok")} /></div></div>
+            <p className="note">Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.</p>
 
-      <h3>Photos ({photos.length}/6 — 3 minimum)</h3>
-      <div className="thumbs">{photos.map((u, i) => (
-        <div key={u}><img src={u} alt="" />
-          <button type="button" onClick={() => setPhotos(photos.filter((_, j) => j !== i))} aria-label="Supprimer">✕</button>
-          {i > 0 && <button type="button" className="mv" onClick={() => move(i, -1)} aria-label="Mettre en avant">★</button>}
-        </div>))}</div>
-      {photos.length < 6 && <p><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => addPhotos(e.target.files)} /></p>}
-      <p className="mut">Le filigrane est ajouté automatiquement. Pour tes photos Instagram : enregistre-les sur ton téléphone, puis ajoute-les ici.</p>
+            <div>
+              <p className="note" style={{ margin: "0 0 6px" }}><b>Mes photos ({photos.length}/6)</b> · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}> Il en faut au moins 3.</span>}</p>
+              <div className="edph">{photos.map((src, i) => (
+                <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} alt={`Photo ${i + 1}`} />
+                  {i === 0 && <span className="fst">En avant</span>}
+                  <button type="button" className="rm" aria-label={`Supprimer la photo ${i + 1}`} title="Supprimer" onClick={() => setPhotos(photos.filter((_, j) => j !== i))}>✕</button>
+                  <span className="mv">{i > 0 ? <button type="button" aria-label="Déplacer vers la gauche" onClick={() => move(i, -1)}>◀</button> : <i />}{i < photos.length - 1 ? <button type="button" aria-label="Déplacer vers la droite" onClick={() => move(i, 1)}>▶</button> : <i />}</span>
+                </div>))}</div>
+            </div>
+            <div className="panel igp"><b>📸 Photos Instagram</b><p className="note" style={{ margin: "4px 0 8px" }}>Instagram ne permet pas d’importer automatiquement tes photos. Enregistre-les d’abord sur ton téléphone ou ton ordinateur, puis choisis-les ici.</p></div>
+            {photos.length < 6 && <label className="f"><span>Ajouter des photos (minimum 3, maximum 6 · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
+            <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => addVideo(e.target.files?.[0])} /></label>
+            {video && <label className="chk"><input type="checkbox" onChange={(e) => e.target.checked && setVideo(null)} /> <span>🎬 Vidéo actuelle : cocher pour la supprimer</span></label>}
 
-      <h3>Vidéo (15 Mo max)</h3>
-      {video && <p><video src={video} controls style={{ maxWidth: 260 }} /> <button type="button" className="btn ghost" onClick={() => setVideo(null)}>Retirer</button></p>}
-      <p><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => addVideo(e.target.files?.[0])} /></p>
-
-      <h3>Disponibilités</h3>
-      <label><input type="checkbox" style={{ width: "auto" }} checked={h24} onChange={(e) => setH24(e.target.checked)} /> Disponible 24h/24, 7j/7</label>
-      {!h24 && DAYS.map((d, i) => { const h = hours[String(i)]; return (
-        <p key={d} style={{ margin: "6px 0" }}><b style={{ display: "inline-block", width: 90 }}>{d}</b>
-          <input type="checkbox" style={{ width: "auto" }} checked={!!h} onChange={(e) => setHours({ ...hours, [i]: e.target.checked ? ["10:00", "20:00"] : null })} />{" "}
-          {h && <><input type="time" style={{ width: 110 }} value={h[0]} onChange={(e) => setHours({ ...hours, [i]: [e.target.value, h[1]] })} /> – <input type="time" style={{ width: 110 }} value={h[1]} onChange={(e) => setHours({ ...hours, [i]: [h[0], e.target.value] })} /></>}
-        </p>); })}
-
-      <h3>Prochains déplacements (facultatif)</h3>
-      {trips.map((t, i) => (
-        <p key={i} className="chips" style={{ margin: "6px 0" }}>
-          <input style={{ width: 150 }} placeholder="Ville" value={t.city} onChange={(e) => setTrips(trips.map((x, j) => j === i ? { ...x, city: e.target.value } : x))} />
-          <input type="date" style={{ width: 150 }} value={t.from} onChange={(e) => setTrips(trips.map((x, j) => j === i ? { ...x, from: e.target.value } : x))} />
-          <input type="date" style={{ width: 150 }} value={t.to} onChange={(e) => setTrips(trips.map((x, j) => j === i ? { ...x, to: e.target.value } : x))} />
-          <button type="button" className="btn ghost" onClick={() => setTrips(trips.filter((_, j) => j !== i))}>✕</button></p>))}
-      <button type="button" className="btn ghost" onClick={() => setTrips([...trips, { city: "", from: "", to: "" }])}>+ Ajouter une ville</button>
-
-      {msg && <p className={msg.ok ? "ok" : "err"}>{msg.t}</p>}
-      <p><button className="btn" disabled={busy}>{busy ? "Patiente…" : "Enregistrer"}</button></p>
-    </form>
+            <div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (optionnel)</strong>
+              <p className="note">Coche les jours où tu es joignable. Ton profil affichera « Dispo » pendant ces heures et sera grisé en dehors.</p>
+              <label className="h24"><input type="checkbox" checked={h24} onChange={(e) => setH24(e.target.checked)} /> <b>Disponible 24h/24, 7j/7</b></label>
+              {DAYL.map((d, i) => { const h = hours[String(i)];
+                return <div className="d" key={d}><label><input type="checkbox" disabled={h24} checked={!!h} onChange={(e) => setHours({ ...hours, [String(i)]: e.target.checked ? (["09:00", "19:00"] as [string, string]) : null })} />{d}</label>
+                  <input type="time" disabled={h24 || !h} value={h ? h[0] : "09:00"} onChange={(e) => h && setHours({ ...hours, [String(i)]: [e.target.value, h[1]] as [string, string] })} />
+                  <input type="time" disabled={h24 || !h} value={h ? h[1] : "19:00"} onChange={(e) => h && setHours({ ...hours, [String(i)]: [h[0], e.target.value] as [string, string] })} /></div>; })}
+            </div>
+            <label className="chk"><input type="checkbox" required checked={ok18} onChange={(e) => setOk18(e.target.checked)} /> <span>Je suis majeur·e, je détiens les droits sur ces contenus et ils sont professionnels (aucun contenu à caractère sexuel).</span></label>
+            {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
+            <button className="btn" type="submit" disabled={busy}>{busy ? "Patiente…" : isNewP ? "Publier mon profil" : "Enregistrer"}</button>
+          </fieldset></form>
+        </div>
+      </div>
+    </section>
   );
 }
