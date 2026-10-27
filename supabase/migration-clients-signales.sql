@@ -35,15 +35,15 @@ create policy "client_reports: supprimer les siens" on public.client_reports for
 -- Empreinte d'un numéro (06 12 34 56 78 = +33 6 12 34 56 78 = 0033612345678)
 create or replace function private.phone_hash(p text) returns text
 language plpgsql stable security definer set search_path = private, extensions as $$
-declare d text := regexp_replace(coalesce(p,''), '\D', '', 'g'); k text;
+declare d text := regexp_replace(coalesce(p,''), '\D', '', 'g'); pep text;
 begin
   if d like '0033%' then d := substr(d, 5);
   elsif d like '33%' and length(d) = 11 then d := substr(d, 3);
   elsif d like '0%' then d := substr(d, 2);
   end if;
   if length(d) < 8 or length(d) > 15 then raise exception 'Numéro invalide'; end if;
-  select v into k from private.secrets where k = 'client_pepper';
-  return encode(hmac(d, k, 'sha256'), 'hex');
+  select s.v into pep from private.secrets s where s.k = 'client_pepper';
+  return encode(hmac(d, pep, 'sha256'), 'hex');
 end $$;
 
 -- Signaler un client (réservé aux profils inscrits et visibles, 20 signalements max par jour)
