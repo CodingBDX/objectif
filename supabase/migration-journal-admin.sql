@@ -54,4 +54,4 @@ end $$;
 revoke all on function public.admin_set_profile(uuid, boolean, boolean, boolean), public.admin_delete_profile(uuid), public.admin_restore_profile(bigint) from public, anon;
 grant execute on function public.admin_set_profile(uuid, boolean, boolean, boolean), public.admin_delete_profile(uuid), public.admin_restore_profile(bigint) to authenticated;
 
--- Voir le journal :  select created_at, action, details->>'nom' as nom, profile_id from public.audit_log order by id desc limit 50;
+-- Voir le journal :  select created_at, action, coalesce(details->>'nom', details->>'name') as nom, profile_id from public.audit_log order by id desc limit 50;
