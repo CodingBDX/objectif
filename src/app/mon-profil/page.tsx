@@ -6,6 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { SPECIALTIES, Trip } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
 import CityInput from "@/components/CityInput";
+import RichEditor from "@/components/RichEditor";
 
 type Hours = Record<string, [string, string] | null>;
 const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
@@ -163,7 +164,7 @@ export default function MyProfile() {
                 <input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} />
                 <input type="date" value={t.to} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></div>)}
               <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>
-</section><section className="dcard"><h3>Présentation et contact</h3><label className="f">Présentation<textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={2000} rows={5} /></label>
+</section><section className="dcard"><h3>Présentation et contact</h3><div className="f"><span style={L}>Présentation</span><RichEditor label="Présentation" value={bio} onChange={setBio} /></div>
             <div className="row2"><label className="f">Site ou réseau (optionnel)<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
             <div className="f"><span style={L}>Tarifs 🌹 (optionnel, nombres uniquement)</span>{!vip && <p className="note" style={{ margin: 0 }}>🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. <Link href="/contact?s=vip">Devenir VIP</Link></p>}<div className="row2"><label className="f">Pour 30 minutes<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" value={t30} disabled={!vip} onChange={(e) => setT30(e.target.value)} /></label><label className="f">Pour 1 heure<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 150" value={t60} disabled={!vip} onChange={(e) => setT60(e.target.value)} /></label></div>{vip && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>Afficher mes tarifs sur mon profil et sur ma carte</span></label>}</div>
             <label className="f">Numéro de téléphone (optionnel)<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>

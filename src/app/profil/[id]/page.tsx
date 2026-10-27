@@ -8,6 +8,7 @@ import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
 import Slider from "@/components/Slider";
 import OwnerBar from "@/components/OwnerBar";
+import { RichText, plain } from "@/lib/rich";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
@@ -19,7 +20,7 @@ const get = async (id: string) => { const { data } = await supabaseServer().from
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const p = await get(params.id);
   if (!p) return {};
-  const desc = (p.bio ? p.bio.slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"} à ${p.city}. Photos, disponibilités et contact.`);
+  const desc = (p.bio ? plain(p.bio).slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"} à ${p.city}. Photos, disponibilités et contact.`);
   return {
     title: `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`, description: desc, alternates: { canonical: `/profil/${p.id}` },
     openGraph: { type: "profile", title: `${p.name} · ${p.city}`, description: desc, images: p.photos[0] ? [{ url: p.photos[0] }] : undefined },
@@ -49,7 +50,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       <TrackView id={p.id} skip={mine} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}/profil/${p.id}`, dateCreated: p.created_at,
-        mainEntity: { "@type": "Person", name: p.name, description: p.bio.slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
+        mainEntity: { "@type": "Person", name: p.name, description: plain(p.bio).slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
           homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } }, knowsAbout: p.specialties,
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
@@ -74,7 +75,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}
                 <Heart id={p.id} /></div>
               {p.bio && <h2 className="pres">Présentation</h2>}
-              <div className="bio" style={{ whiteSpace: "pre-wrap" }}>{p.bio}</div>
+              <div className="bio"><RichText text={p.bio} /></div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
                 {!mine && <ReportBtn profileId={p.id} />}
                 {p.site && /^https?:\/\//.test(p.site) && <a className="btn ghost" href={p.site} target="_blank" rel="noopener noreferrer">Site web</a>}</div>

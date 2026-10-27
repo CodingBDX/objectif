@@ -693,3 +693,14 @@ input[type="file"]:disabled::file-selector-button{opacity:.6;cursor:progress}
 /* Titre « Présentation » du profil */
 .pres{font:700 clamp(22px,3.4vw,28px)/1.1 var(--fd);color:var(--pink);margin:6px 0 0;letter-spacing:-.01em;display:flex;align-items:center;gap:12px}
 .pres::after{content:"";flex:1;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--pink),transparent);opacity:.45}
+
+/* Éditeur de texte du profil */
+.rte{display:grid;gap:8px}
+.rtt{display:flex;gap:6px;flex-wrap:wrap}
+.rtb{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;min-height:38px;font:700 14px var(--fb);cursor:pointer;transition:background .15s,border-color .15s}
+.rtb:hover{background:var(--soft);border-color:var(--pink)}
+.rtb.on{background:var(--btn);color:var(--btnt);border-color:var(--btn)}
+.rtb.pv{margin-left:auto}
+.rte textarea{width:100%;background:var(--bg1);border:1px solid var(--line);border-radius:18px;padding:12px 14px;min-height:170px;resize:vertical;color:var(--ink);font:inherit}
+.rtp{background:var(--bg1);border:1px solid var(--line);border-radius:18px;padding:12px 16px;min-height:170px}
+.rtc{text-align:right;font-size:12px;color:var(--mut);font-weight:600}
