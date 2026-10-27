@@ -117,6 +117,10 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.5; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 3500);
     return () => clearInterval(t);
   }, [hl]);
+  useEffect(() => { // arrivée depuis le menu « Choisir une ville » : on amène directement à la recherche et aux filtres
+    if (location.hash !== "#recherche") return;
+    const el = document.getElementById("recherche"); if (el && el.offsetParent) setTimeout(() => el.scrollIntoView({ block: "start" }), 60);
+  }, [city]);
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
   const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); r.push("/"); };
@@ -142,7 +146,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         </section>}
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
-        <div className="panel msearch"><h2><Ic n="search" s={20} />Rechercher</h2>
+        <div className="panel msearch" id="recherche"><h2><Ic n="search" s={20} />Rechercher</h2>
           <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} />
           <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>

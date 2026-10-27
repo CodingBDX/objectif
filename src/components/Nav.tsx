@@ -34,7 +34,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, cities, isAdmin }: P) 
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
           <div className="sp"><Ic n="pin" />
             <CityInput value={ctext} onChange={setCtext} suggest={cities} label="Choisir une ville" placeholder="Choisir une ville"
-              onPick={(c) => { setCtext(""); r.push(cities.includes(c) ? `/ville/${slug(c)}` : `/?ville=${encodeURIComponent(c)}`); }} /></div>
+              onPick={(c) => { setCtext(""); close(); r.push((cities.includes(c) ? `/ville/${slug(c)}` : `/?ville=${encodeURIComponent(c)}`) + "#recherche"); }} /></div>
           {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>
