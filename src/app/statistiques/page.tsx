@@ -8,7 +8,7 @@ type Me = { name: string; vip: boolean; photos: string[] | null; video: string |
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
 const sum = (r: Row[], k: keyof Row) => r.reduce((a, x) => a + (x[k] as number), 0);
 const JOURS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
-const BAR = ["#b7a4f0", "#ffb3cf", "#ffc27a", "#ffe08a", "#b5e3a8", "#a8d0f7", "#cdb8f5"];
+const BAR = ["#ff9ac8", "#ffc27a", "#ffe08a", "#b5e3a8", "#a8d0f7", "#d9b8f5", "#ff7fb5"];
 const empty = (d: string): Row => ({ day: d, views: 0, calls: 0, copies: 0, socials: 0 });
 
 export default function Stats() {
@@ -44,8 +44,8 @@ export default function Stats() {
   const first = me.name.split(" ")[0];
   const lbl = (d: string) => { const x = new Date(d + "T12:00:00"); return range === 7 ? JOURS[x.getDay()] : String(x.getDate()); };
 
-  const parts = [{ n: "Appels", v: calls, c: "#b7a4f0" }, { n: "Numéro copié", v: copies, c: "#ffb3cf" }, { n: "Réseaux", v: socials, c: "#ffe08a" }];
-  let acc = 0; const stops = contacts ? parts.map((p) => { const a = (acc / contacts) * 360; acc += p.v; return `${p.c} ${a}deg ${(acc / contacts) * 360}deg`; }).join(",") : "#ece5fb 0deg 360deg";
+  const parts = [{ n: "Appels", v: calls, c: "#ff9ac8" }, { n: "Numéro copié", v: copies, c: "#ffc27a" }, { n: "Réseaux", v: socials, c: "#ffe08a" }];
+  let acc = 0; const stops = contacts ? parts.map((p) => { const a = (acc / contacts) * 360; acc += p.v; return `${p.c} ${a}deg ${(acc / contacts) * 360}deg`; }).join(",") : "#ffe1ef 0deg 360deg";
 
   const tips: [boolean, string][] = [
     [(me.photos?.length || 0) >= 4, "Ajoute au moins 4 photos"],
@@ -96,7 +96,7 @@ export default function Stats() {
             {v === 0 ? <p className="note">Aucune vue sur cette période.</p> : (
               <div className="bars" role="img" aria-label={`Graphique des vues sur ${range} jours, total ${v}`} style={{ gap: range === 30 ? 3 : 10 }}>
                 {cur.map((r, i) => <div key={r.day} className="bcol" title={`${r.day} : ${r.views} vue${r.views > 1 ? "s" : ""}`}>
-                  <div className="bar" style={{ height: Math.max(r.views ? 6 : 3, (r.views / max) * 100) + "%", background: r.views ? BAR[i % 7] : "#ece5fb" }} />
+                  <div className="bar" style={{ height: Math.max(r.views ? 6 : 3, (r.views / max) * 100) + "%", background: r.views ? BAR[i % 7] : "#ffe1ef" }} />
                   {(range === 7 || i % 5 === 0) && <span>{lbl(r.day)}</span>}</div>)}
               </div>)}
           </section>
