@@ -48,7 +48,7 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
           {rep === c.id && <div className="cmi reply rform"><textarea maxLength={500} value={rtxt} autoFocus onChange={(e) => setRtxt(e.target.value)} placeholder={`Ta réponse à ${c.author_name}…`} aria-label={`Répondre à ${c.author_name}`} />
             <div><button className="btn" onClick={() => reply(c.id)} disabled={busy}>Publier la réponse</button> <button className="btn ghost" onClick={() => setRep(null)}>Annuler</button></div></div>}
         </div>);
-      })) : <p className="note">Aucun commentaire pour le moment.</p>}
+      }) : <p className="note">Aucun commentaire pour le moment.</p>}
       {me && me.name ? (<>
         <label className="f">Commenter en tant que {me.name || "moi"}<textarea maxLength={500} value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="Votre commentaire respectueux…" /></label>
         {err && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{err}</p>}
