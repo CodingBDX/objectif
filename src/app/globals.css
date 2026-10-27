@@ -342,3 +342,5 @@ a:hover,a:focus{text-decoration:none}
   .pbn{max-width:100%}
 }
 body{overflow-x:clip}
+.pph a.nb{color:inherit;font-weight:700}
+.pph a.nb:hover{color:var(--btn)}

@@ -31,6 +31,7 @@ const SOC: Record<string, [string, string, (h: string) => string]> = {
 };
 const handle = (h: string | null) => String(h || "").trim().replace(/^@/, "");
 const okHandle = (h: string) => /^[A-Za-z0-9._]{1,30}$/.test(h);
+const telHref = (s: string) => { const d = s.replace(/[^\d+]/g, ""); return /^0\d{9}$/.test(d) ? "+33" + d.slice(1) : d.replace(/^00/, "+"); };
 const fmtPh = (s: string) => { const d = s.replace(/\D/g, ""); return /^0\d{9}$/.test(d) ? d.replace(/(\d{2})(?=\d)/g, "$1 ") : s; };
 
 export default async function ProfilePage({ params }: { params: { id: string } }) {
@@ -51,7 +52,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><strong className="pbn">{p.name}</strong>
         <div className="pcontact">
-          {p.phone && <span className="pph"><Ic n="phone" s={18} /><span className="nb">{fmtPh(p.phone)}</span><CopyBtn text={p.phone} label="Copier" className="" /></span>}
+          {p.phone && <span className="pph"><Ic n="phone" s={18} /><a className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</a><CopyBtn text={p.phone} label="Copier" className="" /></span>}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <a key={k} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></a>; })}
         </div></div>
