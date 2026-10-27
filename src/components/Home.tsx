@@ -137,7 +137,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {hl.length > 0 && <section className="mhl" aria-label="Mis en avant">
           <h2><Ic n="star" s={20} />Mis en avant</h2>
           <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={`Voir le profil de ${p.name}`}>
-            <i className={p.vip ? "vip" : ""} style={p.photos[0] ? { backgroundImage: `url('${thumbUrl(p.photos[0])}')` } : undefined}>{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
+            <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} alt="" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
             <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
