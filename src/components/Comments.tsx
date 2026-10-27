@@ -1,15 +1,17 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 type C = { id: number; author_id: string; author_name: string; body: string; created_at: string; parent_id?: number | null };
+const PAGE = 5;
 const fmtD = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 
 export default function Comments({ profileId, ownerId }: { profileId: string; ownerId: string }) {
   const sb = supabaseBrowser();
   const [list, setList] = useState<C[]>([]); const [me, setMe] = useState<{ id: string; name: string } | null>(null);
   const [rep, setRep] = useState<number | null>(null); const [rtxt, setRtxt] = useState("");
+  const [shown, setShown] = useState(PAGE); const sentinel = useRef<HTMLDivElement>(null);
   const [txt, setTxt] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
   const load = useCallback(async () => {
     const { data } = await sb.from("comments").select("*").eq("profile_id", profileId).order("created_at", { ascending: true });
@@ -23,6 +25,12 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
     const { data: p } = await sb.from("profiles").select("name").eq("id", user.id).maybeSingle();
     setMe({ id: user.id, name: p?.name || "" });
   })(); }, [load]);
+  const tops = list.filter((c) => !c.parent_id);
+  useEffect(() => {
+    const el = sentinel.current; if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver((es) => { if (es[0].isIntersecting) setShown((n) => Math.min(n + PAGE, tops.length)); }, { rootMargin: "300px" });
+    io.observe(el); return () => io.disconnect();
+  }, [shown, tops.length]);
   async function post() {
     if (!me || !txt.trim()) return; setBusy(true); setErr("");
     const { error } = await sb.from("comments").insert({ profile_id: profileId, author_id: me.id, author_name: me.name, body: txt.trim() });
@@ -37,9 +45,9 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
   return (
     <section className="panel cm" id="cm">
       <h2>Commentaires ({list.length})</h2>
-      {list.length ? list.filter((c) => !c.parent_id).map((c) => {
+      {list.length ? tops.slice(0, shown).map((c, i) => {
         const kids = list.filter((r) => r.parent_id === c.id); const mine = me?.id === ownerId;
-        return (<div className="cmt" key={c.id}>
+        return (<div className="cmt pop" key={c.id} style={{ animationDelay: (i % PAGE) * 45 + "ms" }}>
           <div className={`cmi${c.author_id === ownerId ? " own" : ""}`}><header>{c.author_name}{c.author_id === ownerId && <span className="cmo">Profil</span>}<time>{fmtD(c.created_at)}</time>
             {mine && c.author_id !== ownerId && <button className="cmr" onClick={() => { setRep(rep === c.id ? null : c.id); setRtxt(""); }}>Répondre</button>}
             {(me?.id === c.author_id || me?.id === ownerId) && <button className="cmx" onClick={() => del(c.id)}>Supprimer</button>}</header><p>{c.body}</p></div>
@@ -49,6 +57,7 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
             <div><button className="btn" onClick={() => reply(c.id)} disabled={busy}>Publier la réponse</button> <button className="btn ghost" onClick={() => setRep(null)}>Annuler</button></div></div>}
         </div>);
       }) : <p className="note">Aucun commentaire pour le moment.</p>}
+      {shown < tops.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{tops.length - shown} commentaire{tops.length - shown > 1 ? "s" : ""} à venir</span><button className="btn ghost" type="button" onClick={() => setShown((n) => n + PAGE)}>Voir plus</button></div>}
       {me && me.name ? (<>
         <label className="f">Commenter en tant que {me.name || "moi"}<textarea maxLength={500} value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="Votre commentaire respectueux…" /></label>
         {err && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{err}</p>}

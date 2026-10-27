@@ -78,7 +78,6 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 {!mine && <ReportBtn profileId={p.id} />}
                 {p.site && /^https?:\/\//.test(p.site) && <a className="btn ghost" href={p.site} target="_blank" rel="noopener noreferrer">Site web</a>}</div>
             </div>
-            <Comments profileId={p.id} ownerId={p.id} />
           </div>
           <aside className="pside" aria-label="Villes, déplacements et disponibilités">
             <section className="bsec"><h3 className="ph"><Ic n="pin" s={18} />Villes</h3><div className="bub">
@@ -101,6 +100,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             </div>}
           </aside>
         </div>
+        <Comments profileId={p.id} ownerId={p.id} />
       </div>
     </section>
   );
