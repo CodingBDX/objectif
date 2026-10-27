@@ -4,6 +4,8 @@ import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
 import AgeGate from "@/components/AgeGate";
+import Splash from "@/components/Splash";
+import NavProgress from "@/components/NavProgress";
 import { siteUrl } from "@/lib/site";
 import { publicCities } from "@/lib/public";
 
@@ -32,6 +34,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "HeyPapi", url: siteUrl(), inLanguage: "fr" }) }} />
+        <Splash /><NavProgress />
         <AgeGate />
         <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} cities={cities} isAdmin={isAdmin} />
         {me?.paused && (
