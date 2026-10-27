@@ -27,13 +27,13 @@ export default function GlobalSearch({ index, onGo }: { index: SIndex; onGo: (ur
   }, [q, open]);
   const list = useMemo<Sug[]>(() => {
     const n = norm(q.trim());
-    if (!n) return index.c.slice(0, 8).map(([c, k]) => ({ k: "ville" as const, label: c, sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/ville/${slug(c)}` }));
+    if (!n) return index.c.slice(0, 8).map(([c, k]) => ({ k: "ville" as const, label: c, sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/recherche?ville=${encodeURIComponent(c)}` }));
     const has = (s: string) => norm(s).includes(n); const st = (s: string) => (norm(s).startsWith(n) ? 0 : 1);
-    const v = index.c.filter(([c]) => has(c)).sort((a, b) => st(a[0]) - st(b[0]) || b[1] - a[1]).slice(0, 3).map(([c, k]) => ({ k: "ville" as const, label: c, sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/ville/${slug(c)}` }));
+    const v = index.c.filter(([c]) => has(c)).sort((a, b) => st(a[0]) - st(b[0]) || b[1] - a[1]).slice(0, 3).map(([c, k]) => ({ k: "ville" as const, label: c, sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/recherche?ville=${encodeURIComponent(c)}` }));
     const known = new Set(index.c.map(([c]) => slug(c)));
-    const fr = api.filter((x) => !known.has(slug(x.nom))).slice(0, 3).map((x) => ({ k: "fr" as const, label: x.nom, sub: x.departement ? `${x.departement.nom} (${x.departement.code})` : "", url: `/?ville=${encodeURIComponent(x.nom)}` }));
+    const fr = api.filter((x) => !known.has(slug(x.nom))).slice(0, 3).map((x) => ({ k: "fr" as const, label: x.nom, sub: x.departement ? `${x.departement.nom} (${x.departement.code})` : "", url: `/recherche?ville=${encodeURIComponent(x.nom)}` }));
     const p = index.p.filter((x) => has(x.name)).sort((a, b) => st(a.name) - st(b.name)).slice(0, 4).map((x) => ({ k: "profil" as const, label: x.name, sub: x.sub, url: `/profil/${x.id}` }));
-    const s = index.t.filter(([t]) => has(t)).sort((a, b) => st(a[0]) - st(b[0]) || b[1] - a[1]).slice(0, 3).map(([t, k]) => ({ k: "spec" as const, label: cap(t), sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/?tag=${encodeURIComponent(t)}` }));
+    const s = index.t.filter(([t]) => has(t)).sort((a, b) => st(a[0]) - st(b[0]) || b[1] - a[1]).slice(0, 3).map(([t, k]) => ({ k: "spec" as const, label: cap(t), sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/recherche?tag=${encodeURIComponent(t)}` }));
     return [...v, ...fr, ...p, ...s];
   }, [q, index, api]);
   const go = (u: string) => { setOpen(false); setHi(-1); setQ(""); onGo(u); };
@@ -47,7 +47,7 @@ export default function GlobalSearch({ index, onGo }: { index: SIndex; onGo: (ur
           if (e.key === "Escape") { setOpen(false); return; }
           if (e.key === "ArrowDown" && list.length) { e.preventDefault(); setOpen(true); setHi((hi + 1) % list.length); }
           else if (e.key === "ArrowUp" && list.length) { e.preventDefault(); setHi((hi - 1 + list.length) % list.length); }
-          else if (e.key === "Enter") { e.preventDefault(); if (hi >= 0 && list[hi]) go(list[hi].url); else if (q.trim()) go(`/?q=${encodeURIComponent(q.trim())}`); }
+          else if (e.key === "Enter") { e.preventDefault(); if (hi >= 0 && list[hi]) go(list[hi].url); else if (q.trim()) go(`/recherche?q=${encodeURIComponent(q.trim())}`); }
         }} />
       {open && list.length > 0 && <ul className="citylist sugl" role="listbox">{list.map((x, i) => <li key={x.k + x.url} role="option" aria-selected={i === hi} className={i === hi ? "on" : ""} onMouseDown={(e) => { e.preventDefault(); go(x.url); }}>
         <em>{T[x.k]}</em><span>{x.label}</span>{x.sub && <small>{x.sub}</small>}</li>)}</ul>}

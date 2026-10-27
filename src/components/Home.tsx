@@ -9,6 +9,7 @@ import Ic from "./Ic";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
 import SearchBox from "./SearchBox";
+const SearchLink = ({ cls = "" }: { cls?: string }) => <Link href="/recherche" className={`sp sbox slink ${cls}`} aria-label="Ouvrir la recherche"><Ic n="search" /><span>Ville, profil, spécialité…</span></Link>;
 import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">Chargement de la carte…</p> });
 import { useFavs } from "@/lib/favs";
@@ -55,7 +56,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
   );
 }
 
-export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {} }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: React.ReactNode; region?: string; regions?: Record<string, string> }) {
+export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {}, searchMode = false }: { searchMode?: boolean; profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: React.ReactNode; region?: string; regions?: Record<string, string> }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
@@ -130,11 +131,11 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   }, [hl]);
   useEffect(() => { setQ(sp.get("q") || ""); setTag(sp.get("tag") || ""); }, [sp]); // recherche venant du menu du haut
   const open = (id: string) => r.push(`/profil/${id}`);
-  const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
-  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); r.push("/"); };
+  const setCity = (c: string) => r.push(c ? `/${searchMode ? "recherche" : ""}?ville=${encodeURIComponent(c)}` : searchMode ? "/recherche" : "/");
+  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); r.push(searchMode ? "/recherche" : "/"); };
 
   return (
-    <div className="shell gut" id="shell">
+    <div className={`shell gut${searchMode ? " srch" : ""}`} id="shell">
       <aside className="side" aria-label="Catégories">
         <div className="panel tip"><svg className="ic" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M12 3l7.500 2.800v5.700c0 4.500-3 8.200-7.500 9.500-4.500-1.300-7.500-5-7.500-9.500V5.800z" /><path d="M8.800 12.200l2.300 2.300 4.200-4.600" /></svg><span>Site fait par et pour les pros, <b>50 % reversés aux associations</b></span></div>
         <div className="panel">
@@ -146,6 +147,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       </aside>
 
       <main style={{ minWidth: 0 }}>
+        {searchMode ? null : <SearchLink cls="msbar" />}
         {hl.length > 0 && <section className="mhl" aria-label="Mis en avant">
           <h2><Ic n="star" s={20} />Mis en avant</h2>
           <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={`Voir le profil de ${p.name}`}>
@@ -154,7 +156,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         </section>}
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">9</span><span className="t6">6</span><span className="t3">3</span> {region || "France"}</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
-        <div className="panel msearch" id="recherche"><h2><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
+        <div className={`panel msearch${searchMode ? " on" : ""}`} id="recherche">{searchMode && <div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2><SearchBox profiles={profiles} q={q} setQ={setQ} onCity={setCity} onProfile={open} onTag={(t) => setTag(t)} /></div>}<h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
           {city && <div className="row"><span>Passages dans {city}</span><select aria-label="Passages dans la ville" value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>Profils de la ville</option><option value={7}>De passage cette semaine</option><option value={30}>De passage ce mois-ci</option></select></div>}
@@ -199,8 +201,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       <aside className="aside" aria-label="Filtres">
         <div className="panel hlp"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + (ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
           <div>{hl.slice(0, 3).map((p) => <button key={p.id} className="hl" onClick={() => open(p.id)}><i style={p.photos[0] ? { backgroundImage: `url('${p.photos[0]}')` } : undefined} /><span><b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div></div>
-        <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2>
-          <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} /></div>
+        <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2><SearchLink /></div>
           <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>

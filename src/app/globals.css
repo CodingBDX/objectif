@@ -764,3 +764,12 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
 .dscr{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .dscr li{display:flex;align-items:center;gap:8px;background:var(--soft);border-radius:999px;padding:6px 14px;font-size:14px}
 .dscr li span{color:var(--mut);font-weight:700}.dscr li b{color:var(--ink)}
+
+/* Page recherche : champ + filtres en haut, résultats dessous */
+.slink{cursor:pointer;color:var(--mut);text-decoration:none;max-width:none;margin:0;width:100%}
+.slink span{flex:1;padding:10px 0}
+.msbar{display:none}
+.panel.msearch.on{display:block}
+.srch .dpanel{display:none}
+.msearch .dsearch{margin-bottom:6px}
+@media (max-width:700px){.msbar{display:flex;margin:0 0 14px}.panel.msearch.on{display:block;margin:0 0 14px}.srch .aside{display:none}}
