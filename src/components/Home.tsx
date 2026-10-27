@@ -9,9 +9,10 @@ import Ic from "./Ic";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
 import SearchBox from "./SearchBox";
-const SearchLink = ({ cls = "" }: { cls?: string }) => <Link href="/recherche" className={`sp sbox slink ${cls}`} aria-label="Ouvrir la recherche"><Ic n="search" /><span>Ville, profil, spécialité…</span></Link>;
+import { useT } from "@/lib/i18n";
+const SearchLink = ({ cls = "" }: { cls?: string }) => { const { tr } = useT(); return <Link href="/recherche" className={`sp sbox slink ${cls}`} aria-label={tr("Ouvrir la recherche")}><Ic n="search" /><span>{tr("Ville, profil, spécialité…")}</span></Link>; };
 import dynamic from "next/dynamic";
-const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">Chargement de la carte…</p> });
+const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">{tr("Chargement de la carte…")}</p> });
 import { useFavs } from "@/lib/favs";
 import { avail, tripsOf, todayP, dShort } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile, showTarif, LANGS, ETHNIES, HAIRS, EYES, BRAS } from "@/lib/types";
@@ -28,30 +29,31 @@ function Tile({ u }: { u: string }) {
   return <div>{u && <img src={thumbUrl(u)} alt="" loading="lazy" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = u; } }} />}</div>;
 }
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
+  const { tr } = useT();
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
   while (pics.length < 3) pics.push(p.photos[0] || "");
   return (
     <article className={`card${p.vip ? " isvip" : ""}${live ? " live" : ""}${a && !a.on ? " off" : ""}${delay !== undefined ? " pop" : ""}`} style={delay !== undefined ? { animationDelay: delay + "ms" } : undefined}
-      tabIndex={0} aria-label={`Voir le profil de ${p.name}`} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
+      tabIndex={0} aria-label={tr("Voir le profil de {n}", { n: p.name })} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
       <div className="cover">
-        <div className="tr"><span className="phb" title="Nombre de photos"><Ic n="camera" s={14} />{p.photos.length}</span>{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}</div>
-        {isNew(p) && <span className="nwb" title="Profil créé il y a moins d’un mois"><Ic n="spark" s={14} />New</span>}
+        <div className="tr"><span className="phb" title={tr("Nombre de photos")}><Ic n="camera" s={14} />{p.photos.length}</span>{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}</div>
+        {isNew(p) && <span className="nwb" title={tr("Profil créé il y a moins d’un mois")}><Ic n="spark" s={14} />{tr("New")}</span>}
         <div className="mos">{pics.map((u, i) => <Tile key={i} u={u} />)}</div>
-        {a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? "En direct" : "Dispo"}</span>}
+        {a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? tr("En direct") : tr("Dispo")}</span>}
         {lab(p) && <span className={`badge${live ? " live" : ""}`}>{lab(p)}</span>}
-        {p.video && <span className="vid-ic"><Ic n="video" s={14} />vidéo</span>}
+        {p.video && <span className="vid-ic"><Ic n="video" s={14} />{tr("vidéo")}</span>}
       </div>
       <div className="in">
         <div className="ln"><h3>{p.name}</h3>
-          {p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
+          {p.verified && <span className="vf" role="img" aria-label={tr("Profil vérifié")} title={tr("Profil vérifié")}><Ic n="check" s={12} /></span>}
           <Heart id={p.id} /></div>
-        <div className="meta"><Ic n="pin" s={15} />{p.city}{p.more?.length ? ` + ${p.more.length} ville${p.more.length > 1 ? "s" : ""}` : ""}</div>
+        <div className="meta"><Ic n="pin" s={15} />{p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>
         {a && (a.on
-          ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? "Disponible 24h/24, 7j/7" : "Disponible jusqu’à " + a.until}</div>
-          : <div className="meta"><Ic n="clock" s={15} />Indisponible{a.next ? " · reprend " + a.next : ""}</div>)}
+          ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? tr("Disponible 24h/24, 7j/7") : tr("Disponible jusqu’à {u}", { u: a.until })}</div>
+          : <div className="meta"><Ic n="clock" s={15} />{tr("Indisponible")}{a.next ? tr(" · reprend {n}", { n: a.next }) : ""}</div>)}
         <div className="meta"><Ic n={CIC[p.genre] || "camera"} s={15} />{lab(p) ? lab(p) + " · " : ""}{p.photos.length} photos</div>
         {showTarif(p) ? <div className="meta"><Ic n="rose" s={15} />{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
-        {trip ? <div className="meta avl on"><Ic n="pin" s={15} />Passe {trip.to !== trip.from ? `du ${dShort(trip.from)} au ${dShort(trip.to)}` : `le ${dShort(trip.from)}`}</div> : null}
+        {trip ? <div className="meta avl on"><Ic n="pin" s={15} />{trip.to !== trip.from ? tr("Passe du {a} au {b}", { a: dShort(trip.from), b: dShort(trip.to) }) : tr("Passe le {a}", { a: dShort(trip.from) })}</div> : null}
         <div className="tags">{p.specialties.slice(0, 2).map((t) => <span className="tag" key={t}>{cap(t)}</span>)}</div>
       </div>
     </article>
@@ -59,7 +61,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
 }
 
 export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {}, searchMode = false }: { searchMode?: boolean; profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: React.ReactNode; region?: string; regions?: Record<string, string> }) {
-  const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
+  const { tr } = useT(); const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
   const [df, setDf] = useState(DF0); const upd = (k: keyof typeof DF0, v: string | boolean) => setDf((d) => ({ ...d, [k]: v }));
@@ -69,18 +71,18 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const city = initialCity || sp.get("ville") || (canNear ? near : "");
   const allCities = useMemo(() => Array.from(new Set(profiles.flatMap(cityList))), [profiles]);
   const locate = (auto = false) => {
-    if (!navigator.geolocation) { setGeoMsg("La localisation n’est pas disponible sur cet appareil."); return; }
+    if (!navigator.geolocation) { setGeoMsg(tr("La localisation n’est pas disponible sur cet appareil.")); return; }
     setGeoBusy(true); setGeoMsg(""); setGeoHelp(false);
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const c = await nearestCity(pos.coords.latitude, pos.coords.longitude, allCities);
       setGeoBusy(false);
       if (c) { setNear(c); try { localStorage.setItem("objectif_pm", JSON.stringify({ city: c, t: Date.now() })); } catch {} }
-      else if (!auto) setGeoMsg("Aucun créateur près de toi pour le moment. Essaie une autre ville dans le Top 10.");
+      else if (!auto) setGeoMsg(tr("Aucun créateur près de toi pour le moment. Essaie une autre ville dans le Top 10."));
     }, (err) => {
       setGeoBusy(false); if (auto) return;
-      if (err.code === 1) { setGeoMsg("La localisation est bloquée pour ce site. Autorise-la dans les réglages de ton appareil, puis réessaie."); setGeoHelp(true); }
-      else if (err.code === 3) setGeoMsg("La localisation a pris trop de temps. Réessaie, ou choisis ta ville dans le Top 10.");
-      else setGeoMsg("Position introuvable. Choisis ta ville dans le Top 10.");
+      if (err.code === 1) { setGeoMsg(tr("La localisation est bloquée pour ce site. Autorise-la dans les réglages de ton appareil, puis réessaie.")); setGeoHelp(true); }
+      else if (err.code === 3) setGeoMsg(tr("La localisation a pris trop de temps. Réessaie, ou choisis ta ville dans le Top 10."));
+      else setGeoMsg(tr("Position introuvable. Choisis ta ville dans le Top 10."));
     }, { timeout: 10000, maximumAge: 600000 });
   };
   const pm = sp.get("pm");
@@ -142,10 +144,10 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
 
   return (
     <div className={`shell gut${searchMode ? " srch" : ""}`} id="shell">
-      <aside className="side" aria-label="Catégories">
-        <div className="panel tip"><svg className="ic" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M12 3l7.500 2.800v5.700c0 4.500-3 8.200-7.500 9.500-4.500-1.300-7.500-5-7.500-9.500V5.800z" /><path d="M8.800 12.200l2.300 2.300 4.200-4.600" /></svg><span>Site fait par et pour les pros, <b>50 % reversés aux associations</b></span></div>
+      <aside className="side" aria-label={tr("Catégories")}>
+        <div className="panel tip"><svg className="ic" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M12 3l7.500 2.800v5.700c0 4.500-3 8.200-7.500 9.500-4.500-1.300-7.500-5-7.500-9.500V5.800z" /><path d="M8.800 12.200l2.300 2.300 4.200-4.600" /></svg><span>{tr("Site fait par et pour les pros, ")}<b>{tr("50 % reversés aux associations")}</b></span></div>
         <div className="panel">
-          <div>{ITEMS.map(([k, v, i]) => <Link key={k} className={`si${type === k && !fav ? " on" : ""}`} href={k === "tous" ? (city ? `/ville/${slug(city)}` : "/") : city ? `/genre/${GPATH[k]}/${slug(city)}` : `/genre/${GPATH[k]}`}><Ic n={i} />{v}<span className="n">{cnt(k)}</span></Link>)}</div>
+          <div>{ITEMS.map(([k, v, i]) => <Link key={k} className={`si${type === k && !fav ? " on" : ""}`} href={k === "tous" ? (city ? `/ville/${slug(city)}` : "/") : city ? `/genre/${GPATH[k]}/${slug(city)}` : `/genre/${GPATH[k]}`}><Ic n={i} />{tr(v)}<span className="n">{cnt(k)}</span></Link>)}</div>
           <hr className="sep" />
           <h2><Ic n="tag" s={20} />Spécialités</h2>
           <div>{tags.map(([t, n]) => <button key={t} className={`si${tag === t ? " on" : ""}`} onClick={() => setTag(tag === t ? "" : t)}>{cap(t)}<span className="n">{n}</span></button>)}</div>
@@ -153,93 +155,93 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       </aside>
 
       <main style={{ minWidth: 0 }}>
-        {!searchMode && hl.length > 0 && <section className="mhl" aria-label="Mis en avant">
-          <h2><Ic n="star" s={20} />Mis en avant</h2>
-          <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={`Voir le profil de ${p.name}`}>
+        {!searchMode && hl.length > 0 && <section className="mhl" aria-label={tr("Mis en avant")}>
+          <h2><Ic n="star" s={20} />{tr("Mis en avant")}</h2>
+          <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={tr("Voir le profil de {n}", { n: p.name })}>
             <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} alt="" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
             <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
         {!searchMode && <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">9</span><span className="t6">6</span><span className="t3">3</span> {region || "France"}</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>}
-        <div className={`panel msearch${searchMode ? " on" : ""}`} id="recherche">{searchMode && <div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2><SearchBox profiles={profiles} q={q} setQ={setQ} onCity={setCity} onProfile={open} onTag={(t) => setTag(t)} /></div>}<h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
-          <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
-          {city && <div className="row"><span>Passages dans {city}</span><select aria-label="Passages dans la ville" value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>Profils de la ville</option><option value={7}>De passage cette semaine</option><option value={30}>De passage ce mois-ci</option></select></div>}
-          <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>
-          <div className="row"><span>Tarif maximum 🌹</span><select aria-label="Tarif maximum" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
-          <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
-          <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
-          <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
-          <div className="row"><span>Âge</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Âge minimum" placeholder="min" value={df.amin} onChange={(e) => upd("amin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Âge maximum" placeholder="max" value={df.amax} onChange={(e) => upd("amax", e.target.value)} /></span></div>
-          <div className="row"><span>Taille (cm)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Taille (cm) minimum" placeholder="min" value={df.hmin} onChange={(e) => upd("hmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Taille (cm) maximum" placeholder="max" value={df.hmax} onChange={(e) => upd("hmax", e.target.value)} /></span></div>
-          <div className="row"><span>Poids (kg)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Poids (kg) minimum" placeholder="min" value={df.wmin} onChange={(e) => upd("wmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Poids (kg) maximum" placeholder="max" value={df.wmax} onChange={(e) => upd("wmax", e.target.value)} /></span></div>
-          <div className="row"><span>Ethnie</span><select aria-label="Ethnie" value={df.eth} onChange={(e) => upd("eth", e.target.value)}><option value="">Peu importe</option>{ETHNIES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Langue parlée</span><select aria-label="Langue parlée" value={df.lang} onChange={(e) => upd("lang", e.target.value)}><option value="">Peu importe</option>{LANGS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Cheveux</span><select aria-label="Cheveux" value={df.hair} onChange={(e) => upd("hair", e.target.value)}><option value="">Peu importe</option>{HAIRS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Yeux</span><select aria-label="Yeux" value={df.eyes} onChange={(e) => upd("eyes", e.target.value)}><option value="">Peu importe</option>{EYES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Bonnet</span><select aria-label="Bonnet" value={df.bra} onChange={(e) => upd("bra", e.target.value)}><option value="">Peu importe</option>{BRAS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Fume</span><select aria-label="Fume" value={df.smk} onChange={(e) => upd("smk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
-          <div className="row"><span>Boit</span><select aria-label="Boit" value={df.drk} onChange={(e) => upd("drk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
-          <label className="ck"><input type="checkbox" checked={df.recv} onChange={(e) => upd("recv", e.target.checked)} /> Reçoit</label>
-          <label className="ck"><input type="checkbox" checked={df.trav} onChange={(e) => upd("trav", e.target.checked)} /> Se déplace</label>
+        <div className={`panel msearch${searchMode ? " on" : ""}`} id="recherche">{searchMode && <div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><SearchBox profiles={profiles} q={q} setQ={setQ} onCity={setCity} onProfile={open} onTag={(t) => setTag(t)} /></div>}<h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
+          <div className="row"><span>{tr("Profil")}</span><select aria-label={tr("Profil")} value={type} onChange={(e) => setType(e.target.value)}><option value="tous">{tr("Tous les profils")}</option><option value="fille">{tr("Filles")}</option><option value="homme">{tr("Hommes")}</option><option value="trans">{tr("Trans")}</option><option value="livecam">{tr("Livecam")}</option></select></div>
+          <div className="row"><span>{tr("Trier par")}</span><select aria-label={tr("Tri")} value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">{tr("Plus récents")}</option><option value="az">{tr("Nom (A à Z)")}</option><option value="tarif">{tr("Tarif croissant (selon la durée)")}</option><option value="vus">{tr("Plus vus (30 jours)")}</option><option value="media">{tr("Plus de contenus")}</option></select></div>
+          {city && <div className="row"><span>{tr("Passages dans {c}", { c: city })}</span><select aria-label={tr("Passages dans la ville")} value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>{tr("Profils de la ville")}</option><option value={7}>{tr("De passage cette semaine")}</option><option value={30}>{tr("De passage ce mois-ci")}</option></select></div>}
+          <div className="row"><span>{tr("Durée")}</span><select aria-label={tr("Durée")} value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>{tr("1 heure")}</option><option value={30}>{tr("30 minutes")}</option></select></div>
+          <div className="row"><span>{tr("Tarif maximum 🌹")}</span><select aria-label={tr("Tarif maximum")} value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>{tr("Tous les tarifs")}</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
+          <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> {tr("Avec vidéo de présentation")}</label>
+          <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> {tr("Profils vérifiés uniquement")}</label>
+          <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> {tr("Disponibles maintenant")}</label>
+          <div className="row"><span>{tr("Âge")}</span><span className="rng"><input type="number" inputMode="numeric" aria-label={tr("Âge minimum")} placeholder="min" value={df.amin} onChange={(e) => upd("amin", e.target.value)} /><input type="number" inputMode="numeric" aria-label={tr("Âge maximum")} placeholder="max" value={df.amax} onChange={(e) => upd("amax", e.target.value)} /></span></div>
+          <div className="row"><span>{tr("Taille (cm)")}</span><span className="rng"><input type="number" inputMode="numeric" aria-label={tr("Taille (cm) minimum")} placeholder="min" value={df.hmin} onChange={(e) => upd("hmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label={tr("Taille (cm) maximum")} placeholder="max" value={df.hmax} onChange={(e) => upd("hmax", e.target.value)} /></span></div>
+          <div className="row"><span>{tr("Poids (kg)")}</span><span className="rng"><input type="number" inputMode="numeric" aria-label={tr("Poids (kg) minimum")} placeholder="min" value={df.wmin} onChange={(e) => upd("wmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label={tr("Poids (kg) maximum")} placeholder="max" value={df.wmax} onChange={(e) => upd("wmax", e.target.value)} /></span></div>
+          <div className="row"><span>{tr("Ethnie")}</span><select aria-label="Ethnie" value={df.eth} onChange={(e) => upd("eth", e.target.value)}><option value="">{tr("Peu importe")}</option>{ETHNIES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Langue parlée")}</span><select aria-label={tr("Langue parlée")} value={df.lang} onChange={(e) => upd("lang", e.target.value)}><option value="">{tr("Peu importe")}</option>{LANGS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Cheveux")}</span><select aria-label="Cheveux" value={df.hair} onChange={(e) => upd("hair", e.target.value)}><option value="">{tr("Peu importe")}</option>{HAIRS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Yeux")}</span><select aria-label="Yeux" value={df.eyes} onChange={(e) => upd("eyes", e.target.value)}><option value="">{tr("Peu importe")}</option>{EYES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Bonnet")}</span><select aria-label="Bonnet" value={df.bra} onChange={(e) => upd("bra", e.target.value)}><option value="">{tr("Peu importe")}</option>{BRAS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Fume")}</span><select aria-label="Fume" value={df.smk} onChange={(e) => upd("smk", e.target.value)}><option value="">{tr("Peu importe")}</option><option value="non">{tr("Non")}</option><option value="parfois">{tr("Parfois")}</option><option value="oui">{tr("Oui")}</option></select></div>
+          <div className="row"><span>{tr("Boit")}</span><select aria-label="Boit" value={df.drk} onChange={(e) => upd("drk", e.target.value)}><option value="">{tr("Peu importe")}</option><option value="non">{tr("Non")}</option><option value="parfois">{tr("Parfois")}</option><option value="oui">{tr("Oui")}</option></select></div>
+          <label className="ck"><input type="checkbox" checked={df.recv} onChange={(e) => upd("recv", e.target.checked)} /> {tr("Reçoit")}</label>
+          <label className="ck"><input type="checkbox" checked={df.trav} onChange={(e) => upd("trav", e.target.checked)} /> {tr("Se déplace")}</label>
         </div>
-        <div className="mchips">{ITEMS.map(([k, v]) => <button key={k} className="chip" aria-pressed={type === k} onClick={() => setType(k)}>{v}</button>)}</div>
-        <div className="sh"><h1><Ic n="star" s={22} />{h1}</h1><span className="cnt0" aria-live="polite">{list.length} profil{list.length > 1 ? "s" : ""}</span>
-          <button type="button" className="btn ghost" onClick={() => locate()} disabled={geoBusy} style={{ marginLeft: "auto" }}>📍 {geoBusy ? "Localisation…" : "Près de moi"}</button>
-          <div className="vsw" role="group" aria-label="Affichage">
-            <button type="button" aria-pressed={view === "cards"} title="Affichage en cartes" aria-label="Cartes" onClick={() => chView("cards")}><Ic n="grid" /></button>
-            <button type="button" aria-pressed={view === "list"} title="Affichage en liste" aria-label="Liste" onClick={() => chView("list")}>
+        <div className="mchips">{ITEMS.map(([k, v]) => <button key={k} className="chip" aria-pressed={type === k} onClick={() => setType(k)}>{tr(v)}</button>)}</div>
+        <div className="sh"><h1><Ic n="star" s={22} />{h1.startsWith("Escortes à ") ? tr("Escortes à {c}", { c: h1.slice(11) }) : tr(h1)}</h1><span className="cnt0" aria-live="polite">{list.length} {tr(list.length > 1 ? "profils" : "profil")}</span>
+          <button type="button" className="btn ghost" onClick={() => locate()} disabled={geoBusy} style={{ marginLeft: "auto" }}>📍 {geoBusy ? tr("Localisation…") : tr("Près de moi")}</button>
+          <div className="vsw" role="group" aria-label={tr("Affichage")}>
+            <button type="button" aria-pressed={view === "cards"} title={tr("Affichage en cartes")} aria-label={tr("Cartes")} onClick={() => chView("cards")}><Ic n="grid" /></button>
+            <button type="button" aria-pressed={view === "list"} title={tr("Affichage en liste")} aria-label={tr("Liste")} onClick={() => chView("list")}>
               <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="18" height="6" rx="2" /></svg></button>
-            <button type="button" aria-pressed={view === "map"} title="Affichage sur la carte" aria-label="Carte" onClick={() => chView("map")}><Ic n="pin" /></button>
+            <button type="button" aria-pressed={view === "map"} title={tr("Affichage sur la carte")} aria-label={tr("Carte")} onClick={() => chView("map")}><Ic n="pin" /></button>
           </div>
         </div>
         {geoMsg && <p className="note" role="alert" style={{ margin: "0 0 12px", color: "var(--btn)", fontWeight: 700 }}>{geoMsg}</p>}
         {geoHelp && <div className="panel" style={{ margin: "0 0 12px", padding: "12px 16px" }}>
-          <b>Comment autoriser la localisation</b>
+          <b>{tr("Comment autoriser la localisation")}</b>
           <ul style={{ margin: "6px 0 8px", paddingLeft: 18 }}>
-            <li><b>iPhone (Safari) :</b> Réglages → Confidentialité et sécurité → Service de localisation → Safari (sites web) → « Lorsque l’app est active ». Ou dans Safari : bouton « aA » à gauche de l’adresse → Réglages du site web → Localisation → Autoriser.</li>
-            <li><b>Android (Chrome) :</b> icône à gauche de l’adresse → Autorisations → Localisation → Autoriser. Vérifie aussi que la localisation du téléphone est activée.</li>
-            <li><b>Ordinateur :</b> clique sur le cadenas à gauche de l’adresse → Localisation → Autoriser, puis recharge la page.</li>
+            <li><b>{tr("iPhone (Safari) :")}</b> {tr("Réglages → Confidentialité et sécurité → Service de localisation → Safari (sites web) → « Lorsque l’app est active ». Ou dans Safari : bouton « aA » à gauche de l’adresse → Réglages du site web → Localisation → Autoriser.")}</li>
+            <li><b>{tr("Android (Chrome) :")}</b> {tr("icône à gauche de l’adresse → Autorisations → Localisation → Autoriser. Vérifie aussi que la localisation du téléphone est activée.")}</li>
+            <li><b>{tr("Ordinateur :")}</b> {tr("clique sur le cadenas à gauche de l’adresse → Localisation → Autoriser, puis recharge la page.")}</li>
           </ul>
-          <button type="button" className="btn" onClick={() => locate()}>Réessayer</button>
+          <button type="button" className="btn" onClick={() => locate()}>{tr("Réessayer")}</button>
         </div>}
         {canNear && near && <div className="panel" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "0 0 12px", padding: "10px 16px" }}>
-          <span>📍 Profils près de toi : <b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>Voir tous les profils</button></div>}
+          <span>{tr("📍 Profils près de toi : ")}<b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>{tr("Voir tous les profils")}</button></div>}
         {city && <NearbyCities profiles={profiles} city={city} type={type} />}
-        {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p> : null) : intro}
-        {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">Aucun profil à afficher sur la carte.</div>)}
+        {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{tr(intro)}</p> : null) : intro}
+        {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
-            : <div className="empty">{fav ? "Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici." : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? `Aucun profil à ${city} pour le moment. Sois le premier : crée ton profil !` : "Aucun profil ne correspond à votre recherche.") : "Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil »."}</div>}
+            : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : tr("Aucun profil ne correspond à votre recherche.")) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
         </div>
-        {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{list.length - shown} profils à venir</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}
+        {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{tr("{n} profils à venir", { n: list.length - shown })}</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>{tr("Voir plus")}</button></div>}
       </main>
 
       <aside className="aside" aria-label="Filtres">
-        {!searchMode && <div className="panel hlp"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + (ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
+        {!searchMode && <div className="panel hlp"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + tr(ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
           <div>{hl.slice(0, 3).map((p) => <button key={p.id} className="hl" onClick={() => open(p.id)}><i style={p.photos[0] ? { backgroundImage: `url('${p.photos[0]}')` } : undefined} /><span><b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div></div>}
-        <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2><SearchLink /></div>
-          <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
-          <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
-          {city && <div className="row"><span>Passages dans {city}</span><select aria-label="Passages dans la ville" value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>Profils de la ville</option><option value={7}>De passage cette semaine</option><option value={30}>De passage ce mois-ci</option></select></div>}
-          <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>
-          <div className="row"><span>Tarif maximum 🌹</span><select aria-label="Tarif maximum" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
-          <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
-          <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
-          <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
-          <div className="row"><span>Âge</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Âge minimum" placeholder="min" value={df.amin} onChange={(e) => upd("amin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Âge maximum" placeholder="max" value={df.amax} onChange={(e) => upd("amax", e.target.value)} /></span></div>
-          <div className="row"><span>Taille (cm)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Taille (cm) minimum" placeholder="min" value={df.hmin} onChange={(e) => upd("hmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Taille (cm) maximum" placeholder="max" value={df.hmax} onChange={(e) => upd("hmax", e.target.value)} /></span></div>
-          <div className="row"><span>Poids (kg)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Poids (kg) minimum" placeholder="min" value={df.wmin} onChange={(e) => upd("wmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Poids (kg) maximum" placeholder="max" value={df.wmax} onChange={(e) => upd("wmax", e.target.value)} /></span></div>
-          <div className="row"><span>Ethnie</span><select aria-label="Ethnie" value={df.eth} onChange={(e) => upd("eth", e.target.value)}><option value="">Peu importe</option>{ETHNIES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Langue parlée</span><select aria-label="Langue parlée" value={df.lang} onChange={(e) => upd("lang", e.target.value)}><option value="">Peu importe</option>{LANGS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Cheveux</span><select aria-label="Cheveux" value={df.hair} onChange={(e) => upd("hair", e.target.value)}><option value="">Peu importe</option>{HAIRS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Yeux</span><select aria-label="Yeux" value={df.eyes} onChange={(e) => upd("eyes", e.target.value)}><option value="">Peu importe</option>{EYES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Bonnet</span><select aria-label="Bonnet" value={df.bra} onChange={(e) => upd("bra", e.target.value)}><option value="">Peu importe</option>{BRAS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
-          <div className="row"><span>Fume</span><select aria-label="Fume" value={df.smk} onChange={(e) => upd("smk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
-          <div className="row"><span>Boit</span><select aria-label="Boit" value={df.drk} onChange={(e) => upd("drk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
-          <label className="ck"><input type="checkbox" checked={df.recv} onChange={(e) => upd("recv", e.target.checked)} /> Reçoit</label>
-          <label className="ck"><input type="checkbox" checked={df.trav} onChange={(e) => upd("trav", e.target.checked)} /> Se déplace</label>
+        <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><SearchLink /></div>
+          <h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
+          <div className="row"><span>{tr("Profil")}</span><select aria-label={tr("Profil")} value={type} onChange={(e) => setType(e.target.value)}><option value="tous">{tr("Tous les profils")}</option><option value="fille">{tr("Filles")}</option><option value="homme">{tr("Hommes")}</option><option value="trans">{tr("Trans")}</option><option value="livecam">{tr("Livecam")}</option></select></div>
+          <div className="row"><span>{tr("Trier par")}</span><select aria-label={tr("Tri")} value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">{tr("Plus récents")}</option><option value="az">{tr("Nom (A à Z)")}</option><option value="tarif">{tr("Tarif croissant (selon la durée)")}</option><option value="vus">{tr("Plus vus (30 jours)")}</option><option value="media">{tr("Plus de contenus")}</option></select></div>
+          {city && <div className="row"><span>{tr("Passages dans {c}", { c: city })}</span><select aria-label={tr("Passages dans la ville")} value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>{tr("Profils de la ville")}</option><option value={7}>{tr("De passage cette semaine")}</option><option value={30}>{tr("De passage ce mois-ci")}</option></select></div>}
+          <div className="row"><span>{tr("Durée")}</span><select aria-label={tr("Durée")} value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>{tr("1 heure")}</option><option value={30}>{tr("30 minutes")}</option></select></div>
+          <div className="row"><span>{tr("Tarif maximum 🌹")}</span><select aria-label={tr("Tarif maximum")} value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>{tr("Tous les tarifs")}</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
+          <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> {tr("Avec vidéo de présentation")}</label>
+          <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> {tr("Profils vérifiés uniquement")}</label>
+          <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> {tr("Disponibles maintenant")}</label>
+          <div className="row"><span>{tr("Âge")}</span><span className="rng"><input type="number" inputMode="numeric" aria-label={tr("Âge minimum")} placeholder="min" value={df.amin} onChange={(e) => upd("amin", e.target.value)} /><input type="number" inputMode="numeric" aria-label={tr("Âge maximum")} placeholder="max" value={df.amax} onChange={(e) => upd("amax", e.target.value)} /></span></div>
+          <div className="row"><span>{tr("Taille (cm)")}</span><span className="rng"><input type="number" inputMode="numeric" aria-label={tr("Taille (cm) minimum")} placeholder="min" value={df.hmin} onChange={(e) => upd("hmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label={tr("Taille (cm) maximum")} placeholder="max" value={df.hmax} onChange={(e) => upd("hmax", e.target.value)} /></span></div>
+          <div className="row"><span>{tr("Poids (kg)")}</span><span className="rng"><input type="number" inputMode="numeric" aria-label={tr("Poids (kg) minimum")} placeholder="min" value={df.wmin} onChange={(e) => upd("wmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label={tr("Poids (kg) maximum")} placeholder="max" value={df.wmax} onChange={(e) => upd("wmax", e.target.value)} /></span></div>
+          <div className="row"><span>{tr("Ethnie")}</span><select aria-label="Ethnie" value={df.eth} onChange={(e) => upd("eth", e.target.value)}><option value="">{tr("Peu importe")}</option>{ETHNIES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Langue parlée")}</span><select aria-label={tr("Langue parlée")} value={df.lang} onChange={(e) => upd("lang", e.target.value)}><option value="">{tr("Peu importe")}</option>{LANGS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Cheveux")}</span><select aria-label="Cheveux" value={df.hair} onChange={(e) => upd("hair", e.target.value)}><option value="">{tr("Peu importe")}</option>{HAIRS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Yeux")}</span><select aria-label="Yeux" value={df.eyes} onChange={(e) => upd("eyes", e.target.value)}><option value="">{tr("Peu importe")}</option>{EYES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Bonnet")}</span><select aria-label="Bonnet" value={df.bra} onChange={(e) => upd("bra", e.target.value)}><option value="">{tr("Peu importe")}</option>{BRAS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></div>
+          <div className="row"><span>{tr("Fume")}</span><select aria-label="Fume" value={df.smk} onChange={(e) => upd("smk", e.target.value)}><option value="">{tr("Peu importe")}</option><option value="non">{tr("Non")}</option><option value="parfois">{tr("Parfois")}</option><option value="oui">{tr("Oui")}</option></select></div>
+          <div className="row"><span>{tr("Boit")}</span><select aria-label="Boit" value={df.drk} onChange={(e) => upd("drk", e.target.value)}><option value="">{tr("Peu importe")}</option><option value="non">{tr("Non")}</option><option value="parfois">{tr("Parfois")}</option><option value="oui">{tr("Oui")}</option></select></div>
+          <label className="ck"><input type="checkbox" checked={df.recv} onChange={(e) => upd("recv", e.target.checked)} /> {tr("Reçoit")}</label>
+          <label className="ck"><input type="checkbox" checked={df.trav} onChange={(e) => upd("trav", e.target.checked)} /> {tr("Se déplace")}</label>
         </div>
       </aside>
     </div>
