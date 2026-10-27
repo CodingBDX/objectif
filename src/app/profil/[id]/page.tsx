@@ -11,6 +11,7 @@ import OwnerBar from "@/components/OwnerBar";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
+import { TrackLink, TrackView } from "@/components/Track";
 import { GPATH, siteUrl, slug } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   const live = p.genre === "livecam";
   return (
     <section id="pf" className="gut">
+      <TrackView id={p.id} skip={mine} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}/profil/${p.id}`, dateCreated: p.created_at,
         mainEntity: { "@type": "Person", name: p.name, description: p.bio.slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
@@ -53,9 +55,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><strong className="pbn">{p.name}</strong>
         <div className="pcontact">
-          {p.phone && <span className="pph"><Ic n="phone" s={18} /><a className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</a><CopyBtn text={p.phone} label="Copier" className="" /></span>}
+          {p.phone && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
-            return <a key={k} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></a>; })}
+            return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
       <div className="pfc">
         <div className="pgrid">

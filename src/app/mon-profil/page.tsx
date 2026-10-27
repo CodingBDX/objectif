@@ -84,7 +84,7 @@ export default function MyProfile() {
           <h1 className="regh">{isNewP ? "Créer mon profil" : "Modifier mon profil"}</h1>
           {!isNewP && <div className="acts" style={{ marginBottom: 12 }}>
             <button type="button" className="btn ghost" onClick={async () => { await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
-            <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link></div>}
+            <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link><Link className="btn ghost" href="/statistiques">📊 Mes statistiques</Link></div>}
           {isNewP && (<>
             <p className="note">Choisis le type de profil qui te correspond.</p>
             <div className="kinds" role="radiogroup" aria-label="Type de profil">
