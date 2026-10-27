@@ -475,3 +475,11 @@ body{overflow-x:clip}
 .citylist li small{font-weight:600;color:var(--mut)}
 .citylist li:hover,.citylist li.on{background:var(--soft);color:var(--btn)}
 .sp .cityin{flex:1;min-width:0}.sp .cityin input{width:100%;border:0;background:transparent;color:inherit;font:inherit;min-height:42px;outline:none}
+
+.nearb{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
+.nearh{font-weight:700;color:var(--mut);font-size:14px}
+.nbub{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh);color:var(--ink);font-weight:700;font-size:14px}
+.nbub b{background:var(--soft);color:var(--btn);border-radius:999px;padding:0 8px;font-size:12px}
+.nbub:hover{border-color:var(--pink)}
+@media (max-width:700px){.nbub:nth-of-type(n+4){display:none}}
+@media (min-width:701px) and (max-width:1100px){.nbub:nth-of-type(n+7){display:none}}

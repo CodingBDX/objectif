@@ -7,6 +7,7 @@ import { nearestCity } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
 import Ic from "./Ic";
 import Heart from "./Heart";
+import NearbyCities from "./NearbyCities";
 import { useFavs } from "@/lib/favs";
 import { avail, tripsOf } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile } from "@/lib/types";
@@ -158,6 +159,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         </div>}
         {canNear && near && <div className="panel" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "0 0 12px", padding: "10px 16px" }}>
           <span>📍 Profils près de toi : <b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>Voir tous les profils</button></div>}
+        {city && <NearbyCities profiles={profiles} city={city} type={type} />}
         {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
         <div className={`grid${view === "list" ? " lst" : ""}`}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={i >= PAGE ? ((i - PAGE) % PAGE) * 45 : undefined} />)

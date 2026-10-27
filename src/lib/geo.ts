@@ -10,7 +10,7 @@ export const COORDS: Record<string, [number, number]> = {
   besancon: [47.2378, 6.0241], orleans: [47.9029, 1.9093], rouen: [49.4432, 1.0993], mulhouse: [47.7508, 7.3359], caen: [49.1829, -0.3707],
   nancy: [48.6921, 6.1844], avignon: [43.9493, 4.8055], "la-rochelle": [46.1603, -1.1511], ajaccio: [41.9192, 8.7386]
 };
-const km = (a: [number, number], b: [number, number]) => {
+export const km = (a: [number, number], b: [number, number]) => {
   const R = 6371, rad = (x: number) => (x * Math.PI) / 180, dLat = rad(b[0] - a[0]), dLon = rad(b[1] - a[1]);
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLon / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
@@ -28,4 +28,18 @@ export async function nearestCity(lat: number, lon: number, cities: string[]): P
   let best: string | null = null, bd = 80;
   for (const c of cities) { const k = COORDS[slug(c)]; if (!k) continue; const d = km([lat, lon], k); if (d < bd) { bd = d; best = c; } }
   return best;
+}
+
+const cc = new Map<string, [number, number] | null>();
+/** Coordonnées d'une commune : table locale, sinon API officielle geo.api.gouv.fr (mémorisées). */
+export async function coordsOf(name: string): Promise<[number, number] | null> {
+  const k = slug(name); if (COORDS[k]) return COORDS[k]; if (cc.has(k)) return cc.get(k)!;
+  try {
+    const ls = localStorage.getItem("hp_c_" + k); if (ls) { const v = JSON.parse(ls); cc.set(k, v); return v; }
+  } catch {}
+  try {
+    const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(name)}&fields=centre&boost=population&limit=1`);
+    const j = await r.json(); const c = j?.[0]?.centre?.coordinates; const v: [number, number] | null = c ? [c[1], c[0]] : null;
+    cc.set(k, v); try { localStorage.setItem("hp_c_" + k, JSON.stringify(v)); } catch {} return v;
+  } catch { return null; }
 }
