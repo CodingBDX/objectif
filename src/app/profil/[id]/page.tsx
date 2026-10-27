@@ -8,7 +8,6 @@ import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
 import Slider from "@/components/Slider";
 import OwnerBar from "@/components/OwnerBar";
-import VideoBox from "@/components/VideoBox";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
@@ -64,8 +63,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="pgrid">
           <div className="pmain">
             {mine && <OwnerBar id={p.id} paused={p.paused} vip={p.vip} />}
-            {p.video && <VideoBox src={p.video} />}
-            <Slider imgs={p.photos} vip={p.vip} />
+            <Slider imgs={p.photos} vip={p.vip} video={p.video} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer">▶ Rejoindre le live</a></p>}
             <div className="panel pi">
               <div className="top"><h1 className="pn">{p.name}</h1>
