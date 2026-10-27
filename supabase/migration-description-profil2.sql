@@ -5,3 +5,6 @@ alter table public.profiles add column if not exists bra text check (bra is null
 alter table public.profiles add column if not exists smoker text check (smoker is null or smoker in ('non','parfois','oui'));
 alter table public.profiles add column if not exists drinker text check (drinker is null or drinker in ('non','parfois','oui'));
 grant update (hair, eyes, bra, smoker, drinker) on public.profiles to authenticated;
+alter table public.profiles add column if not exists receives boolean not null default false;
+alter table public.profiles add column if not exists travels boolean not null default false;
+grant update (receives, travels) on public.profiles to authenticated;

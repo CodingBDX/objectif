@@ -17,6 +17,7 @@ export default function MyProfile() {
   const sb = supabaseBrowser();
   const [uid, setUid] = useState(""); const [loaded, setLoaded] = useState(false); const [isNewP, setIsNewP] = useState(true);
   const [f, setF] = useState({ name: "", genre: "", city: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
+  const [recv, setRecv] = useState(false); const [trav, setTrav] = useState(false);
   const [hair, setHair] = useState(""); const [eyes, setEyes] = useState(""); const [bra, setBra] = useState(""); const [smoker, setSmoker] = useState(""); const [drinker, setDrinker] = useState("");
   const [age, setAge] = useState(""); const [hcm, setHcm] = useState(""); const [wkg, setWkg] = useState(""); const [eth, setEth] = useState(""); const [langs, setLangs] = useState<string[]>([]);
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
@@ -37,6 +38,7 @@ export default function MyProfile() {
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
+      setRecv(!!data.receives); setTrav(!!data.travels);
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
       setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
@@ -120,7 +122,7 @@ export default function MyProfile() {
     let region: string | null | undefined;
     try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
     const num = (v: string, a: number, b: number) => { const n = Math.round(Number(v)); return v && n >= a && n <= b ? n : null; };
-    const row = { ...(region !== undefined ? { region } : {}), age: nAge, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
+    const row = { ...(region !== undefined ? { region } : {}), age: nAge, receives: recv, travels: trav, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
       tarif_visible: tshow, tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
@@ -203,6 +205,9 @@ export default function MyProfile() {
             <div className="row2"><label className="f">Couleur des cheveux<select value={hair} onChange={(e) => setHair(e.target.value)}><option value="">Non précisé</option>{HAIRS.map((x) => <option key={x} value={x}>{x}</option>)}</select></label><label className="f">Couleur des yeux<select value={eyes} onChange={(e) => setEyes(e.target.value)}><option value="">Non précisé</option>{EYES.map((x) => <option key={x} value={x}>{x}</option>)}</select></label></div>
             <div className="row2"><label className="f">Taille de bonnet<select value={bra} onChange={(e) => setBra(e.target.value)}><option value="">Non précisé</option>{BRAS.map((x) => <option key={x} value={x}>{x}</option>)}</select></label>{kind === "createur" && <label className="f">Profil (obligatoire)<select value={f.genre} onChange={set("genre")} required><option value="" disabled>Choisir…</option><option value="fille">Fille</option><option value="homme">Homme</option><option value="trans">Trans</option></select></label>}</div>
             <div className="row2"><label className="f">Fumeuse / fumeur<select value={smoker} onChange={(e) => setSmoker(e.target.value)}>{HABIT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label><label className="f">Buveuse / buveur<select value={drinker} onChange={(e) => setDrinker(e.target.value)}>{HABIT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label></div>
+            <fieldset className="fs"><legend className="note">Rencontres</legend>
+              <label className="ck"><input type="checkbox" checked={recv} onChange={(e) => setRecv(e.target.checked)} /> Je reçois</label>
+              <label className="ck"><input type="checkbox" checked={trav} onChange={(e) => setTrav(e.target.checked)} /> Je me déplace</label></fieldset>
             <fieldset className="fs"><legend className="note">Langues parlées (8 maximum)</legend>
               <div className="tags">{LANGS.map((l) => <button type="button" key={l} className="chip" aria-pressed={langs.includes(l)} onClick={() => setLangs(langs.includes(l) ? langs.filter((x) => x !== l) : langs.length < 8 ? [...langs, l] : langs)}>{l}</button>)}</div></fieldset>
             <p className="note" style={{ margin: 0 }}>Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.</p>
