@@ -10,12 +10,19 @@ import Slider from "@/components/Slider";
 import OwnerBar from "@/components/OwnerBar";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
+import { GPATH, siteUrl, slug } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 const get = async (id: string) => { const { data } = await supabaseServer().from("profiles").select("*").eq("id", id).maybeSingle(); return data as Profile | null; };
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const p = await get(params.id);
-  return p ? { title: `${p.name} · ${p.city}`, description: p.bio.slice(0, 150) } : {};
+  if (!p) return {};
+  const desc = (p.bio ? p.bio.slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"} à ${p.city}. Portfolio, disponibilités et contact.`);
+  return {
+    title: `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`, description: desc, alternates: { canonical: `/profil/${p.id}` },
+    openGraph: { type: "profile", title: `${p.name} · ${p.city}`, description: desc, images: p.photos[0] ? [{ url: p.photos[0] }] : undefined },
+    twitter: { card: "summary_large_image", title: `${p.name} · ${p.city}`, description: desc, images: p.photos[0] ? [p.photos[0]] : undefined }
+  };
 }
 const SOC: Record<string, [string, string, (h: string) => string]> = {
   instagram: ["insta", "Instagram", (h) => "https://www.instagram.com/" + h],
@@ -36,6 +43,12 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   const live = p.genre === "livecam";
   return (
     <section id="pf" className="gut">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}/profil/${p.id}`, dateCreated: p.created_at,
+        mainEntity: { "@type": "Person", name: p.name, description: p.bio.slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
+          homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } }, knowsAbout: p.specialties,
+          sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
+      }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><strong className="pbn">{p.name}</strong>
         <div className="pcontact">
           {p.phone && <span className="pph"><Ic n="phone" s={18} /><span className="nb">{fmtPh(p.phone)}</span><CopyBtn text={p.phone} label="Copier" className="" /></span>}
@@ -51,8 +64,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             <Slider imgs={p.photos} vip={p.vip} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer">▶ Rejoindre le live</a></p>}
             <div className="panel pi">
-              <div className="top"><h2 className="pn">{p.name}</h2>
-                {p.genre && <span className="gchip">{CATS[p.genre]}</span>}
+              <div className="top"><h1 className="pn">{p.name}</h1>
+                {p.genre && <Link className="gchip" href={`/genre/${GPATH[p.genre]}`}>{CATS[p.genre]}</Link>}
                 {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> Nouveau</span>}
                 {live && <span className="liveb"><i />LIVE</span>}
                 {p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
@@ -66,13 +79,13 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           </div>
           <aside className="pside" aria-label="Villes, déplacements et disponibilités">
             <section className="bsec"><h3 className="ph"><Ic n="pin" s={18} />Villes</h3><div className="bub">
-              <Link className="bubble base" href={`/?ville=${encodeURIComponent(p.city)}`} title="Ville de base">{p.city} ★</Link>
-              {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/?ville=${encodeURIComponent(c)}`}>{c}</Link>)}</div></section>
+              <Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
+              {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>
             <section className="bsec"><h3 className="ph"><Ic n="tag" s={18} />Spécialités</h3><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></section>
             {trips.length > 0 && <div className="panel"><h3 className="ph"><Ic n="pin" s={18} />Prochains passages</h3>
               {trips.map((x, i) => { const now = x.from <= td; const [, m, d] = x.from.split("-");
                 return <div className="trip" key={i}><div className="tcal"><b>{MS[+m - 1]}</b><span>{+d}</span></div>
-                  <div className="tinf"><Link href={`/?ville=${encodeURIComponent(x.city)}`}>{x.city}</Link>{now && <span className="tnow">En ce moment</span>}
+                  <div className="tinf"><Link href={`/ville/${slug(x.city)}`}>{x.city}</Link>{now && <span className="tnow">En ce moment</span>}
                     <em>{x.to !== x.from ? `du ${dShort(x.from)} au ${dShort(x.to)}` : `le ${dShort(x.from)}`}</em></div></div>; })}</div>}
             <div className="panel"><h3 className="ph"><Ic n="clock" s={18} />Disponibilités</h3>
               {a ? (<>

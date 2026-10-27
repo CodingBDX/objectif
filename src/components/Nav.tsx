@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Ic from "./Ic";
 import { useFavs } from "@/lib/favs";
+import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; cities: string[] };
@@ -29,7 +30,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, cities }: P) {
           </Link>
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
           <div className="sp"><Ic n="pin" />
-            <select aria-label="Choisir une ville" value={sp.get("ville") || ""} onChange={(e) => r.push(e.target.value ? `/?ville=${encodeURIComponent(e.target.value)}` : "/")}>
+            <select aria-label="Choisir une ville" value={sp.get("ville") || ""} onChange={(e) => r.push(e.target.value ? `/ville/${slug(e.target.value)}` : "/")}>
               <option value="">Choisir une ville</option>{cities.map((c) => <option key={c}>{c}</option>)}
             </select></div>
           {loggedIn ? (<>

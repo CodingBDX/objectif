@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { GPATH, slug } from "@/lib/site";
 import Ic from "./Ic";
 import Heart from "./Heart";
 import { useFavs } from "@/lib/favs";
@@ -39,12 +41,12 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
   );
 }
 
-export default function Home({ profiles }: { profiles: Profile[] }) {
+export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "" }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
-  const [type, setType] = useState("tous"); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
+  const [type, setType] = useState(initialType); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false);
   const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
-  const city = sp.get("ville") || ""; const fav = !!sp.get("fav");
+  const city = initialCity || sp.get("ville") || ""; const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
   useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, city, fav]);
   const chView = (v: "cards" | "list") => { setView(v); try { localStorage.setItem("objectif_vue", v); } catch {} };
@@ -78,7 +80,7 @@ export default function Home({ profiles }: { profiles: Profile[] }) {
       <aside className="side" aria-label="Catégories">
         <div className="panel tip"><svg className="ic" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M12 3l7.500 2.800v5.700c0 4.500-3 8.200-7.500 9.500-4.500-1.300-7.500-5-7.500-9.500V5.800z" /><path d="M8.800 12.200l2.300 2.300 4.200-4.600" /></svg><span>Site fait par et pour les pros, <b>50 % reversés aux associations</b></span></div>
         <div className="panel">
-          <div>{ITEMS.map(([k, v, i]) => <button key={k} className={`si${type === k && !fav ? " on" : ""}`} onClick={() => { setType(k); if (fav) r.push("/"); }}><Ic n={i} />{v}<span className="n">{cnt(k)}</span></button>)}</div>
+          <div>{ITEMS.map(([k, v, i]) => <Link key={k} className={`si${type === k && !fav ? " on" : ""}`} href={k === "tous" ? (city ? `/ville/${slug(city)}` : "/") : city ? `/genre/${GPATH[k]}/${slug(city)}` : `/genre/${GPATH[k]}`}><Ic n={i} />{v}<span className="n">{cnt(k)}</span></Link>)}</div>
           <hr className="sep" />
           <h2><Ic n="tag" s={20} />Spécialités</h2>
           <div>{tags.map(([t, n]) => <button key={t} className={`si${tag === t ? " on" : ""}`} onClick={() => setTag(tag === t ? "" : t)}>{cap(t)}<span className="n">{n}</span></button>)}</div>
@@ -87,15 +89,16 @@ export default function Home({ profiles }: { profiles: Profile[] }) {
 
       <main style={{ minWidth: 0 }}>
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top 10 des villes</h2>
-          <ol>{top.map(([c, n], i) => <li key={c}><button className={city === c ? "on" : ""} onClick={() => setCity(city === c ? "" : c)}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></button></li>)}</ol></section>
+          <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? "/" : `/ville/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
         <div className="mchips">{ITEMS.map(([k, v]) => <button key={k} className="chip" aria-pressed={type === k} onClick={() => setType(k)}>{v}</button>)}</div>
-        <div className="sh"><h2><Ic n="star" s={22} />Tous les profils</h2><span className="cnt0" aria-live="polite">{list.length} profil{list.length > 1 ? "s" : ""}</span>
+        <div className="sh"><h1><Ic n="star" s={22} />{h1}</h1><span className="cnt0" aria-live="polite">{list.length} profil{list.length > 1 ? "s" : ""}</span>
           <div className="vsw" role="group" aria-label="Affichage">
             <button type="button" aria-pressed={view === "cards"} title="Affichage en cartes" aria-label="Cartes" onClick={() => chView("cards")}><Ic n="grid" /></button>
             <button type="button" aria-pressed={view === "list"} title="Affichage en liste" aria-label="Liste" onClick={() => chView("list")}>
               <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="18" height="6" rx="2" /></svg></button>
           </div>
         </div>
+        {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
         <div className={`grid${view === "list" ? " lst" : ""}`}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={i >= PAGE ? ((i - PAGE) % PAGE) * 45 : undefined} />)
             : <div className="empty">{fav ? "Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici." : profiles.length ? "Aucun profil ne correspond à votre recherche." : "Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil »."}</div>}

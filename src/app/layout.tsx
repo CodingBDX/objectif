@@ -3,8 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
+  openGraph: { siteName: "HeyPapi", locale: "fr_FR", type: "website" },
+  twitter: { card: "summary_large_image" },
   title: { default: "HeyPapi, annuaire des créateurs", template: "%s · HeyPapi" },
   description: "Annuaire de photographes, vidéastes, artistes et livecam. Site fait par et pour les pros, 50 % reversés aux associations."
 };
@@ -24,6 +28,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" />
       </head>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "HeyPapi", url: siteUrl(), inLanguage: "fr" }) }} />
         <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} cities={cities} />
         {me?.paused && (
           <div className="pbanner" role="status"><span>⏸ Ton annonce « {me.name} » est en pause{me.vip ? " (même en VIP)" : ""} : elle n’apparaît plus dans l’annuaire.</span>
