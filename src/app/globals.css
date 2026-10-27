@@ -620,3 +620,38 @@ body{overflow-x:clip}
 .bars .bcol:nth-child(30) .bar{animation-delay:725ms}
 .bars .bcol:nth-child(31) .bar{animation-delay:750ms}
 @media (prefers-reduced-motion:reduce){.bars .bar,.donut,.prog i,.dtiles .dt,.dgrid .dcard{animation:none}}
+
+/* Animations de la page d'accueil */
+@keyframes hfade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes hpop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes hslide{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.side>.panel,.side>section,.aside>.panel,.mhl{animation:hfade .55s cubic-bezier(.2,.8,.2,1) both}
+.side>.panel:nth-child(2){animation-delay:.08s}.side>.panel:nth-child(3){animation-delay:.16s}.side>.panel:nth-child(4){animation-delay:.24s}.side>.panel:nth-child(5){animation-delay:.32s}
+.panel.top li{animation:hslide .45s cubic-bezier(.2,.8,.2,1) both}
+.panel.top .rk{animation:hpop .5s cubic-bezier(.2,.8,.2,1) both}
+.nearb .nbub{animation:hpop .5s cubic-bezier(.2,.8,.2,1) both}
+.mhl .mslide{animation:hpop .55s cubic-bezier(.2,.8,.2,1) both}
+h1{animation:hfade .5s ease both}
+.panel.top li:nth-child(1){animation-delay:195ms}.panel.top li:nth-child(1) .rk{animation-delay:295ms}
+.panel.top li:nth-child(2){animation-delay:240ms}.panel.top li:nth-child(2) .rk{animation-delay:340ms}
+.panel.top li:nth-child(3){animation-delay:285ms}.panel.top li:nth-child(3) .rk{animation-delay:385ms}
+.panel.top li:nth-child(4){animation-delay:330ms}.panel.top li:nth-child(4) .rk{animation-delay:430ms}
+.panel.top li:nth-child(5){animation-delay:375ms}.panel.top li:nth-child(5) .rk{animation-delay:475ms}
+.panel.top li:nth-child(6){animation-delay:420ms}.panel.top li:nth-child(6) .rk{animation-delay:520ms}
+.panel.top li:nth-child(7){animation-delay:465ms}.panel.top li:nth-child(7) .rk{animation-delay:565ms}
+.panel.top li:nth-child(8){animation-delay:510ms}.panel.top li:nth-child(8) .rk{animation-delay:610ms}
+.panel.top li:nth-child(9){animation-delay:555ms}.panel.top li:nth-child(9) .rk{animation-delay:655ms}
+.panel.top li:nth-child(10){animation-delay:600ms}.panel.top li:nth-child(10) .rk{animation-delay:700ms}
+.panel.top li:nth-child(11){animation-delay:645ms}.panel.top li:nth-child(11) .rk{animation-delay:745ms}
+.nearb .nbub:nth-child(1){animation-delay:60ms}.mhl .mslide:nth-child(1){animation-delay:70ms}
+.nearb .nbub:nth-child(2){animation-delay:120ms}.mhl .mslide:nth-child(2){animation-delay:140ms}
+.nearb .nbub:nth-child(3){animation-delay:180ms}.mhl .mslide:nth-child(3){animation-delay:210ms}
+.nearb .nbub:nth-child(4){animation-delay:240ms}.mhl .mslide:nth-child(4){animation-delay:280ms}
+.nearb .nbub:nth-child(5){animation-delay:300ms}.mhl .mslide:nth-child(5){animation-delay:350ms}
+.nearb .nbub:nth-child(6){animation-delay:360ms}.mhl .mslide:nth-child(6){animation-delay:420ms}
+.nearb .nbub:nth-child(7){animation-delay:420ms}.mhl .mslide:nth-child(7){animation-delay:490ms}
+.nearb .nbub:nth-child(8){animation-delay:480ms}.mhl .mslide:nth-child(8){animation-delay:560ms}
+.nearb .nbub:nth-child(9){animation-delay:540ms}.mhl .mslide:nth-child(9){animation-delay:630ms}
+.nearb .nbub:nth-child(10){animation-delay:600ms}.mhl .mslide:nth-child(10){animation-delay:700ms}
+.nearb .nbub:nth-child(11){animation-delay:660ms}.mhl .mslide:nth-child(11){animation-delay:770ms}
+@media (prefers-reduced-motion:reduce){.side>.panel,.side>section,.aside>.panel,.mhl,.panel.top li,.panel.top .rk,.nearb .nbub,.mhl .mslide,h1{animation:none}}
