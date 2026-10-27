@@ -7,14 +7,16 @@ const anon = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.e
 
 export const publicProfiles = unstable_cache(async (): Promise<Profile[]> => {
   const sb = anon();
-  const [a, b] = await Promise.all([
+  const [a, b, c] = await Promise.all([
     sb.from("profiles").select("*").eq("paused", false).order("created_at", { ascending: false }).limit(1000),
-    sb.rpc("popular_views")
+    sb.rpc("popular_views"),
+    sb.rpc("popular_favs")
   ]);
   const ps = (a.data || []) as Profile[];
   const rows = (b.data || []) as { profile_id: string; views: number }[];
   const m = new Map<string, number>(rows.map((x) => [x.profile_id, Number(x.views)] as [string, number]));
-  ps.forEach((p) => { p.views = m.get(p.id) || 0; });
+  const f = new Map<string, number>(((c.data || []) as { profile_id: string; favs: number }[]).map((x) => [x.profile_id, Number(x.favs)] as [string, number]));
+  ps.forEach((p) => { p.views = m.get(p.id) || 0; p.favs = f.get(p.id) || 0; });
   return ps;
 }, ["public-profiles"], { revalidate: 30 });
 
