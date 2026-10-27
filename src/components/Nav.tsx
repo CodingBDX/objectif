@@ -39,7 +39,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>
             <button className="nl" onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}>👤 {name || "Moi"} · Quitter</button>
           </>) : (<>
-            <Link className="btn gold" href="/connexion">Se connecter</Link>
+            <Link className="btn login" href="/connexion">Se connecter</Link>
             <Link className="btn" href="/connexion?inscription=1">Créer mon profil</Link>
           </>)}
         </div>

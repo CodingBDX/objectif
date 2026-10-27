@@ -550,6 +550,6 @@ body{overflow-x:clip}
 @media (min-width:701px) and (max-width:1100px){.panel.top li:nth-child(n+7){display:none}.t10{display:none}.t6{display:inline}}
 .top h2 span{background:none!important;box-shadow:none!important}
 
-/* bouton « Se connecter » : même forme que « Créer mon profil », en doré */
-.btn.gold{background:linear-gradient(135deg,#ffe9a8,#f3c84b 55%,#e0a92a)!important;color:#5c3a00!important;border:0!important}
-.btn.gold:hover{filter:brightness(1.05)}
+/* bouton « Se connecter » : même forme que « Créer mon profil », en rose du site (contour) */
+.btn.login{background:var(--card)!important;color:var(--btn)!important;border:2px solid var(--pink)!important;box-shadow:var(--sh)}
+.btn.login:hover{background:var(--soft)!important}
