@@ -11,7 +11,7 @@ const JOURS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 const BAR = ["#ff9ac8", "#ffc27a", "#ffe08a", "#b5e3a8", "#a8d0f7", "#d9b8f5", "#ff7fb5"];
 const empty = (d: string): Row => ({ day: d, views: 0, calls: 0, copies: 0, socials: 0 });
 
-export default function StatsPanel({ onEdit }: { onEdit: () => void }) {
+export default function StatsPanel() {
   const sb = supabaseBrowser();
   const [rows, setRows] = useState<Row[]>([]); const [me, setMe] = useState<Me | null>(null); const [coms, setComs] = useState(0); const [uid, setUid] = useState("");
   const [range, setRange] = useState<7 | 30>(7); const [ready, setReady] = useState(false); const [noProfile, setNoProfile] = useState(false);
@@ -59,15 +59,9 @@ export default function StatsPanel({ onEdit }: { onEdit: () => void }) {
 
   return (
     <>
-        <div className="dtop"><h1>Tableau de bord</h1>
+        <div className="dtop" id="stats"><h2 className="dsub">📊 Mes statistiques</h2>
           <div className="drange" role="group" aria-label="Période"><button aria-pressed={range === 7} onClick={() => setRange(7)}>7 jours</button><button aria-pressed={range === 30} onClick={() => setRange(30)}>30 jours</button></div></div>
 
-        <section className="dhero">
-          <div><h2>{hello}, {first} ! ☀️</h2>
-            <p>{v ? <>Ton profil a été vu <b>{v} fois</b> sur les {range} derniers jours{trend !== null && <> ({trend >= 0 ? "+" : ""}{trend} %)</>}.</> : "Pas encore de visite sur cette période. Partage ton lien pour démarrer !"}</p>
-            <button type="button" className="dbtn" onClick={onEdit}>✏️ Améliorer mon profil</button></div>
-          <div className="dsun" aria-hidden="true">📈</div>
-        </section>
 
         <div className="dtiles">
           <div className="dt t1"><i>👁</i><span>Vues du profil</span><b>{v}</b><small className={trend !== null && trend < 0 ? "neg" : ""}>{trend === null ? "pas de comparaison" : `${trend >= 0 ? "+" : ""}${trend} % vs période préc.`}</small></div>
@@ -107,7 +101,6 @@ export default function StatsPanel({ onEdit }: { onEdit: () => void }) {
           </section>
         </div>
 
-        <section className="dcta"><div><b>Plus de visites ?</b><span>Un profil complet avec photos et vidéo est consulté bien plus souvent.</span></div><button type="button" className="dbtn" onClick={onEdit}>Compléter</button></section>
         <p className="note">Une visite par personne et par jour d’appareil. Tes propres visites ne sont pas comptées. Les favoris (cœurs) sont stockés sur l’appareil du visiteur et ne sont pas comptabilisés.</p>
     </>
   );
