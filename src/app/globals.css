@@ -538,3 +538,11 @@ body{overflow-x:clip}
 .leaflet-popup-content{font-family:var(--fb);color:var(--ink);margin:12px 14px}
 .mpop{list-style:none;margin:8px 0;padding:0;display:grid;gap:4px}.mpop small{color:var(--mut)}
 .mgo{font-weight:700;color:var(--btn)}
+
+/* profils sur la carte */
+.mprof a{display:grid;justify-items:center;gap:2px;text-decoration:none}
+.mprof i{position:relative;display:block;width:56px;height:56px;border-radius:50%;border:3px solid #fff;background:var(--soft);box-shadow:0 4px 12px rgba(92,26,67,.4)}
+.mprof i img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.mprof em{position:absolute;right:-6px;bottom:-4px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 14px/1 var(--fb);font-style:normal;border:2px solid #fff}
+.mprof b{max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#fff;color:var(--ink);border-radius:999px;padding:1px 9px;font:700 12px var(--fb);box-shadow:0 2px 6px rgba(92,26,67,.25)}
+.mprof a.more b{background:var(--btn);color:#fff}

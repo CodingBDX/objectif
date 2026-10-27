@@ -98,7 +98,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, city, fav, favs]);
 
-  const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string }[] }> = {}; list.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 6) c.p.push({ id: p.id, name: p.name, sub: lab(p) }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
+  const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
   const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
