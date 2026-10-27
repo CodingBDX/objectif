@@ -114,7 +114,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     const el = slides.current; if (!el || hl.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let stop = false; const halt = () => { stop = true; };
     el.addEventListener("touchstart", halt, { passive: true }); el.addEventListener("pointerdown", halt);
-    const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.82; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 4000);
+    const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.5; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 3500);
     return () => clearInterval(t);
   }, [hl]);
   const open = (id: string) => r.push(`/profil/${id}`);
@@ -137,8 +137,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {hl.length > 0 && <section className="mhl" aria-label="Mis en avant">
           <h2><Ic n="star" s={20} />Mis en avant</h2>
           <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={`Voir le profil de ${p.name}`}>
-            <i style={p.photos[0] ? { backgroundImage: `url('${thumbUrl(p.photos[0])}')` } : undefined} />
-            <span>{p.vip && <em><Ic n="crown" s={13} />VIP</em>}<b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div>
+            <i className={p.vip ? "vip" : ""} style={p.photos[0] ? { backgroundImage: `url('${thumbUrl(p.photos[0])}')` } : undefined}>{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
+            <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
