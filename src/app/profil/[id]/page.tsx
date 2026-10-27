@@ -37,6 +37,7 @@ const okHandle = (h: string) => /^[A-Za-z0-9._]{1,30}$/.test(h);
 const telHref = (s: string) => { const d = s.replace(/[^\d+]/g, ""); return /^0\d{9}$/.test(d) ? "+33" + d.slice(1) : d.replace(/^00/, "+"); };
 const fmtPh = (s: string) => { const d = s.replace(/\D/g, ""); return /^0\d{9}$/.test(d) ? d.replace(/(\d{2})(?=\d)/g, "$1 ") : s; };
 
+const HL: Record<string, string> = { non: "Non", parfois: "Parfois", oui: "Oui" };
 export default async function ProfilePage({ params }: { params: { id: string } }) {
   const sb = supabaseServer();
   const p = await get(params.id);
@@ -76,8 +77,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 {p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
                 {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}
                 <Heart id={p.id} /></div>
-              {(p.age || p.height_cm || p.weight_kg || p.ethnicity || (p.languages || []).length > 0) && <><h2 className="pres">Description</h2>
-                <ul className="dscr">{p.age ? <li><span>🎂 Âge</span><b>{p.age} ans</b></li> : null}{p.height_cm ? <li><span>📏 Taille</span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span>⚖️ Poids</span><b>{p.weight_kg} kg</b></li> : null}{p.ethnicity ? <li><span>🌍 Ethnie</span><b>{p.ethnicity}</b></li> : null}{(p.languages || []).length > 0 ? <li><span>🗣 Langues</span><b>{p.languages!.join(", ")}</b></li> : null}</ul></>}
+              {(p.genre || p.age || p.hair || p.eyes || p.bra || p.smoker || p.drinker || p.height_cm || p.weight_kg || p.ethnicity || (p.languages || []).length > 0) && <><h2 className="pres">Description</h2>
+                <ul className="dscr">{p.genre ? <li><span>👤 Genre</span><b>{CATS[p.genre]}</b></li> : null}{p.age ? <li><span>🎂 Âge</span><b>{p.age} ans</b></li> : null}{p.height_cm ? <li><span>📏 Taille</span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span>⚖️ Poids</span><b>{p.weight_kg} kg</b></li> : null}{p.hair ? <li><span>💇 Cheveux</span><b>{p.hair}</b></li> : null}{p.eyes ? <li><span>👁 Yeux</span><b>{p.eyes}</b></li> : null}{p.bra ? <li><span>👙 Bonnet</span><b>{p.bra}</b></li> : null}{p.smoker ? <li><span>🚬 Fume</span><b>{HL[p.smoker]}</b></li> : null}{p.drinker ? <li><span>🍷 Boit</span><b>{HL[p.drinker]}</b></li> : null}{p.ethnicity ? <li><span>🌍 Ethnie</span><b>{p.ethnicity}</b></li> : null}{(p.languages || []).length > 0 ? <li><span>🗣 Langues</span><b>{p.languages!.join(", ")}</b></li> : null}</ul></>}
               {p.specialties.length > 0 && <div className="mspec"><h2 className="pres">Spécialités</h2><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></div>}
               {p.bio && <h2 className="pres">Présentation</h2>}
               <div className="bio"><RichText text={p.bio} /></div>
