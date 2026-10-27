@@ -100,7 +100,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
-  const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.forEach((p) => cityList(p).forEach((c) => (cc[c] = (cc[c] || 0) + 1))); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 10); }, [profiles]);
+  const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.filter((p) => type === "tous" || p.genre === type).forEach((p) => cityList(p).forEach((c) => (cc[c] = (cc[c] || 0) + 1))); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 10); }, [profiles, type]);
   const hl = useMemo(() => profiles.filter((p) => (type === "tous" || p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 3), [profiles, type, tag, city]);
 
   const sentinel = useRef<HTMLDivElement>(null);
@@ -127,7 +127,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
 
       <main style={{ minWidth: 0 }}>
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
-          <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? "/" : `/ville/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
+          <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
         <div className="panel msearch"><h2><Ic n="search" s={20} />Rechercher</h2>
           <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} />
           <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
