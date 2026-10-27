@@ -12,5 +12,6 @@ export type Profile = {
 };
 export const lab = (p: Profile) => CATS[p.genre] || "";
 export const isNew = (p: Profile) => { const d = Date.now() - new Date(p.created_at).getTime(); return d >= 0 && d < 30 * 864e5; };
-export const cityList = (p: Profile) => [p.city, ...(p.more || []).filter((c) => c && c !== p.city)];
+/** Ville de base uniquement : les compteurs, filtres et pages ville ne comptent que les profils basés dans la ville. */
+export const cityList = (p: Profile) => [p.city];
 export const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
