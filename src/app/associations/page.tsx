@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { Asso } from "@/lib/public";
 import { assosForViewer } from "@/lib/assosServer";
-import AssoGate from "@/components/AssoGate";
+import { notFound } from "next/navigation";
 import { assoCities } from "@/lib/assos";
 import { slug } from "@/lib/site";
 import AssoShell from "@/components/AssoShell";
@@ -24,7 +24,7 @@ function AssoCard({ a }: { a: Asso }) {
 
 export default async function Page({ searchParams }: { searchParams: { ville?: string } }) {
   const { allowed, list: all } = await assosForViewer();
-  if (!allowed) return <AssoShell title="Associations et soutien" active="liste"><AssoGate /></AssoShell>;
+  if (!allowed) notFound();
   const counts = new Map<string, number>();
   all.filter((a) => !a.national).forEach((a) => assoCities(a).forEach((c) => counts.set(c, (counts.get(c) || 0) + 1)));
   const cities = [...counts.keys()].sort((x, y) => x.localeCompare(y, "fr"));

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { assosForViewer } from "@/lib/assosServer";
-import AssoGate from "@/components/AssoGate";
 import { assoCities } from "@/lib/assos";
 import AssoShell from "@/components/AssoShell";
 
@@ -13,7 +12,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 const web = (u: string | null) => (u && /^https?:\/\//i.test(u) ? u : null);
 export default async function Page({ params }: { params: { slug: string } }) {
   const { allowed, list } = await assosForViewer();
-  if (!allowed) return <AssoShell title="Association" active="liste"><AssoGate /></AssoShell>;
+  if (!allowed) notFound();
   const a = list.find((x) => x.slug === params.slug); if (!a) notFound();
   const site = web(a.site);
   return (

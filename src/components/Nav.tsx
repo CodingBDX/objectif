@@ -8,9 +8,9 @@ import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean };
+type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean; escort?: boolean };
 
-function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
+function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort }: P) {
     const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
@@ -28,7 +28,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
           <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />Annuaire</Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte"><Ic n="pin" />Carte</Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1"><Ic n="heart" />Favoris <span className="cn">{favs.length}</span></Link>
-          <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title="Associations et soutien par ville">🤝 <span className="nlt">Associations</span></Link>
+          {escort && <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title="Associations et soutien par ville">🤝 <span className="nlt">Associations</span></Link>}
           <Link className="nl" href="/contact" aria-label="Nous contacter" title="Nous contacter">
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">Contact</span>
           </Link>

@@ -46,13 +46,13 @@ export default function Page() {
 
   if (st === "load") return <section className="gut"><p className="note">Chargement…</p></section>;
   if (st === "out") return (
-    <AssoShell title="Espace association" active="fiche">
+    <AssoShell title="Espace association" active="fiche" list={false}>
       <section className="dcard"><p className="note" style={{ marginTop: 0 }}>Crée un compte (ou connecte-toi) avec l’e-mail de l’association pour publier ta fiche.</p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Link className="btn" href="/connexion?inscription=1&next=/mon-association">Créer un compte</Link><Link className="btn ghost" href="/connexion?next=/mon-association">Se connecter</Link></div></section>
     </AssoShell>);
 
   return (
-    <AssoShell title={row ? "Ma fiche association" : "Créer la fiche de mon association"} active="fiche" avatar={(f.name || "?").slice(0, 1).toUpperCase()} hi={f.name || "Nouvelle association"}
+    <AssoShell list={false} title={row ? "Ma fiche association" : "Créer la fiche de mon association"} active="fiche" avatar={(f.name || "?").slice(0, 1).toUpperCase()} hi={f.name || "Nouvelle association"}
       top={row?.status === "approved" ? <Link className="btn ghost" href={`/associations/${row.slug}`}>Voir la fiche publique</Link> : undefined}>
       {row && <section className="dcard"><b>{STATUT[row.status]}</b>
         {row.status === "rejected" && row.admin_note && <p className="note" style={{ color: "var(--btn)", fontWeight: 700, margin: "6px 0 0" }}>Motif : {row.admin_note}</p>}

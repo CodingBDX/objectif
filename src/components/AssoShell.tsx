@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 /** Structure « tableau de bord » (colonne latérale + zone principale) partagée par les pages associations. */
-export default function AssoShell({ title, active, cities, extra, children, avatar = "🤝", hi = "Associations", top }: {
-  title: string; active?: "liste" | "fiche"; cities?: { name: string; n: number; on?: boolean }[]; extra?: React.ReactNode; children: React.ReactNode; avatar?: string; hi?: string; top?: React.ReactNode;
+export default function AssoShell({ title, active, cities, extra, children, avatar = "🤝", hi = "Associations", top, list = true }: {
+  title: string; active?: "liste" | "fiche"; cities?: { name: string; n: number; on?: boolean }[]; extra?: React.ReactNode; children: React.ReactNode; avatar?: string; hi?: string; top?: React.ReactNode; list?: boolean;
 }) {
   return (
     <div className="dash gut">
@@ -10,7 +10,7 @@ export default function AssoShell({ title, active, cities, extra, children, avat
         <div className="dav">{avatar}</div>
         <div className="dhi">{hi}</div>
         <nav>
-          <Link className={active === "liste" ? "on" : ""} href="/associations">📋 Toutes les associations</Link>
+          {list && <Link className={active === "liste" ? "on" : ""} href="/associations">📋 Toutes les associations</Link>}
           <Link className={active === "fiche" ? "on" : ""} href="/mon-association">✏️ Ma fiche association</Link>
           <Link href="/">🏠 Annuaire</Link>
           <Link href="/contact">✉️ Contact</Link>
