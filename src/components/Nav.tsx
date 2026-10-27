@@ -3,14 +3,15 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Ic from "./Ic";
+import PauseBtn from "./PauseBtn";
 import GlobalSearch, { SIndex } from "./GlobalSearch";
 import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean; escort?: boolean };
+type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean; escort?: boolean; paused?: boolean };
 
-function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort }: P) {
+function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort, paused }: P) {
     const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
@@ -37,6 +38,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
           <GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} />
           {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
+            {hasProfile && <PauseBtn id={userId} paused={!!paused} />}
             {hasProfile && <Link className={`nl${path === "/verifier" ? " on" : ""}`} href="/verifier" title="Vérifier un client">🛡️ <span className="nlt">Vérifier un client</span></Link>}
             {hasProfile && <Link className={`nl own${path === "/mon-profil" ? " on" : ""}`} href="/mon-profil" title="Modifier mon profil">✏️ <span className="nlt">Modifier mon profil</span></Link>}
             {hasProfile && <Link className="nl own" href="/mon-profil#stats" title="Mes statistiques">📊 <span className="nlt">Mes statistiques</span></Link>}
