@@ -5,7 +5,7 @@ import CountUp from "@/components/CountUp";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS } from "@/lib/types";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "clients" | "journal";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "clients" | "assos" | "journal";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -18,10 +18,10 @@ export default function Admin() {
   const [state, setState] = useState<"load" | "no" | "ok">("load");
   const [tab, setTab] = useState<Tab>("dash");
   const [reports, setReports] = useState<any[]>([]); const [profiles, setProfiles] = useState<any[]>([]); const [messages, setMessages] = useState<any[]>([]);
-  const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
+  const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
   const [cnt, setCnt] = useState<{ total: number; vip: number; paused: number; month: number; g: Record<string, number> }>({ total: 0, vip: 0, paused: 0, month: 0, g: {} });
-  const [q, setQ] = useState(""); const [onlyNew, setOnlyNew] = useState(true); const [sure, setSure] = useState(""); const [err, setErr] = useState("");
+  const [rej, setRej] = useState<Record<string, string>>({}); const [q, setQ] = useState(""); const [onlyNew, setOnlyNew] = useState(true); const [sure, setSure] = useState(""); const [err, setErr] = useState("");
 
   const loadReports = useCallback(async () => {
     const { data } = await sb.from("reports").select("*, profiles(id,name,city,paused,vip,verified)").order("created_at", { ascending: false }).limit(300); setReports(data || []);
@@ -69,6 +69,12 @@ export default function Admin() {
     if (error) setErr(error.message); else { loadProfiles(); loadReports(); loadCounts(); loadExtra(); }
   }
   async function mark(table: "reports" | "messages", id: number, v: any) { await sb.from(table).update(v).eq("id", id); table === "reports" ? loadReports() : loadMessages(); }
+  async function loadAssos() { const { data } = await sb.from("associations").select("*").order("created_at", { ascending: false }).limit(300); setAssos(data || []); }
+  useEffect(() => { if (state === "ok") loadAssos(); }, [state]);
+  async function setAsso(a: any, status: "approved" | "rejected" | "pending") {
+    const { error } = await sb.from("associations").update({ status, admin_note: status === "rejected" ? (rej[a.id] || null) : null }).eq("id", a.id);
+    if (error) setErr(error.message); else loadAssos();
+  }
   async function delClient(id: number) { await sb.from("client_reports").delete().eq("id", id); loadExtra(); }
 
   if (state === "load") return <section className="gut"><p className="note">Chargement…</p></section>;
@@ -94,7 +100,7 @@ export default function Admin() {
     ...profiles.slice(0, 8).map((p) => ({ t: p.created_at, i: "👤", title: "Nouveau profil", sub: `${p.name} · ${p.city}` })),
   ].sort((a, b) => +new Date(b.t) - +new Date(a.t)).slice(0, 8);
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", clients: "Clients signalés", journal: "Journal des actions" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions" };
 
   return (
     <div className="dash gut">
@@ -103,7 +109,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}
-          {nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}
           <Link href="/">🏠 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -200,6 +206,23 @@ export default function Admin() {
               <div>{m.name} · <a href={`mailto:${m.contact}`}>{m.contact}</a></div>
               <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{m.body}</p>
               <div className="acts"><button className="btn ghost" onClick={() => mark("messages", m.id, { done: !m.done })}>{m.done ? "Rouvrir" : "✓ Marquer traité"}</button></div>
+            </div>))}
+        </div>)}
+
+        {tab === "assos" && (<div style={{ display: "grid", gap: 10 }}>
+          <p className="note" style={{ margin: 0 }}>Avant de valider : appelle ou écris à l’association pour vérifier qu’elle existe vraiment. Une modification par l’association la remet en attente.</p>
+          {assos.length === 0 && <p className="note">Aucune fiche (ou <code>migration-associations.sql</code> pas encore lancé).</p>}
+          {assos.map((a) => (
+            <div className="dcard" key={a.id} style={{ display: "grid", gap: 6 }}>
+              <div><b>{a.name}</b> · {a.city} · <span className="note">{fmt(a.created_at)} · {a.status === "pending" ? "⏳ en attente" : a.status === "approved" ? "✅ publiée" : "❌ refusée"}</span></div>
+              <div className="note">{[a.phone, a.email, a.site, a.address].filter(Boolean).join(" · ") || "Aucun contact"}</div>
+              {a.description && <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{a.description}</p>}
+              <input placeholder="Motif du refus (visible par l’association)" maxLength={300} value={rej[a.id] || ""} onChange={(e) => setRej({ ...rej, [a.id]: e.target.value })} />
+              <div className="acts">
+                {a.status !== "approved" && <button className="btn" onClick={() => setAsso(a, "approved")}>✓ Valider</button>}
+                {a.status !== "rejected" && <button className="btn ghost" onClick={() => setAsso(a, "rejected")}>✕ Refuser</button>}
+                <Link className="btn ghost" href={`/associations/${a.slug}`}>Voir</Link>
+              </div>
             </div>))}
         </div>)}
 

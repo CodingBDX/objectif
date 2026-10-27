@@ -5,18 +5,19 @@ import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 function Form() {
-  const [signup, setSignup] = useState(!!useSearchParams().get("inscription"));
+  const sp = useSearchParams(); const [signup, setSignup] = useState(!!sp.get("inscription"));
+  const nx = sp.get("next") === "/mon-association" ? "/mon-association" : "/mon-profil";
   const [adult, setAdult] = useState(false); const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
   async function go(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null);
     const sb = supabaseBrowser();
     if (signup) {
-      const { error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}/mon-profil`, data: { adult_confirmed_at: new Date().toISOString() } } });
+      const { error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}${nx}`, data: { adult_confirmed_at: new Date().toISOString() } } });
       setMsg(error ? { t: error.message } : { t: "Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi.", ok: true });
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw });
-      if (error) setMsg({ t: "E-mail ou mot de passe incorrect." }); else location.href = "/mon-profil";
+      if (error) setMsg({ t: "E-mail ou mot de passe incorrect." }); else location.href = nx;
     }
     setBusy(false);
   }

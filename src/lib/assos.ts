@@ -1,0 +1,2 @@
+export const ASSO_SERVICES = ["Écoute et accompagnement", "Accompagnement juridique", "Accompagnement social", "Santé et dépistage", "Matériel de prévention", "Hébergement d’urgence", "Aide aux démarches administratives", "Soutien psychologique", "Permanence téléphonique", "Maraudes et rencontres", "Aide aux victimes de violences", "Formation et reconversion"];
+export const assoCities = (a: { city: string; more: string[] }) => [a.city, ...(a.more || [])].filter(Boolean);

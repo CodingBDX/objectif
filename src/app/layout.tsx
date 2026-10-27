@@ -46,7 +46,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
             <Link href="/mon-profil?reactiver=1">▶ Réactiver mon annonce</Link></div>
         )}
         {children}
-        <footer className="gut" id="foot">Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos.<br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · <Link href="/contact">Contact</Link></footer>
+        <footer className="gut" id="foot">Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos.<br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · <Link href="/associations">Associations</Link> · <Link href="/contact">Contact</Link></footer>
       </body>
     </html>
   );

@@ -24,3 +24,10 @@ export const publicCities = unstable_cache(async (): Promise<string[]> => {
   const { data } = await anon().from("profiles").select("city").eq("paused", false);
   return Array.from(new Set((data || []).map((c: { city: string }) => c.city).filter(Boolean))).sort((x, y) => x.localeCompare(y, "fr"));
 }, ["public-cities"], { revalidate: 30 });
+
+export type Asso = { id: string; slug: string; name: string; city: string; more: string[]; region: string | null; description: string; services: string[]; phone: string | null; email: string | null; site: string | null; address: string | null; hours: string | null; created_at: string };
+export const ASSO_COLS = "id,slug,name,city,more,region,description,services,phone,email,site,address,hours,created_at";
+export const publicAssos = unstable_cache(async (): Promise<Asso[]> => {
+  const { data } = await anon().from("associations").select(ASSO_COLS).eq("status", "approved").order("name").limit(1000);
+  return (data || []) as Asso[];
+}, ["public-assos"], { revalidate: 60 });

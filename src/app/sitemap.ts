@@ -7,12 +7,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
   const { data } = await sb.from("profiles").select("id,city,more,genre,created_at").eq("paused", false).limit(5000);
+  const { data: ad } = await sb.from("associations").select("slug").eq("status", "approved").limit(2000);
   const ps = (data || []) as { id: string; city: string; more: string[]; genre: string; created_at: string }[];
   const cities = new Set<string>(); const gc = new Set<string>();
   ps.forEach((p) => [p.city, ...(p.more || [])].filter(Boolean).forEach((c) => { cities.add(slug(c)); gc.add(`${GPATH[p.genre]}/${slug(c)}`); }));
   const now = new Date();
   return [
     { url: base, lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: `${base}/associations`, changeFrequency: "weekly", priority: 0.5 },
+    ...((ad || []) as { slug: string }[]).map((a) => ({ url: `${base}/associations/${a.slug}`, changeFrequency: "monthly" as const, priority: 0.4 })),
     { url: `${base}/contact`, changeFrequency: "yearly", priority: 0.3 },
     ...["mentions-legales", "cgu", "confidentialite"].map((x) => ({ url: `${base}/${x}`, changeFrequency: "yearly" as const, priority: 0.2 })),
     ...Object.values(GPATH).map((g) => ({ url: `${base}/genre/${g}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.8 })),
