@@ -562,3 +562,12 @@ body{overflow-x:clip}
 .card.isvip:not(.live):not(.off) .ln h3,.card.isvip:not(.live):not(.off) .avl.on{color:#a3175f}
 .card.isvip:not(.live):not(.off) .meta svg{color:var(--pink)}
 .card.isvip:not(.live):not(.off):hover{box-shadow:0 12px 32px rgba(238,79,151,.5)}
+
+/* zone d'envoi des photos */
+.dz{position:relative;display:grid;gap:6px;justify-items:center;text-align:center;padding:22px 16px;border:2px dashed var(--pink);border-radius:22px;background:var(--bg1);color:var(--ink);cursor:pointer;transition:background .15s}
+.dz:hover,.dz.drag{background:var(--soft)}
+.dz input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.dz input:disabled{cursor:progress}
+.dz b{font:700 17px var(--fd);color:var(--btn)}.dz span{font-size:14px;color:var(--mut);font-weight:600;max-width:46ch}
+.dzp{display:block;width:100%;max-width:320px;height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.dzp u{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--btn));transition:width .25s}

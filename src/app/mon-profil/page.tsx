@@ -16,7 +16,7 @@ export default function MyProfile() {
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
-  const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
+  const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
@@ -43,11 +43,19 @@ export default function MyProfile() {
     const r = await fetch("/api/upload", { method: "POST", body: fd }); const j = await r.json();
     if (!r.ok) throw new Error(j.error); return j.url as string;
   }
-  async function addPhotos(files: FileList | null) {
-    if (!files || !files.length) return; setBusy(true); setMsg(null); setPMsg({ t: "⏳ Envoi des photos en cours…", ok: true });
-    try { const next = [...photos]; let n = 0; for (const file of Array.from(files)) { if (next.length >= maxP) break; next.push(await up(file)); n++; setPhotos([...next]); }
-      setPMsg({ t: n ? `✔ ${n} photo${n > 1 ? "s ajoutée" + "s" : " ajoutée"}.` : `Tu as déjà ${maxP} photos : supprime-en une pour en ajouter.`, ok: !!n }); }
-    catch (e: any) { setPMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
+  async function addPhotos(files: FileList | File[] | null) {
+    const all = files ? Array.from(files).filter((f) => f.type.startsWith("image/")) : []; if (!all.length) { if (files && (files as any).length) setPMsg({ t: "Choisis des images (JPG, PNG, WebP, HEIC…)." }); return; }
+    const room = maxP - photos.length; if (room <= 0) { setPMsg({ t: `Tu as déjà ${maxP} photos : supprime-en une pour en ajouter.` }); return; }
+    const list = all.slice(0, room); setBusy(true); setMsg(null); setProg(0);
+    const next = [...photos]; let ok = 0, ko = 0;
+    for (let i = 0; i < list.length; i++) {
+      setPMsg({ t: `⏳ Envoi de la photo ${i + 1} sur ${list.length}…`, ok: true }); setProg(i / list.length);
+      try { next.push(await up(list[i])); ok++; setPhotos([...next]); } catch { ko++; }
+    }
+    setProg(1); setTimeout(() => setProg(-1), 700);
+    const skipped = all.length - list.length;
+    setPMsg({ t: `${ok ? `✔ ${ok} photo${ok > 1 ? "s ajoutées" : " ajoutée"}.` : "Aucune photo n’a pu être envoyée."}${ko ? ` ${ko} en échec (trop lourde ou format non pris en charge).` : ""}${skipped > 0 ? ` ${skipped} ignorée${skipped > 1 ? "s" : ""} : maximum ${maxP} photos.` : ""}`, ok: ok > 0 && !ko });
+    setBusy(false);
   }
   async function addVideo(file?: File) {
     if (!file) return;
@@ -156,8 +164,12 @@ export default function MyProfile() {
                   <span className="mv">{i > 0 ? <button type="button" aria-label="Déplacer vers la gauche" onClick={() => move(i, -1)}>◀</button> : <i />}{i < photos.length - 1 ? <button type="button" aria-label="Déplacer vers la droite" onClick={() => move(i, 1)}>▶</button> : <i />}</span>
                 </div>))}</div>
             </div>
-            <div className="panel igp"><b>📸 Photos Instagram</b><p className="note" style={{ margin: "4px 0 8px" }}>Instagram ne permet pas d’importer automatiquement tes photos. Enregistre-les d’abord sur ton téléphone ou ton ordinateur, puis choisis-les ici.</p></div>
-            {photos.length < maxP && <label className="f"><span>Ajouter des photos (minimum 3, maximum {maxP}{vip ? "" : ", 20 en VIP"} · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
+            {photos.length < maxP && <label className={`dz${drag ? " drag" : ""}`} onDragOver={(e) => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)} onDrop={(e) => { e.preventDefault(); setDrag(false); if (!busy) addPhotos(e.dataTransfer.files); }}>
+              <input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} />
+              <b>📷 {busy ? "Envoi en cours…" : "Choisir des photos"}</b>
+              <span>Sélectionne <u>plusieurs photos d’un coup</u> dans ta galerie{"\u00A0"}— ou glisse-les ici sur ordinateur. Minimum 3, maximum {maxP}{vip ? "" : " (20 en VIP)"}. Le filigrane est ajouté automatiquement.</span>
+              {prog >= 0 && <i className="dzp"><u style={{ width: Math.round(prog * 100) + "%" }} /></i>}
+            </label>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
 </section><section className="dcard"><h3>Vidéo</h3>{kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
