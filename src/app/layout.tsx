@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
-import PauseBtn from "@/components/PauseBtn";
+import PauseBanner from "@/components/PauseBanner";
 import AgeGate from "@/components/AgeGate";
 import Splash from "@/components/Splash";
 import NavProgress from "@/components/NavProgress";
@@ -43,10 +43,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         <Splash /><NavProgress />
         <AgeGate />
         <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} index={index} isAdmin={isAdmin} escort={escort} paused={!!me?.paused} />
-        {me?.paused && (
-          <div className="pbanner" role="status"><span>⏸ Ton annonce « {me.name} » est en pause{me.vip ? " (même en VIP)" : ""} : elle n’apparaît plus dans l’annuaire.</span>
-            {me.vip ? <PauseBtn id={user!.id} paused className="" full /> : <Link href="/mon-profil?reactiver=1">▶ Réactiver mon annonce</Link>}</div>
-        )}
+        {me && <PauseBanner id={user!.id} name={me.name} vip={me.vip} paused={me.paused} />}
         {children}
         <footer className="gut" id="foot">Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos.<br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · {escort && <><Link href="/associations">Associations</Link> · </>}<Link href="/contact">Contact</Link></footer>
       </body>

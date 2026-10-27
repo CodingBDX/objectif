@@ -7,6 +7,7 @@ import { SPECIALTIES, Trip } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
 import CityInput from "@/components/CityInput";
 import RichEditor from "@/components/RichEditor";
+import { refreshListings } from "@/app/actions";
 
 type Hours = Record<string, [string, string] | null>;
 const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
@@ -36,7 +37,7 @@ export default function MyProfile() {
       setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
       setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
-      if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); }
+      if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); window.dispatchEvent(new CustomEvent("hp-pause", { detail: false })); await refreshListings(); }
     }
     setLoaded(true);
   })(); }, []);
@@ -116,6 +117,7 @@ export default function MyProfile() {
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
       tarif_visible: tshow, tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
+    if (!error) await refreshListings();
     setBusy(false);
     if (error) setMsg({ t: error.message }); else { location.href = `/profil/${uid}`; }
   }
@@ -149,7 +151,7 @@ export default function MyProfile() {
         {!isNewP && <h2 className="dsub" id="profil">✏️ Modifier mon profil</h2>}
         <div className="dform0">
           {!isNewP && <div className="acts dacts">
-            <button type="button" className="btn ghost" onClick={async () => { await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
+            <button type="button" className="btn ghost" onClick={async () => { window.dispatchEvent(new CustomEvent("hp-pause", { detail: !paused })); await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); await refreshListings(); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
             <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link></div>}
           {isNewP && (<>
             <p className="note">Choisis le type de profil qui te correspond.</p>
