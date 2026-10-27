@@ -3,7 +3,7 @@ import { km } from "./geo";
 
 type Com = { nom: string; population?: number; centre?: { coordinates: [number, number] } };
 const GEO = "https://geo.api.gouv.fr";
-const get = async (u: string) => { try { const r = await fetch(u, { next: { revalidate: 86400 } }); return r.ok ? await r.json() : null; } catch { return null; } };
+const get = async (u: string) => { try { const r = await fetch(u, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(2500) }); return r.ok ? await r.json() : null; } catch { return null; } };
 
 /** Les 3 communes les plus proches (même département, ≥ 2 000 habitants), avec ou sans profil. API officielle, mise en cache 24 h. */
 export async function nearbyCommunes(city: string, n = 3): Promise<string[]> {
@@ -31,12 +31,14 @@ export async function cityIntro(city: string, profiles: Profile[]): Promise<stri
     + (specs.length ? ` Spécialités les plus présentes : ${list(specs)}.` : "") + (near.length ? ` Villes proches : ${list(near)}.` : "");
 }
 
-/** Région de chaque ville (API officielle geo.api.gouv.fr, mise en cache 7 jours). */
-export async function regionMap(cities: string[]): Promise<Record<string, string>> {
+/** Région de chaque ville : lue d'abord dans les profils (colonne `region`, instantané). L'API officielle (cache 7 jours, 1,2 s max) ne sert que pour les villes sans région enregistrée. */
+export async function regionMap(profiles: Profile[]): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
-  await Promise.all(Array.from(new Set(cities)).map(async (c) => {
+  profiles.forEach((p) => { if (p.region) out[p.city] = p.region; });
+  const missing = Array.from(new Set(profiles.map((p) => p.city))).filter((c) => !out[c]).slice(0, 40);
+  await Promise.all(missing.map(async (c) => {
     try {
-      const r = await fetch(`${GEO}/communes?nom=${encodeURIComponent(c)}&fields=nom,region&boost=population&limit=1`, { next: { revalidate: 604800 } });
+      const r = await fetch(`${GEO}/communes?nom=${encodeURIComponent(c)}&fields=nom,region&boost=population&limit=1`, { next: { revalidate: 604800 }, signal: AbortSignal.timeout(1200) });
       if (!r.ok) return; const j = (await r.json()) as { region?: { nom: string } }[];
       if (j?.[0]?.region?.nom) out[c] = j[0].region.nom;
     } catch {}

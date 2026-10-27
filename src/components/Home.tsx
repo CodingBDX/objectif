@@ -55,7 +55,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
   );
 }
 
-export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {} }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string; region?: string; regions?: Record<string, string> }) {
+export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {} }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: React.ReactNode; region?: string; regions?: Record<string, string> }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
@@ -187,7 +187,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {canNear && near && <div className="panel" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "0 0 12px", padding: "10px 16px" }}>
           <span>📍 Profils près de toi : <b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>Voir tous les profils</button></div>}
         {city && <NearbyCities profiles={profiles} city={city} type={type} />}
-        {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
+        {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p> : null) : intro}
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">Aucun profil à afficher sur la carte.</div>)}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} trip={visit && city ? visitOf(p, city, visit) : undefined} />)

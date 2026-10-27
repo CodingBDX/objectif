@@ -5,7 +5,7 @@ export const SPECIALTIES = ["Portrait","Mode","Mariage","Studio","Lifestyle","Bo
 export type Trip = { city: string; from: string; to: string };
 export type Hours = Record<string, [string, string] | null>;
 export type Profile = {
-  id: string; name: string; genre: Genre; city: string; more: string[]; specialties: string[]; bio: string;
+  id: string; name: string; genre: Genre; city: string; more: string[]; specialties: string[]; region?: string | null; bio: string;
   phone: string | null; instagram: string | null; snapchat: string | null; tiktok: string | null; site: string | null;
   h24: boolean; hours: Hours; trips: Trip[];
   photos: string[]; video: string | null; vlink: string | null; vip: boolean; verified: boolean; paused: boolean; created_at: string; views?: number; favs?: number; tarif?: number | null; tarif_visible?: boolean; tarif_30?: number | null; tarif_60?: number | null;
