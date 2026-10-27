@@ -8,6 +8,7 @@ import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
 import Slider from "@/components/Slider";
 import OwnerBar from "@/components/OwnerBar";
+import VideoBox from "@/components/VideoBox";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
@@ -19,7 +20,7 @@ const get = async (id: string) => { const { data } = await supabaseServer().from
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const p = await get(params.id);
   if (!p) return {};
-  const desc = (p.bio ? p.bio.slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"} à ${p.city}. Portfolio, disponibilités et contact.`);
+  const desc = (p.bio ? p.bio.slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"} à ${p.city}. Photos, disponibilités et contact.`);
   return {
     title: `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`, description: desc, alternates: { canonical: `/profil/${p.id}` },
     openGraph: { type: "profile", title: `${p.name} · ${p.city}`, description: desc, images: p.photos[0] ? [{ url: p.photos[0] }] : undefined },
@@ -63,8 +64,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="pgrid">
           <div className="pmain">
             {mine && <OwnerBar id={p.id} paused={p.paused} vip={p.vip} />}
-            {p.video && <div className="video"><video controls playsInline src={p.video} /></div>}
-            <h2 className="sec">Portfolio</h2>
+            {p.video && <VideoBox src={p.video} />}
             <Slider imgs={p.photos} vip={p.vip} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer">▶ Rejoindre le live</a></p>}
             <div className="panel pi">
