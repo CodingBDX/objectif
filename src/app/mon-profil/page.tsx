@@ -16,7 +16,7 @@ export default function MyProfile() {
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
-  const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
+  const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
@@ -30,7 +30,7 @@ export default function MyProfile() {
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
-      setBio(data.bio); setMore([...(data.more || []), "", "", ""].slice(0, 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
+      setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
       setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); }
@@ -45,8 +45,8 @@ export default function MyProfile() {
   }
   async function addPhotos(files: FileList | null) {
     if (!files || !files.length) return; setBusy(true); setMsg(null); setPMsg({ t: "⏳ Envoi des photos en cours…", ok: true });
-    try { const next = [...photos]; let n = 0; for (const file of Array.from(files)) { if (next.length >= 6) break; next.push(await up(file)); n++; setPhotos([...next]); }
-      setPMsg({ t: n ? `✔ ${n} photo${n > 1 ? "s ajoutée" + "s" : " ajoutée"}.` : "Tu as déjà 6 photos : supprime-en une pour en ajouter.", ok: !!n }); }
+    try { const next = [...photos]; let n = 0; for (const file of Array.from(files)) { if (next.length >= maxP) break; next.push(await up(file)); n++; setPhotos([...next]); }
+      setPMsg({ t: n ? `✔ ${n} photo${n > 1 ? "s ajoutée" + "s" : " ajoutée"}.` : `Tu as déjà ${maxP} photos : supprime-en une pour en ajouter.`, ok: !!n }); }
     catch (e: any) { setPMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }
   async function addVideo(file?: File) {
@@ -56,6 +56,7 @@ export default function MyProfile() {
     setBusy(true); setMsg(null); setVMsg({ t: "⏳ Envoi de la vidéo en cours…", ok: true });
     try { setVideo(await up(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }
+  const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3;
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
 
   async function save(e: React.FormEvent) {
@@ -128,8 +129,8 @@ export default function MyProfile() {
               <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < 6 ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
 </section><section className="dcard"><h3>Où te trouver ?</h3><div className="f"><span style={L}>Ville (tape les premières lettres)</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label="Ville" placeholder="Ex. Lyon" /></div>
-            <div className="f"><span style={L}>Villes supplémentaires (jusqu’à 3, optionnel)</span>
-              <div className="row3">{more.map((m, i) => <CityInput key={i} value={m} placeholder={`Ville ${i + 2}`} label={`Ville supplémentaire ${i + 1}`} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} />)}</div></div>
+            <div className="f"><span style={L}>{`Villes supplémentaires (jusqu’à ${maxM}, optionnel)`}{!vip && " · 6 en VIP"}</span>
+              <div className="row3">{more.slice(0, maxM).map((m, i) => <CityInput key={i} value={m} placeholder={`Ville ${i + 2}`} label={`Ville supplémentaire ${i + 1}`} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} />)}</div></div>
             <div className="f"><span style={L}>Prochains déplacements (calendrier, optionnel)</span>
               {trips.map((t, i) => <div className="trow" key={i}>
                 <CityInput placeholder="Ville visitée" value={t.city} onChange={(v) => setTrip(i, "city", v)} label={`Ville du déplacement ${i + 1}`} />
@@ -147,7 +148,7 @@ export default function MyProfile() {
             <p className="note">Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.</p>
 
 </section><section className="dcard"><h3>Mes photos</h3><div>
-              <p className="note" style={{ margin: "0 0 6px" }}><b>Mes photos ({photos.length}/6)</b> · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}> Il en faut au moins 3.</span>}</p>
+              <p className="note" style={{ margin: "0 0 6px" }}><b>Mes photos ({photos.length}/{maxP})</b> · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}> Il en faut au moins 3.</span>}</p>
               <div className="edph">{photos.map((src, i) => (
                 <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} alt={`Photo ${i + 1}`} />
                   {i === 0 && <span className="fst">En avant</span>}
@@ -156,7 +157,7 @@ export default function MyProfile() {
                 </div>))}</div>
             </div>
             <div className="panel igp"><b>📸 Photos Instagram</b><p className="note" style={{ margin: "4px 0 8px" }}>Instagram ne permet pas d’importer automatiquement tes photos. Enregistre-les d’abord sur ton téléphone ou ton ordinateur, puis choisis-les ici.</p></div>
-            {photos.length < 6 && <label className="f"><span>Ajouter des photos (minimum 3, maximum 6 · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
+            {photos.length < maxP && <label className="f"><span>Ajouter des photos (minimum 3, maximum {maxP}{vip ? "" : ", 20 en VIP"} · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
 </section><section className="dcard"><h3>Vidéo</h3>{kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
