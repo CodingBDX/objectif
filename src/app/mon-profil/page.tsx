@@ -83,6 +83,7 @@ export default function MyProfile() {
     if (!genre) { setMsg({ t: "Choisis ton profil (obligatoire)." }); return; }
     if (kind === "livecam" && !/^https?:\/\//.test(vlink)) { setMsg({ t: "Indique le lien de ton live (https://…)." }); return; }
     if (photos.length < 3) { setMsg({ t: "Ajoute au moins 3 photos." }); return; }
+    if (!h24 && !Object.values(hours).some((h) => h && h[0] && h[1])) { setMsg({ t: "Indique tes disponibilités (obligatoire) : coche « 24h/24, 7j/7 » ou au moins un jour avec ses horaires." }); document.getElementById("dispo")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     setBusy(true);
     let region: string | null | undefined;
     try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
@@ -200,7 +201,7 @@ export default function MyProfile() {
             </label>}
             {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
 
-</section><section className="dcard"><h3>Disponibilités</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (optionnel)</strong>
+</section><section className="dcard"><h3 id="dispo">Disponibilités</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (obligatoire)</strong>
               <p className="note">Coche les jours où tu es joignable. Ton profil affichera « Dispo » pendant ces heures et sera grisé en dehors.</p>
               <label className="h24"><input type="checkbox" checked={h24} onChange={(e) => setH24(e.target.checked)} /> <b>Disponible 24h/24, 7j/7</b></label>
               {DAYL.map((d, i) => { const h = hours[String(i)];
