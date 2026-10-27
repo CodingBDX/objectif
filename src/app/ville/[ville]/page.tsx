@@ -11,10 +11,10 @@ import { regionMap } from "@/lib/cityinfo";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { ville: string } }): Promise<Metadata> {
   const city = cityBySlug(await allProfiles(), params.ville); if (!city) return {};
-  return { title: `Créateurs à ${city}`, description: `Photographes, vidéastes, artistes et livecam à ${city} : portfolios, disponibilités et agenda des passages.`, alternates: { canonical: `/ville/${params.ville}` } };
+  return { title: `Escortes à ${city}`, description: `Photographes, vidéastes, artistes et livecam à ${city} : portfolios, disponibilités et agenda des passages.`, alternates: { canonical: `/ville/${params.ville}` } };
 }
 export default async function Page({ params }: { params: { ville: string } }) {
   const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville); if (!city) notFound();
   const regions = await regionMap(profiles);
-  return <Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Créateurs à ${city}`} intro={<><Suspense fallback={null}><CityAssos city={city} /></Suspense><Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>Chargement des infos de la ville…</p>}><CityIntro city={city} profiles={profiles} /></Suspense></>} /></Suspense>;
+  return <Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Escortes à ${city}`} intro={<><Suspense fallback={null}><CityAssos city={city} /></Suspense><Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>Chargement des infos de la ville…</p>}><CityIntro city={city} profiles={profiles} /></Suspense></>} /></Suspense>;
 }
