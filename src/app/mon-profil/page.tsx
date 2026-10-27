@@ -81,12 +81,22 @@ export default function MyProfile() {
   if (!loaded) return <section className="gut"><p className="note">Chargement…</p></section>;
 
   return (
-    <section id="reg" className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/">← Retour à l’annuaire</Link></div>
-      <div className="pfc" style={{ maxWidth: 760 }}>
-        <div className="panel regp">
-          <h1 className="regh">{isNewP ? "Créer mon profil" : "Modifier mon profil"}</h1>
-          {!isNewP && <div className="acts" style={{ marginBottom: 12 }}>
+    <div id="reg" className="dash gut">
+      <aside className="dside">
+        <div className="dav">{(f.name || pseudo || "?").slice(0, 1).toUpperCase()}</div>
+        <div className="dhi">{isNewP ? "Bienvenue 👋" : `Salut, ${(f.name || "").split(" ")[0]} 👋`}</div>
+        <nav>
+          {!isNewP && <Link href="/statistiques">📊 Statistiques</Link>}
+          <Link className="on" href="/mon-profil">✏️ Mon profil</Link>
+          {!isNewP && <Link href={`/profil/${uid}`}>👀 Voir ma page</Link>}
+          <Link href="/">🏠 Annuaire</Link>
+          <Link href="/contact">✉️ Contact</Link>
+        </nav>
+      </aside>
+      <main className="dmain dedit">
+        <div className="dtop"><h1>{isNewP ? "Créer mon profil" : "Modifier mon profil"}</h1></div>
+        <div className="dform0">
+          {!isNewP && <div className="acts dacts">
             <button type="button" className="btn ghost" onClick={async () => { await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
             <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link><Link className="btn ghost" href="/statistiques">📊 Mes statistiques</Link></div>}
           {isNewP && (<>
@@ -106,9 +116,9 @@ export default function MyProfile() {
               {msg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
               <button className="btn" type="submit" disabled={busy}>Créer mon profil membre</button>
             </fieldset></form>)}
-          {(kind === "createur" || kind === "livecam") && <form onSubmit={save}><fieldset className="fs">
+          {(kind === "createur" || kind === "livecam") && <form onSubmit={save}><fieldset className="fs dform">
             {kind === "livecam" && <p className="note">Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).</p>}
-            <div className="row2">
+<section className="dcard"><h3>Qui es-tu ?</h3><div className="row2">
               <label className="f">Nom ou nom de studio<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
               {kind === "createur" && <label className="f">Profil (obligatoire)<select value={f.genre} onChange={set("genre")} required>
                 <option value="" disabled>Choisir…</option><option value="fille">Fille</option><option value="homme">Homme</option><option value="trans">Trans</option></select></label>}
@@ -116,7 +126,7 @@ export default function MyProfile() {
             <div className="f"><span style={L}>Spécialités (jusqu’à 6) <span style={{ fontWeight: 600 }}>{spec.length}/6</span></span>
               <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < 6 ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
-            <label className="f">Ville<input value={f.city} onChange={set("city")} required maxLength={40} autoComplete="off" /></label>
+</section><section className="dcard"><h3>Où te trouver ?</h3><label className="f">Ville<input value={f.city} onChange={set("city")} required maxLength={40} autoComplete="off" /></label>
             <div className="f"><span style={L}>Villes supplémentaires (jusqu’à 3, optionnel)</span>
               <div className="row3">{more.map((m, i) => <input key={i} value={m} maxLength={40} placeholder={`Ville ${i + 2}`} aria-label={`Ville supplémentaire ${i + 1}`} onChange={(e) => setMore(more.map((x, j) => (j === i ? e.target.value : x)))} />)}</div></div>
             <div className="f"><span style={L}>Prochains déplacements (calendrier, optionnel)</span>
@@ -125,7 +135,7 @@ export default function MyProfile() {
                 <input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} />
                 <input type="date" value={t.to} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></div>)}
               <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>
-            <label className="f">Présentation<textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={2000} rows={5} /></label>
+</section><section className="dcard"><h3>Présentation et contact</h3><label className="f">Présentation<textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={2000} rows={5} /></label>
             <div className="row2"><label className="f">Site ou réseau (optionnel)<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
             <label className="f">Numéro de téléphone (optionnel)<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
             <div className="f"><span style={L}>Réseaux sociaux (optionnel, ton pseudo sans @)</span>
@@ -134,7 +144,7 @@ export default function MyProfile() {
                 <input maxLength={31} placeholder="TikTok" aria-label="Pseudo TikTok" value={f.tiktok} onChange={set("tiktok")} /></div></div>
             <p className="note">Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.</p>
 
-            <div>
+</section><section className="dcard"><h3>Mes photos</h3><div>
               <p className="note" style={{ margin: "0 0 6px" }}><b>Mes photos ({photos.length}/6)</b> · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}> Il en faut au moins 3.</span>}</p>
               <div className="edph">{photos.map((src, i) => (
                 <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} alt={`Photo ${i + 1}`} />
@@ -146,12 +156,12 @@ export default function MyProfile() {
             <div className="panel igp"><b>📸 Photos Instagram</b><p className="note" style={{ margin: "4px 0 8px" }}>Instagram ne permet pas d’importer automatiquement tes photos. Enregistre-les d’abord sur ton téléphone ou ton ordinateur, puis choisis-les ici.</p></div>
             {photos.length < 6 && <label className="f"><span>Ajouter des photos (minimum 3, maximum 6 · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
-            {kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
+</section><section className="dcard"><h3>Vidéo</h3>{kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
             {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
             {video && <label className="chk"><input type="checkbox" onChange={(e) => e.target.checked && setVideo(null)} /> <span>🎬 Vidéo actuelle : cocher pour la supprimer</span></label>}
 
-            <div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (optionnel)</strong>
+</section><section className="dcard"><h3>Disponibilités</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (optionnel)</strong>
               <p className="note">Coche les jours où tu es joignable. Ton profil affichera « Dispo » pendant ces heures et sera grisé en dehors.</p>
               <label className="h24"><input type="checkbox" checked={h24} onChange={(e) => setH24(e.target.checked)} /> <b>Disponible 24h/24, 7j/7</b></label>
               {DAYL.map((d, i) => { const h = hours[String(i)];
@@ -159,12 +169,12 @@ export default function MyProfile() {
                   <input type="time" disabled={h24 || !h} value={h ? h[0] : "09:00"} onChange={(e) => h && setHours({ ...hours, [String(i)]: [e.target.value, h[1]] as [string, string] })} />
                   <input type="time" disabled={h24 || !h} value={h ? h[1] : "19:00"} onChange={(e) => h && setHours({ ...hours, [String(i)]: [h[0], e.target.value] as [string, string] })} /></div>; })}
             </div>
-            <label className="chk"><input type="checkbox" required checked={ok18} onChange={(e) => setOk18(e.target.checked)} /> <span>Je suis majeur·e, je détiens les droits sur ces contenus et ils sont professionnels (aucun contenu à caractère sexuel).</span></label>
+</section><section className="dcard"><label className="chk"><input type="checkbox" required checked={ok18} onChange={(e) => setOk18(e.target.checked)} /> <span>Je suis majeur·e, je détiens les droits sur ces contenus et ils sont professionnels (aucun contenu à caractère sexuel).</span></label>
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
-            <button className="btn" type="submit" disabled={busy}>{busy ? "Patiente…" : isNewP ? "Publier mon profil" : "Enregistrer"}</button>
+            <button className="dbtn" type="submit" disabled={busy}>{busy ? "Patiente…" : isNewP ? "Publier mon profil" : "Enregistrer"}</button></section>
           </fieldset></form>}
         </div>
-      </div>
-    </section>
+      </main>
+    </div>
   );
 }
