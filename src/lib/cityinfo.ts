@@ -27,6 +27,6 @@ export async function cityIntro(city: string, profiles: Profile[]): Promise<stri
   const sc: Record<string, number> = {}; ps.forEach((p) => p.specialties.forEach((s) => { const k = s.toLowerCase(); sc[k] = (sc[k] || 0) + 1; }));
   const specs = Object.entries(sc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")).slice(0, 5).map(([s]) => cap(s));
   const near = await nearbyCommunes(city, 3);
-  return `${n} profil${n > 1 ? "s" : ""} à ${city}` + (genres.length ? ` (${list(genres)})` : "") + " : photographes, vidéastes, artistes et livecam, avec leurs disponibilités et leurs prochains passages."
+  return `${n} profil${n > 1 ? "s" : ""} à ${city}` + (genres.length ? ` (${list(genres)})` : "") + ", avec leurs disponibilités et leurs prochains passages."
     + (specs.length ? ` Spécialités les plus présentes : ${list(specs)}.` : "") + (near.length ? ` Villes proches : ${list(near)}.` : "");
 }

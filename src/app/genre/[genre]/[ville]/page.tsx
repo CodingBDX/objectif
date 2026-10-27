@@ -16,5 +16,5 @@ export default async function Page({ params }: { params: { genre: string; ville:
   const g = GFROM[params.genre]; const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville);
   if (!g || !city) notFound();
   const n = profiles.filter((p) => p.genre === g && cityList(p).includes(city)).length;
-  return <Suspense><Home key={g + params.ville} profiles={profiles} initialType={g} initialCity={city} h1={`Profils ${GTITLE[g]} à ${city}`} intro={`${n} profil${n > 1 ? "s" : ""} ${GTITLE[g].toLowerCase()} à ${city}. ` + (await cityIntro(city, profiles)).replace(/^[^:]*: [^.]*\. /, "")} /></Suspense>;
+  return <Suspense><Home key={g + params.ville} profiles={profiles} initialType={g} initialCity={city} h1={`Profils ${GTITLE[g]} à ${city}`} intro={`${n} profil${n > 1 ? "s" : ""} ${GTITLE[g].toLowerCase()} à ${city}. ` + (await cityIntro(city, profiles)).replace(/^[^.]*\. /, "")} /></Suspense>;
 }
