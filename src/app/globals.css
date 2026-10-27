@@ -574,3 +574,4 @@ body{overflow-x:clip}
 
 /* Admin : ligne de profil dans le tableau de bord */
 .dprow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-radius:18px;background:var(--soft)}
+.dprow .ck{margin-top:0}
