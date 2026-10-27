@@ -12,16 +12,19 @@ import SearchBox from "./SearchBox";
 import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">Chargement de la carte…</p> });
 import { useFavs } from "@/lib/favs";
-import { avail, tripsOf } from "@/lib/avail";
+import { avail, tripsOf, todayP, dShort } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile, showTarif } from "@/lib/types";
 
 const PAGE = 10;
+const isoIn = (n: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date(Date.now() + n * 864e5));
+/** Déplacement du profil vers cette ville qui tombe dans les n prochains jours. */
+const visitOf = (p: Profile, city: string, n: number) => { const t = todayP(), lim = isoIn(n); return tripsOf(p).find((x) => slug(x.city) === slug(city) && x.from <= lim && x.to >= t); };
 const ITEMS: [string, string, string][] = [["tous", "Tous les profils", "grid"], ["fille", "Filles", "fille"], ["homme", "Hommes", "homme"], ["trans", "Trans", "trans"], ["livecam", "Livecam", "live"]];
 
 function Tile({ u }: { u: string }) {
   return <div>{u && <img src={thumbUrl(u)} alt="" loading="lazy" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = u; } }} />}</div>;
 }
-function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: number }) {
+function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
   while (pics.length < 3) pics.push(p.photos[0] || "");
   return (
@@ -45,6 +48,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
           : <div className="meta"><Ic n="clock" s={15} />Indisponible{a.next ? " · reprend " + a.next : ""}</div>)}
         <div className="meta"><Ic n={CIC[p.genre] || "camera"} s={15} />{lab(p) ? lab(p) + " · " : ""}{p.photos.length} photos</div>
         {showTarif(p) ? <div className="meta"><Ic n="rose" s={15} />{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
+        {trip ? <div className="meta avl on"><Ic n="pin" s={15} />Passe {trip.to !== trip.from ? `du ${dShort(trip.from)} au ${dShort(trip.to)}` : `le ${dShort(trip.from)}`}</div> : null}
         <div className="tags">{p.specialties.slice(0, 2).map((t) => <span className="tag" key={t}>{cap(t)}</span>)}</div>
       </div>
     </article>
@@ -54,7 +58,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
 export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {} }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string; region?: string; regions?: Record<string, string> }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
-  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
+  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
   const [view, setView] = useState<"cards" | "list" | "map">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
@@ -78,7 +82,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const pm = sp.get("pm");
   useEffect(() => { if (pm && canNear) { try { localStorage.removeItem("objectif_pm"); } catch {} locate(); } }, [pm]);
   useEffect(() => { // clic sur le logo : on repart de zéro (recherche, filtres, ville, « près de moi »)
-    const h = () => { setType(initialType); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); setNear(""); setGeoMsg(""); setGeoHelp(false); setShown(PAGE); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    const h = () => { setType(initialType); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); setNear(""); setGeoMsg(""); setGeoHelp(false); setShown(PAGE); window.scrollTo({ top: 0, behavior: "smooth" }); };
     window.addEventListener("hp-home", h); return () => window.removeEventListener("hp-home", h);
   }, [initialType]);
   const stopNear = () => { setNear(""); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} };
@@ -90,17 +94,17 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
-  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, city, fav]);
+  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav]);
   const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
   const list = useMemo(() => {
-    const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || cityList(p).includes(city)) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
+    const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : cityList(p).includes(city))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
       && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
     l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
-  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, city, fav, favs]);
+  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, favs]);
 
   const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
   const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
@@ -127,7 +131,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   useEffect(() => { setQ(sp.get("q") || ""); setTag(sp.get("tag") || ""); }, [sp]); // recherche venant du menu du haut
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
-  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); r.push("/"); };
+  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); r.push("/"); };
 
   return (
     <div className="shell gut" id="shell">
@@ -153,6 +157,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         <div className="panel msearch" id="recherche"><h2><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          {city && <div className="row"><span>Passages dans {city}</span><select aria-label="Passages dans la ville" value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>Profils de la ville</option><option value={7}>De passage cette semaine</option><option value={30}>De passage ce mois-ci</option></select></div>}
           <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>
           <div className="row"><span>Tarif maximum 🌹</span><select aria-label="Tarif maximum" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
@@ -185,7 +190,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">Aucun profil à afficher sur la carte.</div>)}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
-          {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} />)
+          {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
             : <div className="empty">{fav ? "Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici." : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? `Aucun profil à ${city} pour le moment. Sois le premier : crée ton profil !` : "Aucun profil ne correspond à votre recherche.") : "Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil »."}</div>}
         </div>
         {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{list.length - shown} profils à venir</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}
@@ -199,6 +204,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          {city && <div className="row"><span>Passages dans {city}</span><select aria-label="Passages dans la ville" value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>Profils de la ville</option><option value={7}>De passage cette semaine</option><option value={30}>De passage ce mois-ci</option></select></div>}
           <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>
           <div className="row"><span>Tarif maximum 🌹</span><select aria-label="Tarif maximum" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
