@@ -818,3 +818,9 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
 .pst i{font-style:normal;font-size:22px;line-height:1}
 .pst b{font:700 15px var(--fd);color:var(--ink);white-space:nowrap}
 .pst span{font-size:12px;font-weight:600;color:var(--mut);white-space:nowrap}
+
+/* Infos du profil en icônes (sans encart) */
+h1.pbn{margin:0}
+.pst{gap:18px;padding:4px 2px 12px}
+.pst>div{background:none;border-radius:0;padding:0;min-width:104px;gap:3px}
+.pst i{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--card);box-shadow:0 0 0 2px var(--pink),var(--sh);font-size:24px;margin-bottom:6px}

@@ -61,8 +61,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } }, knowsAbout: p.specialties,
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
-      <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><strong className="pbn">{p.name}</strong>
-        <span className="pbadges">{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
+      <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><h1 className="pbn">{p.name}</h1>
+        <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}<Heart id={p.id} />{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
           {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> Nouveau</span>}
           {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
         <div className="pcontact">
@@ -79,10 +79,6 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             <Slider imgs={p.photos} vip={p.vip} video={p.video} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer">▶ Rejoindre le live</a></p>}
             <div className="panel pi">
-              <div className="top"><h1 className="pn">{p.name}</h1>
-                {p.genre && <Link className="gchip" href={`/genre/${GPATH[p.genre]}`}>{CATS[p.genre]}</Link>}
-                {live && <span className="liveb"><i />LIVE</span>}
-                <Heart id={p.id} /></div>
               <div className="pst" role="list" aria-label="Informations du profil">
                 <div role="listitem"><i aria-hidden="true">📅</i><b>{since}</b><span>Inscription</span></div>
                 {seen && <div role="listitem"><i aria-hidden="true">🕒</i><b>{seen}</b><span>Dernière connexion</span></div>}
