@@ -51,7 +51,7 @@ create or replace function public.report_client(p_phone text, p_category text, p
 returns void language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is null or not exists (select 1 from public.profiles where id = auth.uid() and paused = false) then raise exception 'Réservé aux profils inscrits'; end if;
-  if (select count(*) from public.client_reports where reporter_id = auth.uid() and created_at > now() - interval '1 day') >= 20 then raise exception 'Limite de signalements atteinte pour aujourd’hui'; end if;
+  if (select count(*) from public.client_reports where reporter_id = auth.uid() and created_at > now() - interval '1 day') >= 20 then raise exception 'Limite de signalements atteinte pour ce jour'; end if;
   insert into public.client_reports (reporter_id, phone_hash, category, note)
   values (auth.uid(), private.phone_hash(p_phone), p_category, left(coalesce(p_note,''), 300))
   on conflict (reporter_id, phone_hash) do update set category = excluded.category, note = excluded.note, created_at = now();
@@ -64,7 +64,7 @@ language plpgsql security definer set search_path = public as $$
 declare h text; n int; last date; cats text[];
 begin
   if auth.uid() is null or not exists (select 1 from public.profiles where id = auth.uid() and paused = false) then raise exception 'Réservé aux profils inscrits'; end if;
-  if (select count(*) from public.client_lookups where user_id = auth.uid() and created_at > now() - interval '1 day') >= 30 then raise exception 'Limite de vérifications atteinte pour aujourd’hui'; end if;
+  if (select count(*) from public.client_lookups where user_id = auth.uid() and created_at > now() - interval '1 day') >= 30 then raise exception 'Limite de vérifications atteinte pour ce jour'; end if;
   h := private.phone_hash(p_phone);
   insert into public.client_lookups (user_id) values (auth.uid());
   select count(distinct reporter_id)::int, max(created_at)::date, array_agg(distinct category) into n, last, cats
