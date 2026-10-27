@@ -7,7 +7,7 @@ import { avail, DAYL, dShort, MS, nowP, todayP, tripsOf } from "@/lib/avail";
 import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
 import Slider from "@/components/Slider";
-import OwnerBar from "@/components/OwnerBar";
+import PauseBtn from "@/components/PauseBtn";
 import { RichText, plain } from "@/lib/rich";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
@@ -57,6 +57,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><strong className="pbn">{p.name}</strong>
         <div className="pcontact">
+          {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
           {p.phone && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
@@ -64,7 +65,6 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">
-            {mine && <OwnerBar id={p.id} paused={p.paused} vip={p.vip} />}
             <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} />Villes</h2><div className="mvs"><Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
                 {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>
             <Slider imgs={p.photos} vip={p.vip} video={p.video} />
