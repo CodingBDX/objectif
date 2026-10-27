@@ -74,6 +74,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 {p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
                 {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}
                 <Heart id={p.id} /></div>
+              {(p.age || p.height_cm || p.weight_kg || p.ethnicity || (p.languages || []).length > 0) && <><h2 className="pres">Description</h2>
+                <ul className="dscr">{p.age ? <li><span>🎂 Âge</span><b>{p.age} ans</b></li> : null}{p.height_cm ? <li><span>📏 Taille</span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span>⚖️ Poids</span><b>{p.weight_kg} kg</b></li> : null}{p.ethnicity ? <li><span>🌍 Ethnie</span><b>{p.ethnicity}</b></li> : null}{(p.languages || []).length > 0 ? <li><span>🗣 Langues</span><b>{p.languages!.join(", ")}</b></li> : null}</ul></>}
               {p.bio && <h2 className="pres">Présentation</h2>}
               <div className="bio"><RichText text={p.bio} /></div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />

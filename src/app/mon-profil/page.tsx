@@ -8,6 +8,7 @@ import { DAYL } from "@/lib/avail";
 import CityInput from "@/components/CityInput";
 import RichEditor from "@/components/RichEditor";
 import { refreshListings } from "@/app/actions";
+import { LANGS, ETHNIES } from "@/lib/types";
 
 type Hours = Record<string, [string, string] | null>;
 const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
@@ -16,6 +17,7 @@ export default function MyProfile() {
   const sb = supabaseBrowser();
   const [uid, setUid] = useState(""); const [loaded, setLoaded] = useState(false); const [isNewP, setIsNewP] = useState(true);
   const [f, setF] = useState({ name: "", genre: "", city: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
+  const [age, setAge] = useState(""); const [hcm, setHcm] = useState(""); const [wkg, setWkg] = useState(""); const [eth, setEth] = useState(""); const [langs, setLangs] = useState<string[]>([]);
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
@@ -34,6 +36,7 @@ export default function MyProfile() {
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
+      setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
       setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
       setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
@@ -109,11 +112,13 @@ export default function MyProfile() {
     if (!genre) { setMsg({ t: "Choisis ton profil (obligatoire)." }); return; }
     if (kind === "livecam" && !/^https?:\/\//.test(vlink)) { setMsg({ t: "Indique le lien de ton live (https://…)." }); return; }
     if (photos.length < 3) { setMsg({ t: "Ajoute au moins 3 photos." }); return; }
+    const nAge = Number(age); if (!nAge || nAge < 18 || nAge > 99) { setMsg({ t: "Indique ton âge (18 ans minimum) dans l’encart Description." }); document.getElementById("descr")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     if (!h24 && !Object.values(hours).some((h) => h && h[0] && h[1])) { setMsg({ t: "Indique tes disponibilités (obligatoire) : coche « 24h/24, 7j/7 » ou au moins un jour avec ses horaires." }); document.getElementById("dispo")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     setBusy(true);
     let region: string | null | undefined;
     try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
-    const row = { ...(region !== undefined ? { region } : {}), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
+    const num = (v: string, a: number, b: number) => { const n = Math.round(Number(v)); return v && n >= a && n <= b ? n : null; };
+    const row = { ...(region !== undefined ? { region } : {}), age: nAge, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
       tarif_visible: tshow, tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
@@ -190,6 +195,14 @@ export default function MyProfile() {
                 <label className="tdate"><small>Du</small><input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} /></label>
                 <label className="tdate"><small>Au</small><input type="date" value={t.to} min={t.from || undefined} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></label></div>)}
               <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>
+</section><section className="dcard" id="descr"><h3>Description</h3>
+            <div className="row2"><label className="f">Âge (obligatoire, 18 ans minimum)<input type="number" inputMode="numeric" min={18} max={99} required value={age} onChange={(e) => setAge(e.target.value)} /></label>
+              <label className="f">Taille (cm)<input type="number" inputMode="numeric" min={120} max={230} placeholder="ex. 170" value={hcm} onChange={(e) => setHcm(e.target.value)} /></label></div>
+            <div className="row2"><label className="f">Poids (kg)<input type="number" inputMode="numeric" min={30} max={200} placeholder="ex. 58" value={wkg} onChange={(e) => setWkg(e.target.value)} /></label>
+              <label className="f">Ethnie (facultatif)<input list="ethnies" maxLength={40} value={eth} onChange={(e) => setEth(e.target.value)} placeholder="Choisis ou écris" /><datalist id="ethnies">{ETHNIES.map((x) => <option key={x} value={x} />)}</datalist></label></div>
+            <fieldset className="fs"><legend className="note">Langues parlées (8 maximum)</legend>
+              <div className="tags">{LANGS.map((l) => <button type="button" key={l} className="chip" aria-pressed={langs.includes(l)} onClick={() => setLangs(langs.includes(l) ? langs.filter((x) => x !== l) : langs.length < 8 ? [...langs, l] : langs)}>{l}</button>)}</div></fieldset>
+            <p className="note" style={{ margin: 0 }}>Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.</p>
 </section><section className="dcard"><h3>Présentation et contact</h3><div className="f"><span style={L}>Présentation</span><RichEditor label="Présentation" value={bio} onChange={setBio} /></div>
             <div className="row2"><label className="f">Site ou réseau (optionnel)<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
             <div className="f"><span style={L}>Tarifs 🌹 (optionnel, nombres uniquement)</span>{!vip && <p className="note" style={{ margin: 0 }}>🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. <Link href="/contact?s=vip">Devenir VIP</Link></p>}<div className="row2"><label className="f">Pour 30 minutes<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" value={t30} disabled={!vip} onChange={(e) => setT30(e.target.value)} /></label><label className="f">Pour 1 heure<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 150" value={t60} disabled={!vip} onChange={(e) => setT60(e.target.value)} /></label></div>{vip && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>Afficher mes tarifs sur mon profil et sur ma carte</span></label>}</div>
