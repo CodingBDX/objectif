@@ -17,7 +17,8 @@ export default function MyProfile() {
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
-  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
+  const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
   useEffect(() => { (async () => {
     const { data: { user } } = await sb.auth.getUser();
@@ -42,14 +43,17 @@ export default function MyProfile() {
     if (!r.ok) throw new Error(j.error); return j.url as string;
   }
   async function addPhotos(files: FileList | null) {
-    if (!files) return; setBusy(true); setMsg(null);
-    try { const next = [...photos]; for (const file of Array.from(files)) { if (next.length >= 6) break; next.push(await up(file)); } setPhotos(next); }
-    catch (e: any) { setMsg({ t: e.message }); } setBusy(false);
+    if (!files || !files.length) return; setBusy(true); setMsg(null); setPMsg({ t: "⏳ Envoi des photos en cours…", ok: true });
+    try { const next = [...photos]; let n = 0; for (const file of Array.from(files)) { if (next.length >= 6) break; next.push(await up(file)); n++; setPhotos([...next]); }
+      setPMsg({ t: n ? `✔ ${n} photo${n > 1 ? "s ajoutée" + "s" : " ajoutée"}.` : "Tu as déjà 6 photos : supprime-en une pour en ajouter.", ok: !!n }); }
+    catch (e: any) { setPMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }
   async function addVideo(file?: File) {
     if (!file) return;
-    if (file.size > 15 * 1024 * 1024) { setMsg({ t: "La vidéo dépasse 15 Mo." }); return; }
-    setBusy(true); setMsg(null); try { setVideo(await up(file)); } catch (e: any) { setMsg({ t: e.message }); } setBusy(false);
+    setVMsg(null);
+    if (file.size > 15 * 1024 * 1024) { setVMsg({ t: `La vidéo fait ${(file.size / 1048576).toFixed(1).replace(".", ",")} Mo : elle dépasse la limite de 15 Mo.` }); return; }
+    setBusy(true); setMsg(null); setVMsg({ t: "⏳ Envoi de la vidéo en cours…", ok: true });
+    try { setVideo(await up(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
 
@@ -141,8 +145,10 @@ export default function MyProfile() {
             </div>
             <div className="panel igp"><b>📸 Photos Instagram</b><p className="note" style={{ margin: "4px 0 8px" }}>Instagram ne permet pas d’importer automatiquement tes photos. Enregistre-les d’abord sur ton téléphone ou ton ordinateur, puis choisis-les ici.</p></div>
             {photos.length < 6 && <label className="f"><span>Ajouter des photos (minimum 3, maximum 6 · le filigrane est ajouté automatiquement)</span><input type="file" accept="image/*" multiple disabled={busy} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} /></label>}
+            {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
             {kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
-            <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => addVideo(e.target.files?.[0])} /></label>
+            <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
+            {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
             {video && <label className="chk"><input type="checkbox" onChange={(e) => e.target.checked && setVideo(null)} /> <span>🎬 Vidéo actuelle : cocher pour la supprimer</span></label>}
 
             <div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (optionnel)</strong>
