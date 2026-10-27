@@ -516,3 +516,12 @@ body{overflow-x:clip}
 .navbar i{display:block;height:100%;width:40%;background:linear-gradient(90deg,var(--pink),var(--btn));border-radius:0 3px 3px 0;animation:navRun 1s ease-in-out infinite}
 @keyframes navRun{from{transform:translateX(-100%)}to{transform:translateX(260%)}}
 @media (prefers-reduced-motion:reduce){.splash{animation-duration:.01s;animation-delay:.2s}.splog,.splog svg,.navbar i{animation:none}}
+
+/* réponses du profil : encart d'une autre teinte (violet doux) */
+.cmt{display:grid;gap:8px}
+.cmi.own,.cmi.reply{background:var(--livebg);border-color:#dcc6f3}
+.cmi.reply{margin-left:22px;border-left:4px solid var(--live)}
+.cmo{background:var(--live);color:var(--livet);border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700}
+.cmr{margin-left:auto;border:0;background:none;color:var(--live);font:700 12px var(--fb);min-height:32px}
+.cmr+.cmx{margin-left:0}
+.cmi.rform textarea{background:#fff;border-color:#dcc6f3}
