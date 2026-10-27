@@ -64,6 +64,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="pgrid">
           <div className="pmain">
             {mine && <OwnerBar id={p.id} paused={p.paused} vip={p.vip} />}
+            <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} />Villes</h2><div className="mvs"><Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
+                {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>
             <Slider imgs={p.photos} vip={p.vip} video={p.video} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer">▶ Rejoindre le live</a></p>}
             <div className="panel pi">
@@ -76,6 +78,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 <Heart id={p.id} /></div>
               {(p.age || p.height_cm || p.weight_kg || p.ethnicity || (p.languages || []).length > 0) && <><h2 className="pres">Description</h2>
                 <ul className="dscr">{p.age ? <li><span>🎂 Âge</span><b>{p.age} ans</b></li> : null}{p.height_cm ? <li><span>📏 Taille</span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span>⚖️ Poids</span><b>{p.weight_kg} kg</b></li> : null}{p.ethnicity ? <li><span>🌍 Ethnie</span><b>{p.ethnicity}</b></li> : null}{(p.languages || []).length > 0 ? <li><span>🗣 Langues</span><b>{p.languages!.join(", ")}</b></li> : null}</ul></>}
+              {p.specialties.length > 0 && <div className="mspec"><h2 className="pres">Spécialités</h2><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></div>}
               {p.bio && <h2 className="pres">Présentation</h2>}
               <div className="bio"><RichText text={p.bio} /></div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
@@ -84,10 +87,10 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             </div>
           </div>
           <aside className="pside" aria-label="Villes, déplacements et disponibilités">
-            <section className="bsec"><h3 className="ph"><Ic n="pin" s={18} />Villes</h3><div className="bub">
+            <section className="bsec dsk"><h3 className="ph"><Ic n="pin" s={18} />Villes</h3><div className="bub">
               <Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
               {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>
-            <section className="bsec"><h3 className="ph"><Ic n="tag" s={18} />Spécialités</h3><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></section>
+            <section className="bsec dsk"><h3 className="ph"><Ic n="tag" s={18} />Spécialités</h3><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></section>
             {trips.length > 0 && <div className="panel"><h3 className="ph"><Ic n="pin" s={18} />Prochains passages</h3>
               {trips.map((x, i) => { const now = x.from <= td; const [, m, d] = x.from.split("-");
                 return <div className="trip" key={i}><div className="tcal"><b>{MS[+m - 1]}</b><span>{+d}</span></div>

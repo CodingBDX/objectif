@@ -790,3 +790,16 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
 @media (max-width:640px){.pcontact{margin-left:0;width:max-content;justify-content:center;left:50%;padding:6px 8px;gap:6px}.pcontact .pph{padding:2px 4px 2px 10px;gap:6px}.pcontact .pph .nb{font-size:14px}}
 #pf{padding-bottom:90px}
 @media (prefers-reduced-motion:reduce){.pcontact{animation:none}}
+
+/* Profil sur mobile : villes en slider au-dessus des photos, spécialités sous la description */
+.mvil,.mspec{display:none}
+@media (max-width:900px){
+ .pside .dsk{display:none}
+ .mvil{display:block;margin:0 0 14px}
+ .mvil h2{display:flex;align-items:center;gap:8px;font:600 20px var(--fd);margin:0 0 8px}.mvil h2 .ic{color:var(--pink)}
+ .mvs{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .mvs::-webkit-scrollbar{display:none}
+ .mvs .bubble{flex:0 0 auto;scroll-snap-align:start;white-space:nowrap;display:inline-flex;align-items:center;text-decoration:none}
+ .mspec{display:block;margin:6px 0 4px}
+ .mspec .bub{margin-top:8px}
+}
