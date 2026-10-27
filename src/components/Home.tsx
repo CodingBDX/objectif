@@ -8,6 +8,7 @@ import { thumbUrl } from "@/lib/img";
 import Ic from "./Ic";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
+import SearchBox from "./SearchBox";
 import { useFavs } from "@/lib/favs";
 import { avail, tripsOf } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile } from "@/lib/types";
@@ -128,7 +129,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? "/" : `/ville/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
         <div className="panel msearch"><h2><Ic n="search" s={20} />Rechercher</h2>
-          <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div>
+          <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} />
           <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
@@ -172,7 +173,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         <div className="panel"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + (ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
           <div>{hl.map((p) => <button key={p.id} className="hl" onClick={() => open(p.id)}><i style={p.photos[0] ? { backgroundImage: `url('${p.photos[0]}')` } : undefined} /><span><b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div></div>
         <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2>
-          <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div></div>
+          <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} /></div>
           <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
