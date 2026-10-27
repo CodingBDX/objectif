@@ -26,13 +26,13 @@ create table if not exists public.client_lookups (
 create index if not exists client_lookups_user on public.client_lookups (user_id, created_at desc);
 alter table public.client_reports enable row level security;
 alter table public.client_lookups enable row level security;
-drop policy if exists "client_reports: admin" on public.client_reports;
-create policy "client_reports: admin" on public.client_reports for select to authenticated using (public.is_admin());
-drop policy if exists "client_reports: supprimer les siens" on public.client_reports;
-create policy "client_reports: supprimer les siens" on public.client_reports for delete to authenticated using (reporter_id = auth.uid() or public.is_admin());
--- aucune autre policy : on n'écrit et on ne lit que par les fonctions ci-dessous
+drop policy if exists client_reports_admin on public.client_reports;
+create policy client_reports_admin on public.client_reports for select to authenticated using (public.is_admin());
+drop policy if exists client_reports_delete_own on public.client_reports;
+create policy client_reports_delete_own on public.client_reports for delete to authenticated using (reporter_id = auth.uid() or public.is_admin());
+-- aucune autre policy : on ecrit et on lit uniquement par les fonctions ci-dessous
 
--- Empreinte d'un numéro (06 12 34 56 78 = +33 6 12 34 56 78 = 0033612345678)
+-- Empreinte d un numero (06 12 34 56 78 = +33 6 12 34 56 78 = 0033612345678)
 create or replace function private.phone_hash(p text) returns text
 language plpgsql stable security definer set search_path = private, extensions as $$
 declare d text := regexp_replace(coalesce(p,''), '\D', '', 'g'); pep text;
@@ -74,5 +74,4 @@ end $$;
 
 revoke all on function public.report_client(text, text, text), public.check_client(text) from public, anon;
 grant execute on function public.report_client(text, text, text), public.check_client(text) to authenticated;
--- Pas d'accès direct à private.phone_hash : fonction interne uniquement.
 revoke all on function private.phone_hash(text) from public, anon, authenticated;
