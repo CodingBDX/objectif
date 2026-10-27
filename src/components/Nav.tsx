@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Ic from "./Ic";
 import PauseBtn from "./PauseBtn";
 import GlobalSearch, { SIndex } from "./GlobalSearch";
@@ -15,6 +15,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
     const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
+  useEffect(() => { if (!hasProfile) return; try { if (sessionStorage.getItem("hp_seen")) return; sessionStorage.setItem("hp_seen", "1"); } catch {} supabaseBrowser().rpc("touch_last_seen").then(() => {}, () => {}); }, [hasProfile]);
   const path = usePathname();
   return (
     <>

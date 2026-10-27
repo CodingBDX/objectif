@@ -46,6 +46,12 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   const mine = user?.id === p.id;
   const a = avail(p); const trips = tripsOf(p); const td = todayP(); const nd = nowP().d;
   const live = p.genre === "livecam";
+  let st: { views_total: number; views_today: number; last_seen_day: string | null } | null = null;
+  try { const { data } = await sb.rpc("profile_public_stats", { p_id: p.id }); const r = Array.isArray(data) ? data[0] : data; if (r) st = { views_total: Number(r.views_total), views_today: Number(r.views_today), last_seen_day: r.last_seen_day }; } catch {}
+  const nbd = (iso: string) => Math.round((new Date(td + "T12:00:00").getTime() - new Date(iso + "T12:00:00").getTime()) / 864e5);
+  const seen = st?.last_seen_day ? (() => { const n = nbd(st.last_seen_day); return n <= 0 ? "Aujourd’hui" : n === 1 ? "Hier" : n < 30 ? `Il y a ${n} jours` : "Il y a plus d’un mois"; })() : null;
+  const since = new Date(p.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Paris" });
+  const fmtN = (n: number) => n.toLocaleString("fr-FR");
   return (
     <section id="pf" className="gut">
       <TrackView id={p.id} skip={mine} />
@@ -56,6 +62,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/">← Tous les profils</Link><strong className="pbn">{p.name}</strong>
+        <span className="pbadges">{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
+          {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> Nouveau</span>}
+          {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
         <div className="pcontact">
           {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
           {p.phone && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
@@ -72,11 +81,14 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             <div className="panel pi">
               <div className="top"><h1 className="pn">{p.name}</h1>
                 {p.genre && <Link className="gchip" href={`/genre/${GPATH[p.genre]}`}>{CATS[p.genre]}</Link>}
-                {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> Nouveau</span>}
                 {live && <span className="liveb"><i />LIVE</span>}
-                {p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
-                {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}
                 <Heart id={p.id} /></div>
+              <div className="pst" role="list" aria-label="Informations du profil">
+                <div role="listitem"><i aria-hidden="true">📅</i><b>{since}</b><span>Inscription</span></div>
+                {seen && <div role="listitem"><i aria-hidden="true">🕒</i><b>{seen}</b><span>Dernière connexion</span></div>}
+                {st && <div role="listitem"><i aria-hidden="true">👁</i><b>{fmtN(st.views_total)}</b><span>Vues au total</span></div>}
+                {st && <div role="listitem"><i aria-hidden="true">🔥</i><b>{fmtN(st.views_today)}</b><span>Vues aujourd’hui</span></div>}
+              </div>
               {(p.genre || p.receives || p.travels || p.age || p.hair || p.eyes || p.bra || p.smoker || p.drinker || p.height_cm || p.weight_kg || p.ethnicity || (p.languages || []).length > 0) && <><h2 className="pres">Description</h2>
                 <ul className="dscr">{p.genre ? <li><span>👤 Genre</span><b>{CATS[p.genre]}</b></li> : null}{p.receives ? <li><span>🏠 Rencontre</span><b>Reçoit</b></li> : null}{p.travels ? <li><span>🚗 Rencontre</span><b>Se déplace</b></li> : null}{p.age ? <li><span>🎂 Âge</span><b>{p.age} ans</b></li> : null}{p.height_cm ? <li><span>📏 Taille</span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span>⚖️ Poids</span><b>{p.weight_kg} kg</b></li> : null}{p.hair ? <li><span>💇 Cheveux</span><b>{p.hair}</b></li> : null}{p.eyes ? <li><span>👁 Yeux</span><b>{p.eyes}</b></li> : null}{p.bra ? <li><span>👙 Bonnet</span><b>{p.bra}</b></li> : null}{p.smoker ? <li><span>🚬 Fume</span><b>{HL[p.smoker]}</b></li> : null}{p.drinker ? <li><span>🍷 Boit</span><b>{HL[p.drinker]}</b></li> : null}{p.ethnicity ? <li><span>🌍 Ethnie</span><b>{p.ethnicity}</b></li> : null}{(p.languages || []).length > 0 ? <li><span>🗣 Langues</span><b>{p.languages!.join(", ")}</b></li> : null}</ul></>}
               {p.specialties.length > 0 && <div className="mspec"><h2 className="pres">Spécialités</h2><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></div>}
