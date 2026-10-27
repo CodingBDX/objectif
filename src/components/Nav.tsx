@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Ic from "./Ic";
+import CityInput from "./CityInput";
 import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -10,6 +11,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; cities: string[]; isAdmin?: boolean };
 
 function Inner({ loggedIn, hasProfile, vip, name, userId, cities, isAdmin }: P) {
+  const [ctext, setCtext] = useState("");
   const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
@@ -31,9 +33,8 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, cities, isAdmin }: P) 
           <Link className="nl" href="/?pm=1" title="Profils près de moi">📍 <span className="nlt">Près de moi</span></Link>
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
           <div className="sp"><Ic n="pin" />
-            <select aria-label="Choisir une ville" value={sp.get("ville") || ""} onChange={(e) => r.push(e.target.value ? `/ville/${slug(e.target.value)}` : "/")}>
-              <option value="">Choisir une ville</option>{cities.map((c) => <option key={c}>{c}</option>)}
-            </select></div>
+            <CityInput value={ctext} onChange={setCtext} suggest={cities} label="Choisir une ville" placeholder="Choisir une ville"
+              onPick={(c) => { setCtext(""); r.push(cities.includes(c) ? `/ville/${slug(c)}` : `/?ville=${encodeURIComponent(c)}`); }} /></div>
           {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>

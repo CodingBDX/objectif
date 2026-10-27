@@ -474,3 +474,4 @@ body{overflow-x:clip}
 .citylist li{padding:10px 12px;border-radius:12px;font-weight:700;color:var(--ink);cursor:pointer;min-height:40px}
 .citylist li small{font-weight:600;color:var(--mut)}
 .citylist li:hover,.citylist li.on{background:var(--soft);color:var(--btn)}
+.sp .cityin{flex:1;min-width:0}.sp .cityin input{width:100%;border:0;background:transparent;color:inherit;font:inherit;min-height:42px;outline:none}
