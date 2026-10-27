@@ -28,6 +28,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, cities }: P) {
           <Link className="nl" href="/contact" aria-label="Nous contacter" title="Nous contacter">
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">Contact</span>
           </Link>
+          <Link className="nl" href="/?pm=1" title="Profils près de moi">📍 <span className="nlt">Près de moi</span></Link>
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
           <div className="sp"><Ic n="pin" />
             <select aria-label="Choisir une ville" value={sp.get("ville") || ""} onChange={(e) => r.push(e.target.value ? `/ville/${slug(e.target.value)}` : "/")}>

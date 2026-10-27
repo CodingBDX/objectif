@@ -47,20 +47,27 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false);
   const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
-  const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState("");
+  const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
   const city = initialCity || sp.get("ville") || (canNear ? near : "");
   const allCities = useMemo(() => Array.from(new Set(profiles.flatMap(cityList))), [profiles]);
   const locate = (auto = false) => {
     if (!navigator.geolocation) { setGeoMsg("La localisation n’est pas disponible sur cet appareil."); return; }
-    setGeoBusy(true); setGeoMsg("");
+    setGeoBusy(true); setGeoMsg(""); setGeoHelp(false);
     navigator.geolocation.getCurrentPosition(async (pos) => {
       const c = await nearestCity(pos.coords.latitude, pos.coords.longitude, allCities);
       setGeoBusy(false);
       if (c) { setNear(c); try { localStorage.setItem("objectif_pm", JSON.stringify({ city: c, t: Date.now() })); } catch {} }
       else if (!auto) setGeoMsg("Aucun créateur près de toi pour le moment. Essaie une autre ville dans le Top 10.");
-    }, () => { setGeoBusy(false); if (!auto) setGeoMsg("Autorise la localisation dans ton navigateur pour voir les profils près de toi."); }, { timeout: 8000, maximumAge: 600000 });
+    }, (err) => {
+      setGeoBusy(false); if (auto) return;
+      if (err.code === 1) { setGeoMsg("La localisation est bloquée pour ce site. Autorise-la dans les réglages de ton appareil, puis réessaie."); setGeoHelp(true); }
+      else if (err.code === 3) setGeoMsg("La localisation a pris trop de temps. Réessaie, ou choisis ta ville dans le Top 10.");
+      else setGeoMsg("Position introuvable. Choisis ta ville dans le Top 10.");
+    }, { timeout: 10000, maximumAge: 600000 });
   };
+  const pm = sp.get("pm");
+  useEffect(() => { if (pm && canNear) { try { localStorage.removeItem("objectif_pm"); } catch {} locate(); } }, [pm]);
   const stopNear = () => { setNear(""); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} };
   useEffect(() => { // précharge la dernière ville connue, puis la rafraîchit si la localisation est déjà autorisée
     if (!canNear) return;
@@ -122,6 +129,15 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           </div>
         </div>
         {geoMsg && <p className="note" role="alert" style={{ margin: "0 0 12px", color: "var(--btn)", fontWeight: 700 }}>{geoMsg}</p>}
+        {geoHelp && <div className="panel" style={{ margin: "0 0 12px", padding: "12px 16px" }}>
+          <b>Comment autoriser la localisation</b>
+          <ul style={{ margin: "6px 0 8px", paddingLeft: 18 }}>
+            <li><b>iPhone (Safari) :</b> Réglages → Confidentialité et sécurité → Service de localisation → Safari (sites web) → « Lorsque l’app est active ». Ou dans Safari : bouton « aA » à gauche de l’adresse → Réglages du site web → Localisation → Autoriser.</li>
+            <li><b>Android (Chrome) :</b> icône à gauche de l’adresse → Autorisations → Localisation → Autoriser. Vérifie aussi que la localisation du téléphone est activée.</li>
+            <li><b>Ordinateur :</b> clique sur le cadenas à gauche de l’adresse → Localisation → Autoriser, puis recharge la page.</li>
+          </ul>
+          <button type="button" className="btn" onClick={() => locate()}>Réessayer</button>
+        </div>}
         {canNear && near && <div className="panel" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "0 0 12px", padding: "10px 16px" }}>
           <span>📍 Profils près de toi : <b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>Voir tous les profils</button></div>}
         {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
