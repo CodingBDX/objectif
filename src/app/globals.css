@@ -720,3 +720,6 @@ input[type="file"]:disabled::file-selector-button{opacity:.6;cursor:progress}
 .dchips .dch:nth-child(2){animation-delay:.06s}.dchips .dch:nth-child(3){animation-delay:.12s}.dchips .dch:nth-child(4){animation-delay:.18s}
 @media (prefers-reduced-motion:reduce){.dch,.tipp{animation:none}}
 .dchips .dch:nth-child(5){animation-delay:.24s}.dchips .dch:nth-child(6){animation-delay:.3s}.dchips .dch:nth-child(7){animation-delay:.36s}
+
+/* Mobile : le bloc latéral « Salut… » disparaît (ses liens sont dans la barre du haut) */
+@media (max-width:900px){.dside.nomob{display:none}}

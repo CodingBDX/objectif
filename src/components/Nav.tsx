@@ -37,6 +37,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
           <GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} />
           {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
+            {hasProfile && <Link className={`nl${path === "/verifier" ? " on" : ""}`} href="/verifier" title="Vérifier un client">🛡️ <span className="nlt">Vérifier un client</span></Link>}
             {hasProfile && <Link className={`nl own${path === "/mon-profil" ? " on" : ""}`} href="/mon-profil" title="Modifier mon profil">✏️ <span className="nlt">Modifier mon profil</span></Link>}
             {hasProfile && <Link className="nl own" href="/mon-profil#stats" title="Mes statistiques">📊 <span className="nlt">Mes statistiques</span></Link>}
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>

@@ -106,7 +106,7 @@ export default function MyProfile() {
 
   return (
     <div id="reg" className="dash gut">
-      <aside className="dside">
+      <aside className="dside nomob">
         <div className="dav">{(f.name || pseudo || "?").slice(0, 1).toUpperCase()}</div>
         <div className="dhi">{isNewP ? "Bienvenue 👋" : `Salut, ${(f.name || "").split(" ")[0]} 👋`}</div>
         <nav>
