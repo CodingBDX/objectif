@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Ic from "./Ic";
 import { slug } from "@/lib/site";
+import { useT } from "@/lib/i18n";
 
 export type SIndex = { c: [string, number][]; t: [string, number][]; p: { id: string; name: string; sub: string }[] };
 type Sug = { k: "ville" | "profil" | "spec" | "fr"; label: string; sub?: string; url: string };
@@ -12,6 +13,7 @@ const cache = new Map<string, Commune[]>();
 
 /** Recherche du menu du haut : villes (de l'annuaire et de toute la France), profils, spécialités, ou texte libre. */
 export default function GlobalSearch({ index, onGo }: { index: SIndex; onGo: (url: string) => void }) {
+  const { tr } = useT();
   const [q, setQ] = useState(""); const [open, setOpen] = useState(false); const [hi, setHi] = useState(-1); const [api, setApi] = useState<Commune[]>([]);
   const box = useRef<HTMLDivElement>(null); const seq = useRef(0);
   useEffect(() => { const h = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); }; document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h); }, []);
@@ -41,7 +43,7 @@ export default function GlobalSearch({ index, onGo }: { index: SIndex; onGo: (ur
   return (
     <div className="sp sbox gsearch" ref={box}>
       <Ic n="search" />
-      <input type="search" value={q} placeholder="Ville, profil, spécialité…" aria-label="Rechercher une ville, un profil ou une spécialité" autoComplete="off" role="combobox" aria-expanded={open && list.length > 0}
+      <input type="search" value={q} placeholder={tr("Ville, profil, spécialité…")} aria-label={tr("Rechercher une ville, un profil ou une spécialité")} autoComplete="off" role="combobox" aria-expanded={open && list.length > 0}
         onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(-1); }} onFocus={() => setOpen(true)}
         onKeyDown={(e) => {
           if (e.key === "Escape") { setOpen(false); return; }
@@ -50,7 +52,7 @@ export default function GlobalSearch({ index, onGo }: { index: SIndex; onGo: (ur
           else if (e.key === "Enter") { e.preventDefault(); if (hi >= 0 && list[hi]) go(list[hi].url); else if (q.trim()) go(`/recherche?q=${encodeURIComponent(q.trim())}`); }
         }} />
       {open && list.length > 0 && <ul className="citylist sugl" role="listbox">{list.map((x, i) => <li key={x.k + x.url} role="option" aria-selected={i === hi} className={i === hi ? "on" : ""} onMouseDown={(e) => { e.preventDefault(); go(x.url); }}>
-        <em>{T[x.k]}</em><span>{x.label}</span>{x.sub && <small>{x.sub}</small>}</li>)}</ul>}
+        <em>{tr(T[x.k])}</em><span>{x.label}</span>{x.sub && <small>{x.sub}</small>}</li>)}</ul>}
     </div>
   );
 }
