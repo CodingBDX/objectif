@@ -5,6 +5,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
 import AgeGate from "@/components/AgeGate";
 import { siteUrl } from "@/lib/site";
+import { publicCities } from "@/lib/public";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -18,12 +19,11 @@ export const dynamic = "force-dynamic";
 export default async function Root({ children }: { children: React.ReactNode }) {
   const sb = supabaseServer();
   const { data: { user } } = await sb.auth.getUser();
-  let isAdmin = false;
-  let me: { name: string; vip: boolean; paused: boolean } | null = null;
-  if (user) { const { data } = await sb.from("profiles").select("name,vip,paused").eq("id", user.id).maybeSingle(); me = data; }
-  if (user) { const { data: ad } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle(); isAdmin = !!ad; }
-  const { data: cs } = await sb.from("profiles").select("city,more").eq("paused", false);
-  const cities = Array.from(new Set((cs || []).flatMap((c: any) => [c.city, ...(c.more || [])]).filter(Boolean))).sort((a: any, b: any) => a.localeCompare(b, "fr")) as string[];
+  const [me, isAdmin, cities] = await Promise.all([
+    user ? sb.from("profiles").select("name,vip,paused").eq("id", user.id).maybeSingle().then((r: any) => r.data as { name: string; vip: boolean; paused: boolean } | null) : Promise.resolve(null),
+    user ? sb.from("admins").select("id").eq("id", user.id).maybeSingle().then((r: any) => !!r.data) : Promise.resolve(false),
+    publicCities()
+  ]);
   return (
     <html lang="fr" data-theme="light">
       <head>
