@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
-import { cap, CATS, isNew, Profile } from "@/lib/types";
+import { cap, CATS, isNew, Profile, showTarif } from "@/lib/types";
 import { avail, DAYL, dShort, MS, nowP, todayP, tripsOf } from "@/lib/avail";
 import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
@@ -92,7 +92,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 return <div className="trip" key={i}><div className="tcal"><b>{MS[+m - 1]}</b><span>{+d}</span></div>
                   <div className="tinf"><Link href={`/ville/${slug(x.city)}`}>{x.city}</Link>{now && <span className="tnow">En ce moment</span>}
                     <em>{x.to !== x.from ? `du ${dShort(x.from)} au ${dShort(x.to)}` : `le ${dShort(x.from)}`}</em></div></div>; })}</div>}
-            {(p.tarif_30 || p.tarif_60) ? <div className="panel"><h3 className="ph"><Ic n="rose" s={18} />Tarifs</h3>{p.tarif_30 ? <div className="meta"><Ic n="rose" s={15} />30 minutes : <b>{p.tarif_30}</b></div> : null}{p.tarif_60 ? <div className="meta"><Ic n="rose" s={15} />1 heure : <b>{p.tarif_60}</b></div> : null}</div> : null}
+            {showTarif(p) ? <div className="panel"><h3 className="ph"><Ic n="rose" s={18} />Tarifs</h3>{p.tarif_30 ? <div className="meta"><Ic n="rose" s={15} />30 minutes : <b>{p.tarif_30}</b></div> : null}{p.tarif_60 ? <div className="meta"><Ic n="rose" s={15} />1 heure : <b>{p.tarif_60}</b></div> : null}</div> : null}
             <div className="panel"><h3 className="ph"><Ic n="clock" s={18} />Disponibilités</h3>
               {a ? (<>
                 {a.on ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? "Disponible 24h/24, 7j/7" : "Disponible jusqu’à " + a.until}</div>

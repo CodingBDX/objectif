@@ -8,10 +8,13 @@ export type Profile = {
   id: string; name: string; genre: Genre; city: string; more: string[]; specialties: string[]; bio: string;
   phone: string | null; instagram: string | null; snapchat: string | null; tiktok: string | null; site: string | null;
   h24: boolean; hours: Hours; trips: Trip[];
-  photos: string[]; video: string | null; vlink: string | null; vip: boolean; verified: boolean; paused: boolean; created_at: string; views?: number; favs?: number; tarif?: number | null; tarif_30?: number | null; tarif_60?: number | null;
+  photos: string[]; video: string | null; vlink: string | null; vip: boolean; verified: boolean; paused: boolean; created_at: string; views?: number; favs?: number; tarif?: number | null; tarif_visible?: boolean; tarif_30?: number | null; tarif_60?: number | null;
 };
 export const lab = (p: Profile) => CATS[p.genre] || "";
 export const isNew = (p: Profile) => { const d = Date.now() - new Date(p.created_at).getTime(); return d >= 0 && d < 30 * 864e5; };
 /** Ville de base uniquement : les compteurs, filtres et pages ville ne comptent que les profils basés dans la ville. */
 export const cityList = (p: Profile) => [p.city];
 export const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+
+/** Les tarifs ne sont affichés que pour les profils VIP qui ont choisi de les montrer. */
+export const showTarif = (p: Profile) => !!p.vip && p.tarif_visible !== false && !!(p.tarif_30 || p.tarif_60);
