@@ -42,7 +42,7 @@ export default function MyProfile() {
       setRecv(!!data.receives); setTrav(!!data.travels);
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
-      setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
+      setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SPECIALTIES.includes(x))); setPhotos(data.photos); setVideo(data.video);
       setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); window.dispatchEvent(new CustomEvent("hp-pause", { detail: false })); await refreshListings(); }

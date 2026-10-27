@@ -1,7 +1,7 @@
 export type Genre = "fille" | "homme" | "trans" | "livecam";
 export const CATS: Record<string, string> = { fille: "Fille", homme: "Homme", trans: "Trans", livecam: "Livecam" };
 export const CIC: Record<string, string> = { fille: "fille", homme: "homme", trans: "trans", livecam: "live" };
-export const SPECIALTIES = ["Portrait","Mode","Mariage","Studio","Lifestyle","Boudoir","Glamour","Artistique","Nu artistique","Urbain","Nature","Voyage","Événementiel","Produit","Culinaire","Sport","Danse","Musique","Vidéo clip","Court-métrage","Drone","Retouche","Illustration","Peinture","Maquillage","Stylisme","Tatouage","Livecam","Streaming","Réseaux sociaux"];
+export const SPECIALTIES = ["Girlfriend experience","Accompagnement","Dîner","Soirée","Week-end","Voyage","Massage","Massage tantrique","Relaxation","Sensuel","Câlin","Duo","Couple","Rôle play","Lingerie","Tenues sur demande","Strip-tease","Danse","Glamour","Élégante","Naturelle","Discrète","Complice","Fétichisme","Domination","Soumission","Pieds","Livecam","Sortie culturelle","Langues & conversation"];
 export type Trip = { city: string; from: string; to: string };
 export type Hours = Record<string, [string, string] | null>;
 export type Profile = {
