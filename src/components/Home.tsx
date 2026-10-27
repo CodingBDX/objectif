@@ -61,7 +61,7 @@ export default function Home({ profiles }: { profiles: Profile[] }) {
   const cnt = (t: string) => (t === "tous" ? profiles.length : profiles.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; profiles.forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [profiles]);
   const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.forEach((p) => cityList(p).forEach((c) => (cc[c] = (cc[c] || 0) + 1))); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 10); }, [profiles]);
-  const hl = useMemo(() => profiles.filter((p) => (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 3), [profiles, tag, city]);
+  const hl = useMemo(() => profiles.filter((p) => (type === "tous" || p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 3), [profiles, type, tag, city]);
 
   const sentinel = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function Home({ profiles }: { profiles: Profile[] }) {
       </main>
 
       <aside className="aside" aria-label="Filtres">
-        <div className="panel"><h2><Ic n="star" s={20} />Mis en avant{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
+        <div className="panel"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + (ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
           <div>{hl.map((p) => <button key={p.id} className="hl" onClick={() => open(p.id)}><i style={p.photos[0] ? { backgroundImage: `url('${p.photos[0]}')` } : undefined} /><span><b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div></div>
         <div className="panel"><h2><Ic n="search" s={20} />Rechercher</h2>
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div>
