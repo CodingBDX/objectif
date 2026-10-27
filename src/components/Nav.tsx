@@ -18,7 +18,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
   return (
     <>
       <nav className={`nav${open ? " open" : ""}`} aria-label="Navigation principale"><div className="gut">
-        <Link className="logo" href="/" aria-label="HeyPapi, retour à l’annuaire" onClick={close}>
+        <Link className="logo" href="/" aria-label="HeyPapi, retour à l’annuaire" onClick={() => { close(); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} window.dispatchEvent(new Event("hp-home")); }}>
           <svg className="ic" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M14 7c3.5 0 6 3 5 7.5-1.2 5-6 7.5-13.5 5.5 4-1 6.300-3 7.300-6 .8-2.300.4-4.500 1.200-7z" /><path d="M14 7c-.2-2 1-3.600 3.200-4" /></svg>heypapi
         </Link>
         <button className="burger" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen(!open)}>

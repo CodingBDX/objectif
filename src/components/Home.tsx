@@ -77,6 +77,10 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   };
   const pm = sp.get("pm");
   useEffect(() => { if (pm && canNear) { try { localStorage.removeItem("objectif_pm"); } catch {} locate(); } }, [pm]);
+  useEffect(() => { // clic sur le logo : on repart de zéro (recherche, filtres, ville, « près de moi »)
+    const h = () => { setType(initialType); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); setNear(""); setGeoMsg(""); setGeoHelp(false); setShown(PAGE); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    window.addEventListener("hp-home", h); return () => window.removeEventListener("hp-home", h);
+  }, [initialType]);
   const stopNear = () => { setNear(""); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} };
   useEffect(() => { // précharge la dernière ville connue, puis la rafraîchit si la localisation est déjà autorisée
     if (!canNear) return;
