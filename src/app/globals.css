@@ -351,3 +351,10 @@ body{overflow-x:clip}
 .legal p,.legal li{line-height:1.6}
 .legal a{text-decoration:underline}
 #foot a{text-decoration:underline}
+
+.msearch{display:none}.t3{display:none}.fh{margin-top:18px}
+@media (max-width:700px){
+ .panel.top li:nth-child(n+4){display:none}
+ .t10{display:none}.t3{display:inline}
+ .msearch{display:block}.dsearch{display:none}.fh{margin-top:0}
+}
