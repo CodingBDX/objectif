@@ -21,6 +21,7 @@ export default function MyProfile() {
   const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
+  const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
   useEffect(() => { (async () => {
@@ -83,6 +84,20 @@ export default function MyProfile() {
     if (await isHevc(file)) { setVMsg({ t: "Cette vidéo est au format HEVC (H.265) : beaucoup d’ordinateurs la lisent sans image. Sur iPhone : Réglages › Appareil photo › Formats › « Le plus compatible », puis refilme ; ou convertis-la en MP4 H.264." }); return; }
     setBusy(true); setMsg(null); setVMsg({ t: "⏳ Envoi de la vidéo en cours…", ok: true });
     try { setVideo(await upVideo(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
+  }
+  /** Efface les photos et vidéos du dossier de la personne, puis le compte entier (profil, commentaires, signalements…). */
+  async function deleteAll() {
+    setDelBusy(true); setDelMsg("");
+    try {
+      for (let guard = 0; guard < 20; guard++) {
+        const { data: files } = await sb.storage.from("media").list(uid, { limit: 100 });
+        if (!files || !files.length) break;
+        const { error: re } = await sb.storage.from("media").remove(files.map((f) => `${uid}/${f.name}`));
+        if (re) throw re;
+      }
+      const { error } = await sb.rpc("delete_my_account"); if (error) throw error;
+      await sb.auth.signOut(); location.href = "/";
+    } catch (e: any) { setDelMsg("Suppression impossible : " + (e?.message || "réessaie") + ". Écris-nous via la page Contact."); setDelBusy(false); }
   }
   const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3; const maxS = vip ? 30 : 5;
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
@@ -223,6 +238,15 @@ export default function MyProfile() {
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
             <button className="dbtn" type="submit" disabled={busy}>{busy ? "Patiente…" : isNewP ? "Publier mon profil" : "Enregistrer"}</button></section>
           </fieldset></form>}
+          {!isNewP && <section className="dcard dzone" id="supprimer"><h3>🗑 Supprimer mon profil et mes données</h3>
+            <p className="note" style={{ margin: "0 0 10px" }}>Efface définitivement ton profil, tes photos et ta vidéo, tes commentaires, tes signalements de numéros et ton compte de connexion. C’est irréversible.</p>
+            {!delAsk ? <button type="button" className="btn ghost" onClick={() => setDelAsk(true)}>Supprimer mon compte…</button> : <div style={{ display: "grid", gap: 8 }}>
+              <label className="f">Pour confirmer, écris <b>SUPPRIMER</b><input value={delTxt} onChange={(e) => setDelTxt(e.target.value)} autoComplete="off" /></label>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" className="btn" disabled={delBusy || delTxt.trim().toUpperCase() !== "SUPPRIMER"} onClick={deleteAll}>{delBusy ? "Suppression…" : "Oui, tout supprimer"}</button>
+                <button type="button" className="btn ghost" disabled={delBusy} onClick={() => { setDelAsk(false); setDelTxt(""); }}>Annuler</button></div>
+              {delMsg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: 0 }}>{delMsg}</p>}</div>}
+          </section>}
         </div>
       </main>
     </div>
