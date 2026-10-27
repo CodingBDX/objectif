@@ -10,6 +10,7 @@ import Slider from "@/components/Slider";
 import OwnerBar from "@/components/OwnerBar";
 import CopyBtn from "@/components/CopyBtn";
 import Comments from "@/components/Comments";
+import ReportBtn from "@/components/ReportBtn";
 import { GPATH, siteUrl, slug } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 <Heart id={p.id} /></div>
               <div className="bio" style={{ whiteSpace: "pre-wrap" }}>{p.bio}</div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
+                {!mine && <ReportBtn profileId={p.id} />}
                 {p.site && /^https?:\/\//.test(p.site) && <a className="btn ghost" href={p.site} target="_blank" rel="noopener noreferrer">Site web</a>}</div>
             </div>
             <Comments profileId={p.id} ownerId={p.id} />
