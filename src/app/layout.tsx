@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   openGraph: { siteName: "HeyPapi", locale: "fr_FR", type: "website" },
   twitter: { card: "summary_large_image" },
-  title: { default: "HeyPapi, annuaire des créateurs", template: "%s · HeyPapi" },
-  description: "Annuaire de photographes, vidéastes, artistes et livecam. Site fait par et pour les pros, 50 % reversés aux associations."
+  title: { default: "HeyPapi, annuaire des escortes populaire, sexy, numéro un", template: "%s · HeyPapi" },
+  description: "Annuaire des escortes : profils vérifiés, photos, disponibilités et villes visitées. 50 % reversés aux associations."
 };
 export const dynamic = "force-dynamic";
 
