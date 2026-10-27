@@ -79,7 +79,7 @@ export default function MyProfile() {
   }
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });
   const setTrip = (i: number, k: keyof Trip, v: string) => setTrips(trips.map((t, j) => (j === i ? { ...t, [k]: v } : t)));
-  if (!loaded) return <section className="gut"><p className="note">Chargement…</p></section>;
+  if (!loaded) return <section className="gut"><p className="note" style={{ minHeight: 400, opacity: 0 }} aria-busy="true">Chargement…</p></section>;
 
   return (
     <div id="reg" className="dash gut">

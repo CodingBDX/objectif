@@ -28,7 +28,7 @@ export default function Stats() {
     setReady(true);
   })(); }, []);
 
-  if (!ready) return <section className="gut"><p className="note">Chargement…</p></section>;
+  if (!ready) return <section className="gut"><p className="note" style={{ minHeight: 400, opacity: 0 }} aria-busy="true">Chargement…</p></section>;
   if (noProfile || !me) return <section className="gut"><div className="pfc" style={{ maxWidth: 560 }}><div className="panel regp"><h1 className="regh">Mes statistiques</h1><p className="note">Crée d’abord ton profil pour voir tes statistiques.</p><Link className="btn" href="/mon-profil">Créer mon profil</Link></div></div></section>;
 
   const by = new Map(rows.map((r) => [r.day, r]));
