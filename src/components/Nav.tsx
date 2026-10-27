@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Ic from "./Ic";
 import GlobalSearch, { SIndex } from "./GlobalSearch";
@@ -14,6 +14,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
     const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
+  const path = usePathname();
   return (
     <>
       <nav className={`nav${open ? " open" : ""}`} aria-label="Navigation principale"><div className="gut">
@@ -24,7 +25,8 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
           <svg className="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
         <div className="navmenu" onClick={(e) => { if ((e.target as HTMLElement).closest("a,button")) close(); }}>
-          <Link className={`nl${!sp.get("fav") ? " on" : ""}`} href="/"><Ic n="grid" />Annuaire</Link>
+          <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />Annuaire</Link>
+          <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte"><Ic n="pin" />Carte</Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1"><Ic n="heart" />Favoris <span className="cn">{favs.length}</span></Link>
           <Link className="nl" href="/contact" aria-label="Nous contacter" title="Nous contacter">
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">Contact</span>
