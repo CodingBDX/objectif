@@ -356,7 +356,7 @@ body{overflow-x:clip}
 @media (max-width:700px){
  .panel.top li:nth-child(n+4){display:none}
  .t10{display:none}.t3{display:inline}
- .msearch{display:block}.dpanel{display:none}.fh{margin-top:0}
+ .msearch{display:none}.dpanel{display:none}.fh{margin-top:0}
 }
 
 /* ===== Tableau de bord (statistiques) — style pâte douce ===== */
