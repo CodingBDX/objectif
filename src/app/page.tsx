@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 export default async function Page() {
   const profiles = await allProfiles();
-  return <Suspense><Home profiles={profiles} h1="Annuaire des créateurs" intro="Photographes, vidéastes, artistes et créateurs livecam : parcours les portfolios, vois qui est disponible maintenant et où les créateurs passent prochainement." /></Suspense>;
+  return <Suspense><Home profiles={profiles} h1="Annuaire des escortes" intro="Photographes, vidéastes, artistes et créateurs livecam : parcours les portfolios, vois qui est disponible maintenant et où les créateurs passent prochainement." /></Suspense>;
 }
