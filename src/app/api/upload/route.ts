@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   if (!user) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
   const file = (await req.formData()).get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
-  if (file.size > 15 * 1024 * 1024) return NextResponse.json({ error: "15 Mo maximum" }, { status: 413 });
+  if (file.size > 20 * 1024 * 1024) return NextResponse.json({ error: "20 Mo maximum" }, { status: 413 });
   const buf = Buffer.from(await file.arrayBuffer());
   let body: Buffer, ext: string, type: string, thumb: Buffer | null = null;
 

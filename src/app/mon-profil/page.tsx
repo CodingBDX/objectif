@@ -43,6 +43,14 @@ export default function MyProfile() {
     const r = await fetch("/api/upload", { method: "POST", body: fd }); const j = await r.json();
     if (!r.ok) throw new Error(j.error); return j.url as string;
   }
+  /** Vidéo : envoyée directement à Supabase (sans passer par le serveur du site, limité à ~4,5 Mo par envoi sur Vercel). */
+  async function upVideo(file: File) {
+    const ext = file.type === "video/webm" ? "webm" : file.type === "video/mp4" ? "mp4" : "mov";
+    const path = `${uid}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await sb.storage.from("media").upload(path, file, { contentType: file.type, cacheControl: "31536000" });
+    if (error) throw new Error(/size|exceed|payload/i.test(error.message) ? "fichier trop lourd (20 Mo maximum)" : error.message);
+    return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+  }
   async function addPhotos(files: FileList | File[] | null) {
     const all = files ? Array.from(files).filter((f) => f.type.startsWith("image/")) : []; if (!all.length) { if (files && (files as any).length) setPMsg({ t: "Choisis des images (JPG, PNG, WebP, HEIC…)." }); return; }
     const room = maxP - photos.length; if (room <= 0) { setPMsg({ t: `Tu as déjà ${maxP} photos : supprime-en une pour en ajouter.` }); return; }
@@ -60,9 +68,10 @@ export default function MyProfile() {
   async function addVideo(file?: File) {
     if (!file) return;
     setVMsg(null);
-    if (file.size > 15 * 1024 * 1024) { setVMsg({ t: `La vidéo fait ${(file.size / 1048576).toFixed(1).replace(".", ",")} Mo : elle dépasse la limite de 15 Mo.` }); return; }
+    if (file.size > 20 * 1024 * 1024) { setVMsg({ t: `La vidéo fait ${(file.size / 1048576).toFixed(1).replace(".", ",")} Mo : elle dépasse la limite de 20 Mo.` }); return; }
+    if (!["video/mp4", "video/webm", "video/quicktime"].includes(file.type)) { setVMsg({ t: "Format non accepté : choisis un MP4, WebM ou MOV." }); return; }
     setBusy(true); setMsg(null); setVMsg({ t: "⏳ Envoi de la vidéo en cours…", ok: true });
-    try { setVideo(await up(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
+    try { setVideo(await upVideo(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }
   const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3; const maxS = vip ? 30 : 5;
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
@@ -174,7 +183,7 @@ export default function MyProfile() {
             </label>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
 </section><section className="dcard"><h3>Vidéo</h3>{kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
-            <label className="f"><span>Vidéo de présentation (une seule, 15 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
+            <label className="f"><span>Vidéo de présentation (une seule, 20 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
             {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
             {video && <label className="chk"><input type="checkbox" onChange={(e) => e.target.checked && setVideo(null)} /> <span>🎬 Vidéo actuelle : cocher pour la supprimer</span></label>}
 
