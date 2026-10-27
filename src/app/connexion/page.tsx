@@ -6,13 +6,13 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 
 function Form() {
   const [signup, setSignup] = useState(!!useSearchParams().get("inscription"));
-  const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
+  const [adult, setAdult] = useState(false); const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
   async function go(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null);
     const sb = supabaseBrowser();
     if (signup) {
-      const { error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}/mon-profil` } });
+      const { error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}/mon-profil`, data: { adult_confirmed_at: new Date().toISOString() } } });
       setMsg(error ? { t: error.message } : { t: "Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi.", ok: true });
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw });
@@ -30,6 +30,7 @@ function Form() {
           <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={go}>
             <label className="f">Adresse e-mail<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
             <label className="f">Mot de passe (8 caractères minimum)<input type="password" required minLength={8} value={pw} onChange={(e) => setPw(e.target.value)} autoComplete={signup ? "new-password" : "current-password"} /></label>
+            {signup && <label className="chk"><input type="checkbox" required checked={adult} onChange={(e) => setAdult(e.target.checked)} /> <span>Je certifie avoir <b>18 ans ou plus</b> et j’accepte les <Link href="/cgu" style={{ textDecoration: "underline" }}>conditions d’utilisation</Link> et la <Link href="/confidentialite" style={{ textDecoration: "underline" }}>politique de confidentialité</Link>.</span></label>}
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
             <button className="btn" disabled={busy}>{signup ? "Créer mon compte" : "Me connecter"}</button>
             <button type="button" className="btn ghost" onClick={() => setSignup(!signup)}>{signup ? "J’ai déjà un compte" : "Pas encore de compte ?"}</button>

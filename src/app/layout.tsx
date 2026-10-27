@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
+import AgeGate from "@/components/AgeGate";
 import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -31,13 +32,14 @@ export default async function Root({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "HeyPapi", url: siteUrl(), inLanguage: "fr" }) }} />
+        <AgeGate />
         <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} cities={cities} isAdmin={isAdmin} />
         {me?.paused && (
           <div className="pbanner" role="status"><span>⏸ Ton annonce « {me.name} » est en pause{me.vip ? " (même en VIP)" : ""} : elle n’apparaît plus dans l’annuaire.</span>
             <Link href="/mon-profil?reactiver=1">▶ Réactiver mon annonce</Link></div>
         )}
         {children}
-        <footer className="gut" id="foot">Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos.</footer>
+        <footer className="gut" id="foot">Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos.<br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · <Link href="/contact">Contact</Link></footer>
       </body>
     </html>
   );
