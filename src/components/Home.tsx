@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GPATH, slug } from "@/lib/site";
 import { nearestCity } from "@/lib/geo";
+import { thumbUrl } from "@/lib/img";
 import Ic from "./Ic";
 import Heart from "./Heart";
 import { useFavs } from "@/lib/favs";
@@ -13,6 +14,9 @@ import { CIC, cap, cityList, isNew, lab, Profile } from "@/lib/types";
 const PAGE = 10;
 const ITEMS: [string, string, string][] = [["tous", "Tous les profils", "grid"], ["fille", "Filles", "fille"], ["homme", "Hommes", "homme"], ["trans", "Trans", "trans"], ["livecam", "Livecam", "live"]];
 
+function Tile({ u }: { u: string }) {
+  return <div>{u && <img src={thumbUrl(u)} alt="" loading="lazy" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = u; } }} />}</div>;
+}
 function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: number }) {
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
   while (pics.length < 3) pics.push(p.photos[0] || "");
@@ -22,7 +26,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
       <div className="cover">
         <div className="tr"><span className="phb" title="Nombre de photos"><Ic n="camera" s={14} />{p.photos.length}</span>{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}</div>
         {isNew(p) && <span className="nwb" title="Profil créé il y a moins d’un mois"><Ic n="spark" s={14} />New</span>}
-        <div className="mos">{pics.map((u, i) => <div key={i} style={u ? { backgroundImage: `url('${u}')` } : undefined} />)}</div>
+        <div className="mos">{pics.map((u, i) => <Tile key={i} u={u} />)}</div>
         {a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? "En direct" : "Dispo"}</span>}
         {lab(p) && <span className={`badge${live ? " live" : ""}`}>{lab(p)}</span>}
         {p.video && <span className="vid-ic"><Ic n="video" s={14} />vidéo</span>}
