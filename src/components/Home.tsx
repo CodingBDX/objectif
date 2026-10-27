@@ -50,7 +50,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
 export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "" }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
-  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0);
+  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
   const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
@@ -82,17 +82,17 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
-  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, city, fav]);
+  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, city, fav]);
   const chView = (v: "cards" | "list") => { setView(v); try { localStorage.setItem("objectif_vue", v); } catch {} };
 
   const list = useMemo(() => {
     const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || cityList(p).includes(city)) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
-      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (!!p.tarif_60 && (tar === 999 ? p.tarif_60 > 300 : p.tarif_60 <= tar)))
+      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || ((dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
-    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? (a.tarif_60 || 1e9) - (b.tarif_60 || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
+    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((dur === 30 ? a.tarif_30 : a.tarif_60) || 1e9) - ((dur === 30 ? b.tarif_30 : b.tarif_60) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
-  }, [profiles, type, tag, q, sort, vid, ver, now, tar, city, fav, favs]);
+  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, city, fav, favs]);
 
   const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
@@ -109,7 +109,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   }, [shown, list.length]);
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
-  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); r.push("/"); };
+  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); r.push("/"); };
 
   return (
     <div className="shell gut" id="shell">
@@ -130,8 +130,9 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div>
           <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif 1 h croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
-          <div className="row"><span>Tarif pour 1 h</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
+          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>
+          <div className="row"><span>Tarif maximum 🌹</span><select aria-label="Tarif maximum" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
@@ -172,8 +173,9 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div></div>
           <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif 1 h croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
-          <div className="row"><span>Tarif pour 1 h</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
+          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>
+          <div className="row"><span>Tarif maximum 🌹</span><select aria-label="Tarif maximum" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option>{(dur === 30 ? [50, 80, 100, 150] : [100, 150, 200, 300]).map((v) => <option key={v} value={v}>{v} maximum</option>)}<option value={999}>Plus de {dur === 30 ? 150 : 300}</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
