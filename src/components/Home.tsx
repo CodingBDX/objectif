@@ -93,8 +93,10 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, city, fav, favs]);
 
-  const cnt = (t: string) => (t === "tous" ? profiles.length : profiles.filter((p) => p.genre === t).length);
-  const tags = useMemo(() => { const tc: Record<string, number> = {}; profiles.forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [profiles]);
+  const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
+  const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
+  const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
+  useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
   const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.forEach((p) => cityList(p).forEach((c) => (cc[c] = (cc[c] || 0) + 1))); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 10); }, [profiles]);
   const hl = useMemo(() => profiles.filter((p) => (type === "tous" || p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 3), [profiles, type, tag, city]);
 
