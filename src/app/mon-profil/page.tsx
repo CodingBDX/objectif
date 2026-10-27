@@ -4,6 +4,7 @@ import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { SPECIALTIES, Trip } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
+import CityInput from "@/components/CityInput";
 
 type Hours = Record<string, [string, string] | null>;
 const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
@@ -126,12 +127,12 @@ export default function MyProfile() {
             <div className="f"><span style={L}>Spécialités (jusqu’à 6) <span style={{ fontWeight: 600 }}>{spec.length}/6</span></span>
               <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < 6 ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
-</section><section className="dcard"><h3>Où te trouver ?</h3><label className="f">Ville<input value={f.city} onChange={set("city")} required maxLength={40} autoComplete="off" /></label>
+</section><section className="dcard"><h3>Où te trouver ?</h3><div className="f"><span style={L}>Ville (tape les premières lettres)</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label="Ville" placeholder="Ex. Lyon" /></div>
             <div className="f"><span style={L}>Villes supplémentaires (jusqu’à 3, optionnel)</span>
-              <div className="row3">{more.map((m, i) => <input key={i} value={m} maxLength={40} placeholder={`Ville ${i + 2}`} aria-label={`Ville supplémentaire ${i + 1}`} onChange={(e) => setMore(more.map((x, j) => (j === i ? e.target.value : x)))} />)}</div></div>
+              <div className="row3">{more.map((m, i) => <CityInput key={i} value={m} placeholder={`Ville ${i + 2}`} label={`Ville supplémentaire ${i + 1}`} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} />)}</div></div>
             <div className="f"><span style={L}>Prochains déplacements (calendrier, optionnel)</span>
               {trips.map((t, i) => <div className="trow" key={i}>
-                <input placeholder="Ville visitée" maxLength={40} value={t.city} onChange={(e) => setTrip(i, "city", e.target.value)} aria-label={`Ville du déplacement ${i + 1}`} />
+                <CityInput placeholder="Ville visitée" value={t.city} onChange={(v) => setTrip(i, "city", v)} label={`Ville du déplacement ${i + 1}`} />
                 <input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} />
                 <input type="date" value={t.to} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></div>)}
               <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>

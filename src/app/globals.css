@@ -468,3 +468,9 @@ body{overflow-x:clip}
 .dacts .btn{background:var(--card)!important;color:var(--btn)!important;border:1px solid var(--line)!important;box-shadow:none!important}
 .donut::before{background:var(--card);box-shadow:none}
 @media (max-width:760px){.dside{border-radius:26px}.dmain{padding:0}}
+
+.cityin{position:relative;min-width:0}
+.citylist{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);margin:0;padding:6px;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);max-height:280px;overflow:auto}
+.citylist li{padding:10px 12px;border-radius:12px;font-weight:700;color:var(--ink);cursor:pointer;min-height:40px}
+.citylist li small{font-weight:600;color:var(--mut)}
+.citylist li:hover,.citylist li.on{background:var(--soft);color:var(--btn)}
