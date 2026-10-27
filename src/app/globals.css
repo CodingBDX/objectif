@@ -549,3 +549,8 @@ body{overflow-x:clip}
 
 @media (min-width:701px) and (max-width:1100px){.panel.top li:nth-child(n+7){display:none}.t10{display:none}.t6{display:inline}}
 .top h2 span{background:none!important;box-shadow:none!important}
+
+/* bouton « Se connecter » doré */
+.nl.gold{background:linear-gradient(135deg,#ffe9a8,#f3c84b 55%,#e0a92a);color:#5c3a00;font-weight:700;border:1px solid #e0b43a;box-shadow:0 4px 12px rgba(224,169,42,.4),inset 0 1px 0 rgba(255,255,255,.7)}
+.nl.gold:hover{background:linear-gradient(135deg,#fff0bd,#f7d25f 55%,#e8b53a);box-shadow:0 6px 16px rgba(224,169,42,.5),inset 0 1px 0 rgba(255,255,255,.8)}
+@media (max-width:900px){.navmenu .nl.gold{justify-content:center}}
