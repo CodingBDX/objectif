@@ -137,7 +137,7 @@ export default function Admin() {
               <div className="dn"><div className="donut" style={{ background: `conic-gradient(${stops})` }} role="img" aria-label={Object.entries(cnt.g).map(([k, v]) => `${CATS[k]} ${v}`).join(", ")}><b>{gTot}</b></div>
                 <ul>{Object.entries(cnt.g).map(([k, v]) => <li key={k}><i style={{ background: GCOL[k] }} />{CATS[k]}<b>{gTot ? Math.round((v / gTot) * 100) : 0} %</b></li>)}</ul></div>
             </section>
-            <section className="dcard">
+            <section className="dcard" style={{ gridColumn: "1 / -1" }}>
               <h3>Activité récente</h3>
               {activity.length === 0 ? <p className="note">Rien pour le moment.</p> : <ul className="dl">{activity.map((a, i) => <li key={i}><span>{a.i} <b>{a.title}</b> · {a.sub}</span><b style={{ whiteSpace: "nowrap" }}>{ago(a.t)}</b></li>)}</ul>}
             </section>
