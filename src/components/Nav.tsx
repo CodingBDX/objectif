@@ -25,6 +25,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
         <button className="burger" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           <svg className="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
+        <div className="gs-mob"><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
         <div className="navmenu" onClick={(e) => { if ((e.target as HTMLElement).closest("a,button")) close(); }}>
           <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />Annuaire</Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte"><Ic n="pin" />Carte</Link>
@@ -35,7 +36,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
           </Link>
           <Link className="nl" href="/?pm=1" title="Profils près de moi">📍 <span className="nlt">Près de moi</span></Link>
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
-          <GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} />
+          <div className="gs-desk"><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
           {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
             {hasProfile && vip && <PauseBtn id={userId} paused={!!paused} />}
