@@ -5,6 +5,7 @@ import CityInput from "@/components/CityInput";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { ASSO_SERVICES } from "@/lib/assos";
 import { slug } from "@/lib/site";
+import AssoShell from "@/components/AssoShell";
 
 type Row = { id: string; slug: string; name: string; city: string; more: string[]; region: string | null; description: string; services: string[]; phone: string | null; email: string | null; site: string | null; address: string | null; hours: string | null; status: "pending" | "approved" | "rejected"; admin_note: string | null };
 const EMPTY = { name: "", city: "", description: "", phone: "", email: "", site: "", address: "", hours: "" };
@@ -45,41 +46,45 @@ export default function Page() {
 
   if (st === "load") return <section className="gut"><p className="note">Chargement…</p></section>;
   if (st === "out") return (
-    <section className="gut"><div className="pfc" style={{ maxWidth: 560 }}><div className="panel regp">
-      <h1 className="regh">Espace association</h1>
-      <p className="note">Crée un compte (ou connecte-toi) avec l’e-mail de l’association pour publier ta fiche.</p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Link className="btn" href="/connexion?inscription=1&next=/mon-association">Créer un compte</Link><Link className="btn ghost" href="/connexion?next=/mon-association">Se connecter</Link></div>
-    </div></div></section>);
+    <AssoShell title="Espace association" active="fiche">
+      <section className="dcard"><p className="note" style={{ marginTop: 0 }}>Crée un compte (ou connecte-toi) avec l’e-mail de l’association pour publier ta fiche.</p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Link className="btn" href="/connexion?inscription=1&next=/mon-association">Créer un compte</Link><Link className="btn ghost" href="/connexion?next=/mon-association">Se connecter</Link></div></section>
+    </AssoShell>);
 
   return (
-    <section className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/associations">← Annuaire des associations</Link></div>
-      <div className="pfc" style={{ maxWidth: 760 }}><div className="panel regp">
-        <h1 className="regh">{row ? "Ma fiche association" : "Créer la fiche de mon association"}</h1>
-        {row && <p style={{ margin: "0 0 4px" }}><b>{STATUT[row.status]}</b>{row.status === "approved" && <> · <Link href={`/associations/${row.slug}`}>voir la fiche publique</Link></>}</p>}
-        {row?.status === "rejected" && row.admin_note && <p className="note" style={{ color: "var(--btn)", fontWeight: 700 }}>Motif : {row.admin_note}</p>}
-        <p className="note" style={{ margin: "0 0 14px" }}>Chaque création ou modification est relue avant d’être publiée. Indique des coordonnées qui permettent de te joindre pour vérification.</p>
-        <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={save}>
+    <AssoShell title={row ? "Ma fiche association" : "Créer la fiche de mon association"} active="fiche" avatar={(f.name || "?").slice(0, 1).toUpperCase()} hi={f.name || "Nouvelle association"}
+      top={row?.status === "approved" ? <Link className="btn ghost" href={`/associations/${row.slug}`}>Voir la fiche publique</Link> : undefined}>
+      {row && <section className="dcard"><b>{STATUT[row.status]}</b>
+        {row.status === "rejected" && row.admin_note && <p className="note" style={{ color: "var(--btn)", fontWeight: 700, margin: "6px 0 0" }}>Motif : {row.admin_note}</p>}
+        <p className="note" style={{ margin: "6px 0 0" }}>Chaque création ou modification est relue avant d’être publiée.</p></section>}
+      <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={save}>
+        <section className="dcard"><h3>Qui êtes-vous ?</h3>
           <label className="f">Nom de l’association<input required minLength={2} maxLength={80} value={f.name} onChange={set("name")} /></label>
+          <label className="f">Présentation<textarea rows={6} maxLength={1500} value={f.description} onChange={set("description")} placeholder="Qui vous êtes, à qui vous vous adressez, comment vous aidez…" /></label>
+        </section>
+        <section className="dcard"><h3>Où vous trouver ?</h3>
           <div className="f"><span>Ville principale</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label="Ville" placeholder="Ex. Lyon" /></div>
-          <div className="f"><span>Autres villes où tu interviens (facultatif)</span>
+          <div className="f"><span>Autres villes où vous intervenez (facultatif)</span>
             <div style={{ display: "grid", gap: 8 }}>{more.map((m, i) => <div key={i} style={{ display: "flex", gap: 6 }}><div style={{ flex: 1 }}><CityInput value={m} label={`Ville ${i + 2}`} placeholder={`Ville ${i + 2}`} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} /></div><button type="button" className="btn ghost" aria-label="Retirer cette ville" onClick={() => setMore(more.filter((_, j) => j !== i))}>✕</button></div>)}
               {more.length < 10 && <div><button type="button" className="btn ghost" onClick={() => setMore([...more, ""])}>+ Ajouter une ville</button></div>}</div></div>
-          <label className="f">Présentation<textarea rows={6} maxLength={1500} value={f.description} onChange={set("description")} placeholder="Qui vous êtes, à qui vous vous adressez, comment vous aidez…" /></label>
-          <fieldset className="fs"><legend className="note">Ce que vous proposez (12 max.)</legend>
+          <label className="f">Adresse d’accueil (facultatif)<input maxLength={200} value={f.address} onChange={set("address")} /></label>
+        </section>
+        <section className="dcard"><h3>Ce que vous proposez</h3>
+          <fieldset className="fs"><legend className="note">12 maximum</legend>
             <div className="tags">{ASSO_SERVICES.map((s) => <button type="button" key={s} className="chip" aria-pressed={svc.includes(s)} onClick={() => setSvc(svc.includes(s) ? svc.filter((x) => x !== s) : svc.length < 12 ? [...svc, s] : svc)}>{s}</button>)}</div></fieldset>
+        </section>
+        <section className="dcard"><h3>Contact</h3>
           <div className="row2"><label className="f">Téléphone<input type="tel" maxLength={30} value={f.phone} onChange={set("phone")} autoComplete="tel" /></label>
             <label className="f">E-mail public<input type="email" maxLength={120} value={f.email} onChange={set("email")} autoComplete="email" /></label></div>
           <div className="row2"><label className="f">Site web<input maxLength={200} value={f.site} onChange={set("site")} placeholder="https://…" /></label>
             <label className="f">Horaires / permanences<input maxLength={200} value={f.hours} onChange={set("hours")} placeholder="Ex. lun–ven 10h–18h" /></label></div>
-          <label className="f">Adresse d’accueil (facultatif)<input maxLength={200} value={f.address} onChange={set("address")} /></label>
-          {msg && <p className="note" role={msg.ok ? "status" : "alert"} style={msg.ok ? undefined : { color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
-          <button className="btn" type="submit" disabled={busy}>{busy ? "Enregistrement…" : row ? "Enregistrer (revalidation)" : "Envoyer ma fiche"}</button>
-        </form>
-        {row && <div style={{ marginTop: 18 }}>{sure
-          ? <p className="note">Supprimer définitivement la fiche ? <button className="btn" onClick={del}>Oui, supprimer</button> <button className="btn ghost" onClick={() => setSure(false)}>Annuler</button></p>
-          : <button className="btn ghost" onClick={() => setSure(true)}>🗑 Supprimer ma fiche</button>}</div>}
-      </div></div>
-    </section>
+        </section>
+        {msg && <p className="note" role={msg.ok ? "status" : "alert"} style={msg.ok ? undefined : { color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
+        <button className="btn" type="submit" disabled={busy}>{busy ? "Enregistrement…" : row ? "Enregistrer (revalidation)" : "Envoyer ma fiche"}</button>
+      </form>
+      {row && <div>{sure
+        ? <p className="note">Supprimer définitivement la fiche ? <button className="btn" onClick={del}>Oui, supprimer</button> <button className="btn ghost" onClick={() => setSure(false)}>Annuler</button></p>
+        : <button className="btn ghost" onClick={() => setSure(true)}>🗑 Supprimer ma fiche</button>}</div>}
+    </AssoShell>
   );
 }
