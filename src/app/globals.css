@@ -803,3 +803,6 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
  .mspec{display:block;margin:6px 0 4px}
  .mspec .bub{margin-top:8px}
 }
+
+/* Filtres de description */
+.rng{display:flex;gap:8px}.rng input{width:100%;min-width:0;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 10px;min-height:40px}

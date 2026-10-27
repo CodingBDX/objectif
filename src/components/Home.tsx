@@ -14,9 +14,11 @@ import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">Chargement de la carte…</p> });
 import { useFavs } from "@/lib/favs";
 import { avail, tripsOf, todayP, dShort } from "@/lib/avail";
-import { CIC, cap, cityList, isNew, lab, Profile, showTarif } from "@/lib/types";
+import { CIC, cap, cityList, isNew, lab, Profile, showTarif, LANGS, ETHNIES, HAIRS, EYES, BRAS } from "@/lib/types";
+const DF0 = { amin: "", amax: "", hmin: "", hmax: "", wmin: "", wmax: "", eth: "", lang: "", hair: "", eyes: "", bra: "", smk: "", drk: "", recv: false, trav: false };
 
 const PAGE = 10;
+const inRange = (v: number | null | undefined, a: string, b: string) => { if (!a && !b) return true; if (!v) return false; return (!a || v >= Number(a)) && (!b || v <= Number(b)); };
 const isoIn = (n: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date(Date.now() + n * 864e5));
 /** Déplacement du profil vers cette ville qui tombe dans les n prochains jours. */
 const visitOf = (p: Profile, city: string, n: number) => { const t = todayP(), lim = isoIn(n); return tripsOf(p).find((x) => slug(x.city) === slug(city) && x.from <= lim && x.to >= t); };
@@ -60,6 +62,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
+  const [df, setDf] = useState(DF0); const upd = (k: keyof typeof DF0, v: string | boolean) => setDf((d) => ({ ...d, [k]: v }));
   const [view, setView] = useState<"cards" | "list" | "map">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
@@ -95,17 +98,20 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
-  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav]);
+  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, df]);
   const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
   const list = useMemo(() => {
     const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : cityList(p).includes(city))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
-      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
+      && (!fav || favs.includes(p.id)) && inRange(p.age, df.amin, df.amax) && inRange(p.height_cm, df.hmin, df.hmax) && inRange(p.weight_kg, df.wmin, df.wmax)
+      && (!df.eth || p.ethnicity === df.eth) && (!df.lang || (p.languages || []).includes(df.lang)) && (!df.hair || p.hair === df.hair) && (!df.eyes || p.eyes === df.eyes) && (!df.bra || p.bra === df.bra)
+      && (!df.smk || p.smoker === df.smk) && (!df.drk || p.drinker === df.drk) && (!df.recv || p.receives) && (!df.trav || p.travels)
+      && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio.replace(/[*#]/g, "") + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
     l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
-  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, favs]);
+  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, favs, df]);
 
   const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
   const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
@@ -132,7 +138,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   useEffect(() => { setQ(sp.get("q") || ""); setTag(sp.get("tag") || ""); }, [sp]); // recherche venant du menu du haut
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/${searchMode ? "recherche" : ""}?ville=${encodeURIComponent(c)}` : searchMode ? "/recherche" : "/");
-  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); r.push(searchMode ? "/recherche" : "/"); };
+  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); setDf(DF0); r.push(searchMode ? "/recherche" : "/"); };
 
   return (
     <div className={`shell gut${searchMode ? " srch" : ""}`} id="shell">
@@ -164,6 +170,18 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
+          <div className="row"><span>Âge</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Âge minimum" placeholder="min" value={df.amin} onChange={(e) => upd("amin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Âge maximum" placeholder="max" value={df.amax} onChange={(e) => upd("amax", e.target.value)} /></span></div>
+          <div className="row"><span>Taille (cm)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Taille (cm) minimum" placeholder="min" value={df.hmin} onChange={(e) => upd("hmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Taille (cm) maximum" placeholder="max" value={df.hmax} onChange={(e) => upd("hmax", e.target.value)} /></span></div>
+          <div className="row"><span>Poids (kg)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Poids (kg) minimum" placeholder="min" value={df.wmin} onChange={(e) => upd("wmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Poids (kg) maximum" placeholder="max" value={df.wmax} onChange={(e) => upd("wmax", e.target.value)} /></span></div>
+          <div className="row"><span>Ethnie</span><select aria-label="Ethnie" value={df.eth} onChange={(e) => upd("eth", e.target.value)}><option value="">Peu importe</option>{ETHNIES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Langue parlée</span><select aria-label="Langue parlée" value={df.lang} onChange={(e) => upd("lang", e.target.value)}><option value="">Peu importe</option>{LANGS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Cheveux</span><select aria-label="Cheveux" value={df.hair} onChange={(e) => upd("hair", e.target.value)}><option value="">Peu importe</option>{HAIRS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Yeux</span><select aria-label="Yeux" value={df.eyes} onChange={(e) => upd("eyes", e.target.value)}><option value="">Peu importe</option>{EYES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Bonnet</span><select aria-label="Bonnet" value={df.bra} onChange={(e) => upd("bra", e.target.value)}><option value="">Peu importe</option>{BRAS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Fume</span><select aria-label="Fume" value={df.smk} onChange={(e) => upd("smk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
+          <div className="row"><span>Boit</span><select aria-label="Boit" value={df.drk} onChange={(e) => upd("drk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
+          <label className="ck"><input type="checkbox" checked={df.recv} onChange={(e) => upd("recv", e.target.checked)} /> Reçoit</label>
+          <label className="ck"><input type="checkbox" checked={df.trav} onChange={(e) => upd("trav", e.target.checked)} /> Se déplace</label>
         </div>
         <div className="mchips">{ITEMS.map(([k, v]) => <button key={k} className="chip" aria-pressed={type === k} onClick={() => setType(k)}>{v}</button>)}</div>
         <div className="sh"><h1><Ic n="star" s={22} />{h1}</h1><span className="cnt0" aria-live="polite">{list.length} profil{list.length > 1 ? "s" : ""}</span>
@@ -210,6 +228,18 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
+          <div className="row"><span>Âge</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Âge minimum" placeholder="min" value={df.amin} onChange={(e) => upd("amin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Âge maximum" placeholder="max" value={df.amax} onChange={(e) => upd("amax", e.target.value)} /></span></div>
+          <div className="row"><span>Taille (cm)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Taille (cm) minimum" placeholder="min" value={df.hmin} onChange={(e) => upd("hmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Taille (cm) maximum" placeholder="max" value={df.hmax} onChange={(e) => upd("hmax", e.target.value)} /></span></div>
+          <div className="row"><span>Poids (kg)</span><span className="rng"><input type="number" inputMode="numeric" aria-label="Poids (kg) minimum" placeholder="min" value={df.wmin} onChange={(e) => upd("wmin", e.target.value)} /><input type="number" inputMode="numeric" aria-label="Poids (kg) maximum" placeholder="max" value={df.wmax} onChange={(e) => upd("wmax", e.target.value)} /></span></div>
+          <div className="row"><span>Ethnie</span><select aria-label="Ethnie" value={df.eth} onChange={(e) => upd("eth", e.target.value)}><option value="">Peu importe</option>{ETHNIES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Langue parlée</span><select aria-label="Langue parlée" value={df.lang} onChange={(e) => upd("lang", e.target.value)}><option value="">Peu importe</option>{LANGS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Cheveux</span><select aria-label="Cheveux" value={df.hair} onChange={(e) => upd("hair", e.target.value)}><option value="">Peu importe</option>{HAIRS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Yeux</span><select aria-label="Yeux" value={df.eyes} onChange={(e) => upd("eyes", e.target.value)}><option value="">Peu importe</option>{EYES.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Bonnet</span><select aria-label="Bonnet" value={df.bra} onChange={(e) => upd("bra", e.target.value)}><option value="">Peu importe</option>{BRAS.map((x) => <option key={x} value={x}>{x}</option>)}</select></div>
+          <div className="row"><span>Fume</span><select aria-label="Fume" value={df.smk} onChange={(e) => upd("smk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
+          <div className="row"><span>Boit</span><select aria-label="Boit" value={df.drk} onChange={(e) => upd("drk", e.target.value)}><option value="">Peu importe</option><option value="non">Non</option><option value="parfois">Parfois</option><option value="oui">Oui</option></select></div>
+          <label className="ck"><input type="checkbox" checked={df.recv} onChange={(e) => upd("recv", e.target.checked)} /> Reçoit</label>
+          <label className="ck"><input type="checkbox" checked={df.trav} onChange={(e) => upd("trav", e.target.checked)} /> Se déplace</label>
         </div>
       </aside>
     </div>
