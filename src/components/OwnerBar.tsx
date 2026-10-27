@@ -10,7 +10,7 @@ export default function OwnerBar({ id, paused, vip }: { id: string; paused: bool
       {paused && <div className="pnote">⏸ Ton annonce est en pause : elle n’apparaît plus dans l’annuaire{vip ? ", même en VIP" : ""}.</div>}
       <div className="acts">
         <Link className="btn" href="/mon-profil">✏️ Modifier mon profil</Link>
-        <Link className="btn ghost" href="/statistiques">📊 Mes statistiques</Link>
+        <Link className="btn ghost" href="/mon-profil#stats">📊 Mes statistiques</Link>
         <button className="btn ghost" onClick={toggle}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
       </div>
     </div>

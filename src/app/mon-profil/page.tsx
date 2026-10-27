@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import StatsPanel from "@/components/StatsPanel";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { SPECIALTIES, Trip } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
@@ -11,6 +12,8 @@ const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
 
 export default function MyProfile() {
   const sb = supabaseBrowser();
+  const [tab, setTab] = useState<"stats" | "edit">("edit");
+  useEffect(() => { const f = () => setTab(location.hash === "#stats" ? "stats" : "edit"); f(); window.addEventListener("hashchange", f); return () => window.removeEventListener("hashchange", f); }, []);
   const [uid, setUid] = useState(""); const [loaded, setLoaded] = useState(false); const [isNewP, setIsNewP] = useState(true);
   const [f, setF] = useState({ name: "", genre: "", city: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
@@ -107,20 +110,22 @@ export default function MyProfile() {
         <div className="dav">{(f.name || pseudo || "?").slice(0, 1).toUpperCase()}</div>
         <div className="dhi">{isNewP ? "Bienvenue 👋" : `Salut, ${(f.name || "").split(" ")[0]} 👋`}</div>
         <nav>
-          {!isNewP && <Link href="/statistiques">📊 Statistiques</Link>}
+          {!isNewP && <a href="#stats" className={tab === "stats" ? "on" : ""} aria-current={tab === "stats" ? "page" : undefined}>📊 Statistiques</a>}
           {!isNewP && <Link href="/verifier">🛡️ Vérifier un client</Link>}
-          <Link className="on" href="/mon-profil">✏️ Mon profil</Link>
+          <a href="#profil" className={tab === "edit" || isNewP ? "on" : ""} aria-current={tab === "edit" || isNewP ? "page" : undefined}>✏️ Mon profil</a>
           {!isNewP && <Link href={`/profil/${uid}`}>👀 Voir ma page</Link>}
           <Link href="/">🏠 Annuaire</Link>
           <Link href="/contact">✉️ Contact</Link>
         </nav>
+        {!isNewP && !vip && <div className="dvip"><div className="crown">👑</div><b>Passe en VIP</b><span>Plus de visibilité dans l’annuaire.</span><Link className="dbtn pink" href="/contact?s=vip">Devenir VIP</Link></div>}
       </aside>
+      {tab === "stats" && !isNewP ? <main className="dmain"><StatsPanel onEdit={() => { location.hash = "profil"; }} /></main> : (
       <main className="dmain dedit">
         <div className="dtop"><h1>{isNewP ? "Créer mon profil" : "Modifier mon profil"}</h1></div>
         <div className="dform0">
           {!isNewP && <div className="acts dacts">
             <button type="button" className="btn ghost" onClick={async () => { await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); }}>{paused ? "▶ Réactiver mon annonce" : "⏸ Mettre mon annonce en pause"}</button>
-            <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link><Link className="btn ghost" href="/statistiques">📊 Mes statistiques</Link></div>}
+            <Link className="btn ghost" href={`/profil/${uid}`}>Voir mon profil</Link><a className="btn ghost" href="#stats">📊 Mes statistiques</a></div>}
           {isNewP && (<>
             <p className="note">Choisis le type de profil qui te correspond.</p>
             <div className="kinds" role="radiogroup" aria-label="Type de profil">
@@ -201,7 +206,7 @@ export default function MyProfile() {
             <button className="dbtn" type="submit" disabled={busy}>{busy ? "Patiente…" : isNewP ? "Publier mon profil" : "Enregistrer"}</button></section>
           </fieldset></form>}
         </div>
-      </main>
+      </main>)}
     </div>
   );
 }
