@@ -3,16 +3,15 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import Ic from "./Ic";
-import CityInput from "./CityInput";
+import GlobalSearch, { SIndex } from "./GlobalSearch";
 import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; cities: string[]; isAdmin?: boolean };
+type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean };
 
-function Inner({ loggedIn, hasProfile, vip, name, userId, cities, isAdmin }: P) {
-  const [ctext, setCtext] = useState("");
-  const [open, setOpen] = useState(false);
+function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin }: P) {
+    const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
   return (
@@ -32,9 +31,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, cities, isAdmin }: P) 
           </Link>
           <Link className="nl" href="/?pm=1" title="Profils près de moi">📍 <span className="nlt">Près de moi</span></Link>
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>Devenir VIP</span></Link>}
-          <div className="sp"><Ic n="pin" />
-            <CityInput value={ctext} onChange={setCtext} suggest={cities} label="Choisir une ville" placeholder="Choisir une ville"
-              onPick={(c) => { setCtext(""); close(); r.push((cities.includes(c) ? `/ville/${slug(c)}` : `/?ville=${encodeURIComponent(c)}`) + "#recherche"); }} /></div>
+          <GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} />
           {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>

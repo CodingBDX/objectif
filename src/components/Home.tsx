@@ -51,7 +51,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
 
 export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "" }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
-  const [type, setType] = useState(initialType); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
+  const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
   const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
@@ -117,10 +117,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.5; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 3500);
     return () => clearInterval(t);
   }, [hl]);
-  useEffect(() => { // arrivée depuis le menu « Choisir une ville » : on amène directement à la recherche et aux filtres
-    if (location.hash !== "#recherche") return;
-    const el = document.getElementById("recherche"); if (el && el.offsetParent) setTimeout(() => el.scrollIntoView({ block: "start" }), 60);
-  }, [city]);
+  useEffect(() => { setQ(sp.get("q") || ""); setTag(sp.get("tag") || ""); }, [sp]); // recherche venant du menu du haut
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
   const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); r.push("/"); };
@@ -146,9 +143,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         </section>}
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
-        <div className="panel msearch" id="recherche"><h2><Ic n="search" s={20} />Rechercher</h2>
-          <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} />
-          <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
+        <div className="panel msearch" id="recherche"><h2><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
           <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant (selon la durée)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
           <div className="row"><span>Durée</span><select aria-label="Durée" value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>1 heure</option><option value={30}>30 minutes</option></select></div>

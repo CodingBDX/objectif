@@ -7,7 +7,8 @@ import AgeGate from "@/components/AgeGate";
 import Splash from "@/components/Splash";
 import NavProgress from "@/components/NavProgress";
 import { siteUrl } from "@/lib/site";
-import { publicCities } from "@/lib/public";
+import { publicProfiles } from "@/lib/public";
+import { lab } from "@/lib/types";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -21,11 +22,14 @@ export const dynamic = "force-dynamic";
 export default async function Root({ children }: { children: React.ReactNode }) {
   const sb = supabaseServer();
   const { data: { user } } = await sb.auth.getUser();
-  const [me, isAdmin, cities] = await Promise.all([
+  const [me, isAdmin, all] = await Promise.all([
     user ? sb.from("profiles").select("name,vip,paused").eq("id", user.id).maybeSingle().then((r: any) => r.data as { name: string; vip: boolean; paused: boolean } | null) : Promise.resolve(null),
     user ? sb.from("admins").select("id").eq("id", user.id).maybeSingle().then((r: any) => !!r.data) : Promise.resolve(false),
-    publicCities()
+    publicProfiles()
   ]);
+  const cc: Record<string, number> = {}, tc: Record<string, number> = {};
+  all.forEach((p) => { cc[p.city] = (cc[p.city] || 0) + 1; p.specialties.forEach((x) => { const k = x.toLowerCase(); tc[k] = (tc[k] || 0) + 1; }); });
+  const index = { c: Object.entries(cc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")) as [string, number][], t: Object.entries(tc).sort((a, b) => b[1] - a[1]) as [string, number][], p: all.map((p) => ({ id: p.id, name: p.name, sub: [lab(p), p.city].filter(Boolean).join(" · ") })) };
   return (
     <html lang="fr" data-theme="light">
       <head>
@@ -36,7 +40,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "HeyPapi", url: siteUrl(), inLanguage: "fr" }) }} />
         <Splash /><NavProgress />
         <AgeGate />
-        <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} cities={cities} isAdmin={isAdmin} />
+        <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} index={index} isAdmin={isAdmin} />
         {me?.paused && (
           <div className="pbanner" role="status"><span>⏸ Ton annonce « {me.name} » est en pause{me.vip ? " (même en VIP)" : ""} : elle n’apparaît plus dans l’annuaire.</span>
             <Link href="/mon-profil?reactiver=1">▶ Réactiver mon annonce</Link></div>
