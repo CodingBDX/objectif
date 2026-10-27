@@ -553,3 +553,11 @@ body{overflow-x:clip}
 /* bouton « Se connecter » : même forme que « Créer mon profil », en rose du site (contour) */
 .btn.login{background:var(--card)!important;color:var(--btn)!important;border:2px solid var(--pink)!important;box-shadow:var(--sh)}
 .btn.login:hover{background:var(--soft)!important}
+
+/* tons des encarts : normal = blanc rosé, VIP = champagne doré, livecam = violet (déjà défini plus haut) */
+.card:not(.isvip):not(.live):not(.off){background:linear-gradient(180deg,#ffffff,#fff5fa)}
+.card.isvip:not(.live):not(.off){background:linear-gradient(180deg,#fff9e6,#ffeaf1);border:1.5px solid #e6b94a;box-shadow:0 8px 26px rgba(224,169,42,.32)}
+.card.isvip:not(.live):not(.off) .tag{background:rgba(230,185,74,.22);color:#7a5200}
+.card.isvip:not(.live):not(.off) .ln h3{color:#8a5a00}
+.card.isvip:not(.live):not(.off) .meta svg{color:#d1991f}
+.card.isvip:not(.live):not(.off):hover{box-shadow:0 12px 32px rgba(224,169,42,.45)}
