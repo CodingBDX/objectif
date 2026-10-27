@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { coordsOf } from "@/lib/geo";
+import { coordsOf, coordsOfAddress } from "@/lib/geo";
 import { slug } from "@/lib/site";
 import { thumbUrl } from "@/lib/img";
 
 export type MapProfile = { id: string; name: string; sub: string; g: string; img: string };
+export type MapAsso = { slug: string; name: string; address: string; city: string; phone: string | null };
 export type MapCity = { city: string; n: number; p: MapProfile[] };
 const V = "1.9.4"; const ZOOM_PROFILES = 8; const MAXP = 14;
 const GI: Record<string, [string, string]> = { fille: ["♀", "#ee4f97"], homme: ["♂", "#3b8be0"], trans: ["⚧", "#9a5cc8"], livecam: ["●", "#e0344a"] };
@@ -25,7 +26,7 @@ function ring(k: number, f = 1): [number, number][] {
 }
 
 /** Carte Leaflet / OpenStreetMap. Dézoomée : une bulle par ville. Zoomée : les profils (photo, pseudo, icône du genre). */
-export default function MapView({ cities }: { cities: MapCity[] }) {
+export default function MapView({ cities, assos = [] }: { cities: MapCity[]; assos?: MapAsso[] }) {
   const el = useRef<HTMLDivElement>(null); const [msg, setMsg] = useState("Chargement de la carte…");
   useEffect(() => {
     let map: any, dead = false;
@@ -41,6 +42,12 @@ export default function MapView({ cities }: { cities: MapCity[] }) {
           L.marker(k, { icon: L.divIcon({ className: "mpin", iconSize: [size, size], html: `<span style="width:${size}px;height:${size}px">${c.n}</span>` }), title: `${c.city} : ${c.n} profil${c.n > 1 ? "s" : ""}` })
             .addTo(cityLayer).bindPopup(`<b>${esc(c.city)}</b> · ${c.n} profil${c.n > 1 ? "s" : ""}<br><a class="mgo" href="/ville/${slug(c.city)}">Voir tous les profils →</a><br><small>Zoome pour voir les profils.</small>`);
           data.push({ c, k });
+        }));
+        // associations de soutien (visibles seulement des escortes) : à leur adresse d'accueil, à tous les niveaux de zoom
+        await Promise.all(assos.map(async (a) => {
+          const k = (await coordsOfAddress(`${a.address} ${/\d{5}/.test(a.address) ? "" : a.city}`.trim())) || (await coordsOf(a.city)); if (!k || dead) return; pts.push(k);
+          L.marker(k, { icon: L.divIcon({ className: "masso", iconSize: [38, 38], iconAnchor: [19, 19], html: "<span>🤝</span>" }), title: a.name, zIndexOffset: 900 })
+            .addTo(map).bindPopup(`<b>${esc(a.name)}</b><br>📍 ${esc(a.address)}${a.phone ? `<br>📞 ${esc(a.phone)}` : ""}<br><a class="mgo" href="/associations/${esc(a.slug)}">Voir la fiche →</a>`);
         }));
         // les profils s'écartent quand on zoome : le rayon des cercles grandit avec le zoom
         const draw = () => {
@@ -64,6 +71,6 @@ export default function MapView({ cities }: { cities: MapCity[] }) {
       } catch { setMsg("La carte n’a pas pu se charger. Vérifie ta connexion et recharge la page."); }
     })();
     return () => { dead = true; map?.remove(); };
-  }, [cities]);
+  }, [cities, assos]);
   return (<div className="mapbox"><div ref={el} className="mapel" role="application" aria-label="Carte des profils par ville" />{msg && <p className="note mapmsg">{msg}</p>}</div>);
 }

@@ -43,3 +43,14 @@ export async function coordsOf(name: string): Promise<[number, number] | null> {
     cc.set(k, v); try { localStorage.setItem("hp_c_" + k, JSON.stringify(v)); } catch {} return v;
   } catch { return null; }
 }
+
+/** Coordonnées d'une adresse postale (API officielle des adresses, gratuite) ; mémorisées dans le navigateur. */
+export async function coordsOfAddress(addr: string): Promise<[number, number] | null> {
+  const k = "hp_a_" + slug(addr);
+  try { const ls = localStorage.getItem(k); if (ls) return JSON.parse(ls); } catch {}
+  try {
+    const r = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(addr)}&limit=1`);
+    const c = (await r.json())?.features?.[0]?.geometry?.coordinates; const v: [number, number] | null = c ? [c[1], c[0]] : null;
+    try { if (v) localStorage.setItem(k, JSON.stringify(v)); } catch {} return v;
+  } catch { return null; }
+}
