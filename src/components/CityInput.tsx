@@ -8,9 +8,13 @@ const cache = new Map<string, Commune[]>();
  *  Aucune liste n'est chargée à l'avance : on interroge l'API pendant la frappe (≥ 2 lettres, avec délai). */
 export default function CityInput({ value, onChange, required, placeholder, label, onPick, suggest }: { value: string; onChange: (v: string) => void; required?: boolean; placeholder?: string; label?: string; onPick?: (v: string) => void; suggest?: string[] }) {
   const [list, setList] = useState<Commune[]>([]); const [open, setOpen] = useState(false); const [hi, setHi] = useState(-1);
-  const seq = useRef(0); const box = useRef<HTMLDivElement>(null);
+  const seq = useRef(0); const box = useRef<HTMLDivElement>(null); const inp = useRef<HTMLInputElement>(null);
+  const [text, setText] = useState(value); // texte tapé : la valeur n'est validée que si on choisit une suggestion
+  useEffect(() => { setText(value); }, [value]);
+  useEffect(() => { inp.current?.setCustomValidity(text && text !== value ? "Choisis la ville dans la liste de suggestions." : required && !value ? "Choisis une ville dans la liste de suggestions." : ""); }, [text, value, required]);
+  const revert = () => { setOpen(false); setHi(-1); setText(value); };
   useEffect(() => {
-    const q = value.trim();
+    const q = text.trim();
     if (!open) { setList([]); return; }
     if (q.length < 2) { setList((suggest || []).map((nom) => ({ nom }))); return; }
     if (cache.has(q.toLowerCase())) { setList(cache.get(q.toLowerCase())!); return; }
@@ -23,17 +27,18 @@ export default function CityInput({ value, onChange, required, placeholder, labe
       } catch {}
     }, 250);
     return () => clearTimeout(t);
-  }, [value, open, suggest]);
+  }, [text, open, suggest]);
   useEffect(() => {
-    const h = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) setOpen(false); };
+    const h = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) revert(); };
     document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h);
-  }, []);
-  const pick = (c: Commune) => { onChange(c.nom); onPick?.(c.nom); setOpen(false); setHi(-1); };
+  }, [value]);
+  const pick = (c: Commune) => { setText(c.nom); onChange(c.nom); onPick?.(c.nom); setOpen(false); setHi(-1); };
   return (
-    <div className="cityin" ref={box}>
-      <input value={value} required={required} maxLength={40} placeholder={placeholder} aria-label={label} autoComplete="off" role="combobox" aria-expanded={open && list.length > 0}
-        onChange={(e) => { onChange(e.target.value); setOpen(true); setHi(-1); }} onFocus={() => setOpen(true)}
+    <div className="cityin" ref={box} onBlur={(e) => { if (!box.current?.contains(e.relatedTarget as Node)) revert(); }}>
+      <input ref={inp} value={text} required={required} maxLength={40} placeholder={placeholder} aria-label={label} autoComplete="off" role="combobox" aria-expanded={open && list.length > 0}
+        onChange={(e) => { setText(e.target.value); if (!e.target.value.trim()) onChange(""); setOpen(true); setHi(-1); }} onFocus={() => setOpen(true)}
         onKeyDown={(e) => {
+          if (e.key === "Enter" && open) { e.preventDefault(); const ex = list.find((c) => c.nom.toLowerCase() === text.trim().toLowerCase()); if (hi < 0 && ex) { pick(ex); return; } }
           if (!open || !list.length) return;
           if (e.key === "ArrowDown") { e.preventDefault(); setHi((hi + 1) % list.length); }
           else if (e.key === "ArrowUp") { e.preventDefault(); setHi((hi - 1 + list.length) % list.length); }
