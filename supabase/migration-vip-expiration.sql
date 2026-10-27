@@ -38,5 +38,7 @@ revoke all on function public.expire_vip() from public, anon, authenticated;
 select cron.schedule('expire-vip', '5 * * * *', $$ select public.expire_vip() $$);
 
 -- Exemples :
---   select public.admin_set_vip('<id du profil>', 30);     -- VIP 30 jours (appelé depuis le SQL Editor, voir note)
+--   (depuis le SQL Editor, la fonction admin_set_vip est refusée car tu n'es pas connecté en tant qu'admin du site ; utilise ces deux lignes à la place :)
+--   update public.profiles set vip = true where id = '<id du profil>';
+--   insert into public.vip_until values ('<id du profil>', now() + interval '30 days') on conflict (profile_id) do update set until = excluded.until;
 --   select p.name, v.until from public.vip_until v join public.profiles p on p.id = v.profile_id order by v.until;  -- qui expire bientôt
