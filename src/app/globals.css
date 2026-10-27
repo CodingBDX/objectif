@@ -689,3 +689,7 @@ input[type="file"]:disabled::file-selector-button{opacity:.6;cursor:progress}
 
 .cmt.pop{animation:pop .5s cubic-bezier(.2,.8,.2,1) both}
 @media (prefers-reduced-motion:reduce){.cmt.pop{animation:none}}
+
+/* Titre « Présentation » du profil */
+.pres{font:700 clamp(22px,3.4vw,28px)/1.1 var(--fd);color:var(--pink);margin:6px 0 0;letter-spacing:-.01em;display:flex;align-items:center;gap:12px}
+.pres::after{content:"";flex:1;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--pink),transparent);opacity:.45}

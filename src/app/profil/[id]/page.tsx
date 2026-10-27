@@ -73,6 +73,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 {p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
                 {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}
                 <Heart id={p.id} /></div>
+              {p.bio && <h2 className="pres">Présentation</h2>}
               <div className="bio" style={{ whiteSpace: "pre-wrap" }}>{p.bio}</div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
                 {!mine && <ReportBtn profileId={p.id} />}
