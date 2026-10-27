@@ -344,3 +344,4 @@ a:hover,a:focus{text-decoration:none}
 body{overflow-x:clip}
 .pph a.nb{color:inherit;font-weight:700}
 .pph a.nb:hover{color:var(--btn)}
+.sh{flex-wrap:wrap;row-gap:8px}

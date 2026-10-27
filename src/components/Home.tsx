@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GPATH, slug } from "@/lib/site";
+import { nearestCity } from "@/lib/geo";
 import Ic from "./Ic";
 import Heart from "./Heart";
 import { useFavs } from "@/lib/favs";
@@ -46,7 +47,28 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false);
   const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
-  const city = initialCity || sp.get("ville") || ""; const fav = !!sp.get("fav");
+  const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState("");
+  const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
+  const city = initialCity || sp.get("ville") || (canNear ? near : "");
+  const allCities = useMemo(() => Array.from(new Set(profiles.flatMap(cityList))), [profiles]);
+  const locate = (auto = false) => {
+    if (!navigator.geolocation) { setGeoMsg("La localisation n’est pas disponible sur cet appareil."); return; }
+    setGeoBusy(true); setGeoMsg("");
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const c = await nearestCity(pos.coords.latitude, pos.coords.longitude, allCities);
+      setGeoBusy(false);
+      if (c) { setNear(c); try { localStorage.setItem("objectif_pm", JSON.stringify({ city: c, t: Date.now() })); } catch {} }
+      else if (!auto) setGeoMsg("Aucun créateur près de toi pour le moment. Essaie une autre ville dans le Top 10.");
+    }, () => { setGeoBusy(false); if (!auto) setGeoMsg("Autorise la localisation dans ton navigateur pour voir les profils près de toi."); }, { timeout: 8000, maximumAge: 600000 });
+  };
+  const stopNear = () => { setNear(""); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} };
+  useEffect(() => { // précharge la dernière ville connue, puis la rafraîchit si la localisation est déjà autorisée
+    if (!canNear) return;
+    let saved: any = null; try { saved = JSON.parse(localStorage.getItem("objectif_pm") || "null"); } catch {}
+    if (saved?.off) return;
+    if (saved?.city && allCities.includes(saved.city)) setNear(saved.city);
+    (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
+  }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
   useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, city, fav]);
   const chView = (v: "cards" | "list") => { setView(v); try { localStorage.setItem("objectif_vue", v); } catch {} };
@@ -92,12 +114,16 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? "/" : `/ville/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
         <div className="mchips">{ITEMS.map(([k, v]) => <button key={k} className="chip" aria-pressed={type === k} onClick={() => setType(k)}>{v}</button>)}</div>
         <div className="sh"><h1><Ic n="star" s={22} />{h1}</h1><span className="cnt0" aria-live="polite">{list.length} profil{list.length > 1 ? "s" : ""}</span>
+          <button type="button" className="btn ghost" onClick={() => locate()} disabled={geoBusy} style={{ marginLeft: "auto" }}>📍 {geoBusy ? "Localisation…" : "Près de moi"}</button>
           <div className="vsw" role="group" aria-label="Affichage">
             <button type="button" aria-pressed={view === "cards"} title="Affichage en cartes" aria-label="Cartes" onClick={() => chView("cards")}><Ic n="grid" /></button>
             <button type="button" aria-pressed={view === "list"} title="Affichage en liste" aria-label="Liste" onClick={() => chView("list")}>
               <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="18" height="6" rx="2" /></svg></button>
           </div>
         </div>
+        {geoMsg && <p className="note" role="alert" style={{ margin: "0 0 12px", color: "var(--btn)", fontWeight: 700 }}>{geoMsg}</p>}
+        {canNear && near && <div className="panel" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", margin: "0 0 12px", padding: "10px 16px" }}>
+          <span>📍 Profils près de toi : <b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>Voir tous les profils</button></div>}
         {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
         <div className={`grid${view === "list" ? " lst" : ""}`}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={i >= PAGE ? ((i - PAGE) % PAGE) * 45 : undefined} />)
