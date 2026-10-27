@@ -67,11 +67,20 @@ export default function MyProfile() {
     setPMsg({ t: `${ok ? `✔ ${ok} photo${ok > 1 ? "s ajoutées" : " ajoutée"}.` : "Aucune photo n’a pu être envoyée."}${ko ? ` ${ko} en échec (trop lourde ou format non pris en charge).` : ""}${skipped > 0 ? ` ${skipped} ignorée${skipped > 1 ? "s" : ""} : maximum ${maxP} photos.` : ""}`, ok: ok > 0 && !ko });
     setBusy(false);
   }
+  /** Les vidéos d'iPhone (HEVC / H.265) se lisent avec le son mais sans image sur beaucoup d'ordinateurs : on les repère avant l'envoi. */
+  async function isHevc(file: File) {
+    try {
+      const n = 2 * 1024 * 1024; const parts = [file.slice(0, n), file.size > n ? file.slice(Math.max(n, file.size - n)) : null].filter(Boolean) as Blob[];
+      let txt = ""; for (const b of parts) txt += new TextDecoder("latin1").decode(await b.arrayBuffer());
+      return /(hvc1|hev1|dvh1|dvhe)/.test(txt) && !/avc1/.test(txt);
+    } catch { return false; }
+  }
   async function addVideo(file?: File) {
     if (!file) return;
     setVMsg(null);
     if (file.size > 20 * 1024 * 1024) { setVMsg({ t: `La vidéo fait ${(file.size / 1048576).toFixed(1).replace(".", ",")} Mo : elle dépasse la limite de 20 Mo.` }); return; }
     if (!["video/mp4", "video/webm", "video/quicktime"].includes(file.type)) { setVMsg({ t: "Format non accepté : choisis un MP4, WebM ou MOV." }); return; }
+    if (await isHevc(file)) { setVMsg({ t: "Cette vidéo est au format HEVC (H.265) : beaucoup d’ordinateurs la lisent sans image. Sur iPhone : Réglages › Appareil photo › Formats › « Le plus compatible », puis refilme ; ou convertis-la en MP4 H.264." }); return; }
     setBusy(true); setMsg(null); setVMsg({ t: "⏳ Envoi de la vidéo en cours…", ok: true });
     try { setVideo(await upVideo(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }

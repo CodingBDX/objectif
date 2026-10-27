@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 type Item = { v: boolean; src: string };
 /** Photos du profil ; la vidéo (si elle existe) est la première diapositive. Un clic agrandit la photo ou lance la vidéo en grand. */
 export default function Slider({ imgs, vip, video }: { imgs: string[]; vip: boolean; video?: string | null }) {
-  const [i, setI] = useState(0); const [stop, setStop] = useState(false); const [lb, setLb] = useState(false);
+  const [i, setI] = useState(0); const [stop, setStop] = useState(false); const [lb, setLb] = useState(false); const [vbad, setVbad] = useState(false);
   const hov = useRef(false); const tx = useRef<number | null>(null);
   const items: Item[] = [...(video ? [{ v: true, src: video }] : []), ...imgs.map((src) => ({ v: false, src }))]; const N = items.length;
   const go = (n: number, manual = false) => { setI((c) => (c + n + N) % N); if (manual) setStop(true); };
@@ -33,7 +33,7 @@ export default function Slider({ imgs, vip, video }: { imgs: string[]; vip: bool
       {lb && (
         <dialog id="lb" open style={{ position: "fixed", inset: 0, margin: "auto", zIndex: 60 }} onClick={() => setLb(false)}>
           <button className="x" style={{ position: "absolute", right: 8, top: 8 }} aria-label="Fermer" onClick={() => setLb(false)}>✕</button>
-          {items[i].v ? <video controls autoPlay playsInline src={items[i].src} onClick={(e) => e.stopPropagation()} /> : <img id="lbi" src={items[i].src} alt="" />}
+          {items[i].v ? <><video controls autoPlay playsInline src={items[i].src} onClick={(e) => e.stopPropagation()} onLoadedMetadata={(e) => setVbad(!e.currentTarget.videoWidth)} />{vbad && <p className="vbad" onClick={(e) => e.stopPropagation()}>Ton navigateur ne peut pas afficher l’image de cette vidéo (format HEVC / H.265). Essaie sur un téléphone ou avec Safari.</p>}</> : <img id="lbi" src={items[i].src} alt="" />}
           <span className="wm">© HeyPapi</span>
         </dialog>
       )}
