@@ -92,6 +92,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 return <div className="trip" key={i}><div className="tcal"><b>{MS[+m - 1]}</b><span>{+d}</span></div>
                   <div className="tinf"><Link href={`/ville/${slug(x.city)}`}>{x.city}</Link>{now && <span className="tnow">En ce moment</span>}
                     <em>{x.to !== x.from ? `du ${dShort(x.from)} au ${dShort(x.to)}` : `le ${dShort(x.from)}`}</em></div></div>; })}</div>}
+            {p.tarif ? <div className="panel"><h3 className="ph"><Ic n="rose" s={18} />Tarif</h3><div className="meta"><Ic n="rose" s={15} />À partir de <b>{p.tarif}</b></div></div> : null}
             <div className="panel"><h3 className="ph"><Ic n="clock" s={18} />Disponibilités</h3>
               {a ? (<>
                 {a.on ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? "Disponible 24h/24, 7j/7" : "Disponible jusqu’à " + a.until}</div>

@@ -40,6 +40,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
           ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? "Disponible 24h/24, 7j/7" : "Disponible jusqu’à " + a.until}</div>
           : <div className="meta"><Ic n="clock" s={15} />Indisponible{a.next ? " · reprend " + a.next : ""}</div>)}
         <div className="meta"><Ic n={CIC[p.genre] || "camera"} s={15} />{lab(p) ? lab(p) + " · " : ""}{p.photos.length} photos</div>
+        {p.tarif ? <div className="meta"><Ic n="rose" s={15} />dès <b>{p.tarif}</b></div> : null}
         <div className="tags">{p.specialties.slice(0, 2).map((t) => <span className="tag" key={t}>{cap(t)}</span>)}</div>
       </div>
     </article>
@@ -49,7 +50,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
 export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "" }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(""); const [q, setQ] = useState("");
-  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false);
+  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0);
   const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
@@ -81,17 +82,17 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
-  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, city, fav]);
+  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, city, fav]);
   const chView = (v: "cards" | "list") => { setView(v); try { localStorage.setItem("objectif_vue", v); } catch {} };
 
   const list = useMemo(() => {
     const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || cityList(p).includes(city)) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
-      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on)
+      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (!!p.tarif && (tar === 999 ? p.tarif > 300 : p.tarif <= tar)))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
-    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
+    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? (a.tarif || 1e9) - (b.tarif || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
-  }, [profiles, type, tag, q, sort, vid, ver, now, city, fav, favs]);
+  }, [profiles, type, tag, q, sort, vid, ver, now, tar, city, fav, favs]);
 
   const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
@@ -108,7 +109,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   }, [shown, list.length]);
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
-  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); r.push("/"); };
+  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); r.push("/"); };
 
   return (
     <div className="shell gut" id="shell">
@@ -129,7 +130,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div>
           <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Tarif (à partir de)</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
@@ -170,7 +172,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div></div>
           <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Tarif (à partir de)</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
