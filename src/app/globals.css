@@ -660,3 +660,9 @@ h1{animation:hfade .5s ease both}
 .mapw.dash{padding-block:20px}
 
 .eph.vid{width:170px;height:96px}.eph.vid video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+
+/* Boutons « Choisir un fichier » aux couleurs du site */
+input[type="file"]{font:600 14px var(--fb);color:var(--mut);max-width:100%}
+input[type="file"]::file-selector-button{margin-right:12px;border:0;border-radius:999px;padding:10px 18px;min-height:40px;background:var(--btn);color:var(--btnt);font:700 14px var(--fb);cursor:pointer;box-shadow:0 4px 10px rgba(214,51,132,.3);transition:filter .15s,transform .15s}
+input[type="file"]::file-selector-button:hover{filter:brightness(1.07);transform:translateY(-1px)}
+input[type="file"]:disabled::file-selector-button{opacity:.6;cursor:progress}
