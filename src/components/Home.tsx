@@ -190,7 +190,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p> : null) : intro}
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">Aucun profil à afficher sur la carte.</div>)}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
-          {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={i >= PAGE ? ((i - PAGE) % PAGE) * 45 : undefined} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
+          {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
             : <div className="empty">{fav ? "Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici." : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? `Aucun profil à ${city} pour le moment. Sois le premier : crée ton profil !` : "Aucun profil ne correspond à votre recherche.") : "Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil »."}</div>}
         </div>
         {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{list.length - shown} profils à venir</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}

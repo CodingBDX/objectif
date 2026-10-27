@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import CountUp from "@/components/CountUp";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 type Row = { day: string; views: number; calls: number; copies: number; socials: number };
@@ -64,10 +65,10 @@ export default function StatsPanel() {
 
 
         <div className="dtiles">
-          <div className="dt t1"><i>👁</i><span>Vues du profil</span><b>{v}</b><small className={trend !== null && trend < 0 ? "neg" : ""}>{trend === null ? "pas de comparaison" : `${trend >= 0 ? "+" : ""}${trend} % vs période préc.`}</small></div>
-          <div className="dt t2"><i>📞</i><span>Appels</span><b>{calls}</b><small>clics sur ton numéro</small></div>
-          <div className="dt t3"><i>🔗</i><span>Réseaux</span><b>{socials}</b><small>clics sur tes liens</small></div>
-          <div className="dt t4"><i>💬</i><span>Commentaires</span><b>{coms}</b><small>au total</small></div>
+          <div className="dt t1"><i>👁</i><span>Vues du profil</span><b><CountUp to={v} /></b><small className={trend !== null && trend < 0 ? "neg" : ""}>{trend === null ? "pas de comparaison" : `${trend >= 0 ? "+" : ""}${trend} % vs période préc.`}</small></div>
+          <div className="dt t2"><i>📞</i><span>Appels</span><b><CountUp to={calls} /></b><small>clics sur ton numéro</small></div>
+          <div className="dt t3"><i>🔗</i><span>Réseaux</span><b><CountUp to={socials} /></b><small>clics sur tes liens</small></div>
+          <div className="dt t4"><i>💬</i><span>Commentaires</span><b><CountUp to={coms} /></b><small>au total</small></div>
         </div>
 
         <div className="dgrid">

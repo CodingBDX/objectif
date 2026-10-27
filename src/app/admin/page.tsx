@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import CountUp from "@/components/CountUp";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS } from "@/lib/types";
 
@@ -117,10 +118,10 @@ export default function Admin() {
 
         {tab === "dash" && (<>
           <div className="dtiles">
-            <div className="dt t1"><i>👤</i><span>Profils</span><b>{cnt.total}</b><small>+{cnt.month} ces 30 jours</small></div>
-            <div className="dt t2"><i>👑</i><span>Profils VIP</span><b>{cnt.vip}</b><small>{cnt.total ? Math.round((cnt.vip / cnt.total) * 100) : 0} % du total</small></div>
-            <div className="dt t3"><i>🚩</i><span>Signalements</span><b>{nNew}</b><small>à traiter</small></div>
-            <div className="dt t4"><i>✉️</i><span>Messages</span><b>{nMsg}</b><small>non traités · {cnt.paused} profil{cnt.paused > 1 ? "s" : ""} masqué{cnt.paused > 1 ? "s" : ""}</small></div>
+            <div className="dt t1"><i>👤</i><span>Profils</span><b><CountUp to={cnt.total} /></b><small>+{cnt.month} ces 30 jours</small></div>
+            <div className="dt t2"><i>👑</i><span>Profils VIP</span><b><CountUp to={cnt.vip} /></b><small>{cnt.total ? Math.round((cnt.vip / cnt.total) * 100) : 0} % du total</small></div>
+            <div className="dt t3"><i>🚩</i><span>Signalements</span><b><CountUp to={nNew} /></b><small>à traiter</small></div>
+            <div className="dt t4"><i>✉️</i><span>Messages</span><b><CountUp to={nMsg} /></b><small>non traités · {cnt.paused} profil{cnt.paused > 1 ? "s" : ""} masqué{cnt.paused > 1 ? "s" : ""}</small></div>
           </div>
           <div className="dgrid">
             <section className="dcard">

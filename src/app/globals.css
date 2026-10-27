@@ -577,3 +577,46 @@ body{overflow-x:clip}
 .dprow .ck{margin-top:0}
 .dsub{font:700 22px var(--fd);margin:0;color:var(--btn)}
 .dedit .dtiles,.dedit .dgrid{margin:0}
+
+/* Animations des tableaux de bord (statistiques, administration) */
+@keyframes dgrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes dfade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes dspin{from{opacity:0;transform:rotate(-140deg) scale(.55)}to{opacity:1;transform:none}}
+@keyframes dfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.bars .bar{transform-origin:bottom;animation:dgrow .8s cubic-bezier(.2,.8,.2,1) both}
+.donut{animation:dspin 1s cubic-bezier(.2,.8,.2,1) both}
+.prog i{transform-origin:left;animation:dfill 1s cubic-bezier(.2,.8,.2,1) .2s both}
+.dtiles .dt,.dgrid .dcard{animation:dfade .55s cubic-bezier(.2,.8,.2,1) both}
+.dtiles .dt:nth-child(2){animation-delay:.08s}.dtiles .dt:nth-child(3){animation-delay:.16s}.dtiles .dt:nth-child(4){animation-delay:.24s}
+.dgrid .dcard:nth-child(2){animation-delay:.1s}.dgrid .dcard:nth-child(3){animation-delay:.2s}.dgrid .dcard:nth-child(4){animation-delay:.3s}
+.bars .bcol:nth-child(2) .bar{animation-delay:25ms}
+.bars .bcol:nth-child(3) .bar{animation-delay:50ms}
+.bars .bcol:nth-child(4) .bar{animation-delay:75ms}
+.bars .bcol:nth-child(5) .bar{animation-delay:100ms}
+.bars .bcol:nth-child(6) .bar{animation-delay:125ms}
+.bars .bcol:nth-child(7) .bar{animation-delay:150ms}
+.bars .bcol:nth-child(8) .bar{animation-delay:175ms}
+.bars .bcol:nth-child(9) .bar{animation-delay:200ms}
+.bars .bcol:nth-child(10) .bar{animation-delay:225ms}
+.bars .bcol:nth-child(11) .bar{animation-delay:250ms}
+.bars .bcol:nth-child(12) .bar{animation-delay:275ms}
+.bars .bcol:nth-child(13) .bar{animation-delay:300ms}
+.bars .bcol:nth-child(14) .bar{animation-delay:325ms}
+.bars .bcol:nth-child(15) .bar{animation-delay:350ms}
+.bars .bcol:nth-child(16) .bar{animation-delay:375ms}
+.bars .bcol:nth-child(17) .bar{animation-delay:400ms}
+.bars .bcol:nth-child(18) .bar{animation-delay:425ms}
+.bars .bcol:nth-child(19) .bar{animation-delay:450ms}
+.bars .bcol:nth-child(20) .bar{animation-delay:475ms}
+.bars .bcol:nth-child(21) .bar{animation-delay:500ms}
+.bars .bcol:nth-child(22) .bar{animation-delay:525ms}
+.bars .bcol:nth-child(23) .bar{animation-delay:550ms}
+.bars .bcol:nth-child(24) .bar{animation-delay:575ms}
+.bars .bcol:nth-child(25) .bar{animation-delay:600ms}
+.bars .bcol:nth-child(26) .bar{animation-delay:625ms}
+.bars .bcol:nth-child(27) .bar{animation-delay:650ms}
+.bars .bcol:nth-child(28) .bar{animation-delay:675ms}
+.bars .bcol:nth-child(29) .bar{animation-delay:700ms}
+.bars .bcol:nth-child(30) .bar{animation-delay:725ms}
+.bars .bcol:nth-child(31) .bar{animation-delay:750ms}
+@media (prefers-reduced-motion:reduce){.bars .bar,.donut,.prog i,.dtiles .dt,.dgrid .dcard{animation:none}}
