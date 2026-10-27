@@ -45,7 +45,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} index={index} isAdmin={isAdmin} escort={escort} paused={!!me?.paused} />
         {me?.paused && (
           <div className="pbanner" role="status"><span>⏸ Ton annonce « {me.name} » est en pause{me.vip ? " (même en VIP)" : ""} : elle n’apparaît plus dans l’annuaire.</span>
-            <PauseBtn id={user!.id} paused className="" full /></div>
+            {me.vip ? <PauseBtn id={user!.id} paused className="" full /> : <Link href="/mon-profil?reactiver=1">▶ Réactiver mon annonce</Link>}</div>
         )}
         {children}
         <footer className="gut" id="foot">Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos.<br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · {escort && <><Link href="/associations">Associations</Link> · </>}<Link href="/contact">Contact</Link></footer>
