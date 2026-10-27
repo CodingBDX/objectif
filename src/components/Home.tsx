@@ -49,7 +49,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
   );
 }
 
-export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "" }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string }) {
+export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {} }: { profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: string; region?: string; regions?: Record<string, string> }) {
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
@@ -100,7 +100,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
-  const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.filter((p) => type === "tous" || p.genre === type).forEach((p) => cityList(p).forEach((c) => (cc[c] = (cc[c] || 0) + 1))); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 10); }, [profiles, type]);
+  const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.filter((p) => type === "tous" || p.genre === type).forEach((p) => cityList(p).forEach((c) => { if (!region || regions[c] === region) cc[c] = (cc[c] || 0) + 1; })); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 10); }, [profiles, type, region, regions]);
   const hl = useMemo(() => profiles.filter((p) => (type === "tous" || p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || (b.views || 0) + 5 * (b.favs || 0) - (a.views || 0) - 5 * (a.favs || 0) || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 10), [profiles, type, tag, city]);
 
   const sentinel = useRef<HTMLDivElement>(null);
@@ -141,7 +141,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
             <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} alt="" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
             <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
-        <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
+        <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> {region || "France"}</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
         <div className="panel msearch" id="recherche"><h2><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>

@@ -30,3 +30,16 @@ export async function cityIntro(city: string, profiles: Profile[]): Promise<stri
   return `${n} profil${n > 1 ? "s" : ""} à ${city}` + (genres.length ? ` (${list(genres)})` : "") + ", avec leurs disponibilités et leurs prochains passages."
     + (specs.length ? ` Spécialités les plus présentes : ${list(specs)}.` : "") + (near.length ? ` Villes proches : ${list(near)}.` : "");
 }
+
+/** Région de chaque ville (API officielle geo.api.gouv.fr, mise en cache 7 jours). */
+export async function regionMap(cities: string[]): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  await Promise.all(Array.from(new Set(cities)).map(async (c) => {
+    try {
+      const r = await fetch(`${GEO}/communes?nom=${encodeURIComponent(c)}&fields=nom,region&boost=population&limit=1`, { next: { revalidate: 604800 } });
+      if (!r.ok) return; const j = (await r.json()) as { region?: { nom: string } }[];
+      if (j?.[0]?.region?.nom) out[c] = j[0].region.nom;
+    } catch {}
+  }));
+  return out;
+}

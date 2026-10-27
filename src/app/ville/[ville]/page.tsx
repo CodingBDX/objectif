@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import Home from "@/components/Home";
 import { allProfiles, cityBySlug } from "@/lib/data";
 import { cityList } from "@/lib/types";
-import { cityIntro } from "@/lib/cityinfo";
+import { cityIntro, regionMap } from "@/lib/cityinfo";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { ville: string } }): Promise<Metadata> {
@@ -13,5 +13,6 @@ export async function generateMetadata({ params }: { params: { ville: string } }
 }
 export default async function Page({ params }: { params: { ville: string } }) {
   const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville); if (!city) notFound();
-  return <Suspense><Home key={params.ville} profiles={profiles} initialCity={city} h1={`Créateurs à ${city}`} intro={await cityIntro(city, profiles)} /></Suspense>;
+  const regions = await regionMap(profiles.map((p) => p.city));
+  return <Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Créateurs à ${city}`} intro={await cityIntro(city, profiles)} /></Suspense>;
 }
