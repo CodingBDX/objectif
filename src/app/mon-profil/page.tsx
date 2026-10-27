@@ -128,8 +128,9 @@ export default function MyProfile() {
           {isNewP && (<>
             <p className="note">Choisis le type de profil qui te correspond.</p>
             <div className="kinds" role="radiogroup" aria-label="Type de profil">
-              <label className={`kind${kind === "createur" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "createur"} onChange={() => setKind("createur")} /><b>📷 Profil photographe</b><span>Photographe, vidéaste ou artiste : ton portfolio, ta vidéo, ton contact.</span></label>
+              <label className={`kind${kind === "createur" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "createur"} onChange={() => setKind("createur")} /><b>💖 Profil escorte</b><span>Ton portfolio, ta vidéo, tes disponibilités et ton contact.</span></label>
               <label className={`kind${kind === "livecam" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "livecam"} onChange={() => setKind("livecam")} /><b>🔴 Profil livecam</b><span>Tu animes des lives créatifs (dessin, musique, cuisine, atelier). Catégorie à part.</span></label>
+              <Link className="kind" href="/mon-association"><b>🤝 Profil association</b><span>Tu représentes une association de soutien : fiche par ville, validée avant publication.</span></Link>
               {!isMember && <label className={`kind${kind === "membre" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "membre"} onChange={() => setKind("membre")} /><b>💬 Profil membre</b><span>Pour laisser des commentaires sous les profils. Rien d’autre.</span></label>}
             </div>
             {!kind && <p className="note" style={{ textAlign: "center", margin: 0 }}>👆 Clique sur un profil pour afficher le formulaire correspondant.</p>}
