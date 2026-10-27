@@ -5,7 +5,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: { default: "Objectif, annuaire des créateurs", template: "%s · Objectif" },
+  title: { default: "HeyPapi, annuaire des créateurs", template: "%s · HeyPapi" },
   description: "Annuaire de photographes, vidéastes, artistes et livecam. Site fait par et pour les pros, 50 % reversés aux associations."
 };
 export const dynamic = "force-dynamic";

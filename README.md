@@ -1,4 +1,4 @@
-# Objectif — Next.js + Supabase
+# HeyPapi — Next.js + Supabase
 
 ## 1. Base de données
 Supabase → **SQL Editor** → colle tout `supabase/schema.sql` → **Run**.

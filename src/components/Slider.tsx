@@ -27,7 +27,7 @@ export default function Slider({ imgs, vip }: { imgs: string[]; vip: boolean }) 
         <dialog id="lb" open style={{ position: "fixed", inset: 0, margin: "auto", zIndex: 60 }} onClick={() => setLb(false)}>
           <button className="x" style={{ position: "absolute", right: 8, top: 8 }} aria-label="Fermer" onClick={() => setLb(false)}>✕</button>
           <img id="lbi" src={imgs[i]} alt="" />
-          <span className="wm">© Objectif</span>
+          <span className="wm">© HeyPapi</span>
         </dialog>
       )}
     </>
