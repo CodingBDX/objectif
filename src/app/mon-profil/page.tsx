@@ -161,8 +161,8 @@ export default function MyProfile() {
             <div className="f"><span style={L}>Prochains déplacements (calendrier, optionnel)</span>
               {trips.map((t, i) => <div className="trow" key={i}>
                 <CityInput placeholder="Ville visitée" value={t.city} onChange={(v) => setTrip(i, "city", v)} label={`Ville du déplacement ${i + 1}`} />
-                <input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} />
-                <input type="date" value={t.to} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></div>)}
+                <label className="tdate"><small>Du</small><input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={`Du (déplacement ${i + 1})`} /></label>
+                <label className="tdate"><small>Au</small><input type="date" value={t.to} min={t.from || undefined} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={`Au (déplacement ${i + 1})`} /></label></div>)}
               <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>
 </section><section className="dcard"><h3>Présentation et contact</h3><div className="f"><span style={L}>Présentation</span><RichEditor label="Présentation" value={bio} onChange={setBio} /></div>
             <div className="row2"><label className="f">Site ou réseau (optionnel)<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>

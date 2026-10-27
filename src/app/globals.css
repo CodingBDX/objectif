@@ -723,3 +723,16 @@ input[type="file"]:disabled::file-selector-button{opacity:.6;cursor:progress}
 
 /* Mobile : le bloc latéral « Salut… » disparaît (ses liens sont dans la barre du haut) */
 @media (max-width:900px){.dside.nomob{display:none}}
+
+/* Calendrier des déplacements : dans les tons du site, sans débordement sur mobile */
+input[type="date"],input[type="time"]{-webkit-appearance:none;appearance:none;display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;min-height:46px;padding:10px 16px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;font:600 15px var(--fb);accent-color:var(--pink);text-align:left}
+input[type="date"]:focus,input[type="time"]:focus{outline:3px solid var(--pink);outline-offset:1px}
+input[type="date"]::-webkit-date-and-time-value{text-align:left;min-height:1.2em}
+input[type="date"]::-webkit-datetime-edit,input[type="time"]::-webkit-datetime-edit{padding:0;color:var(--ink)}
+input[type="date"]::-webkit-datetime-edit-fields-wrapper{padding:0}
+input[type="date"]::-webkit-calendar-picker-indicator,input[type="time"]::-webkit-calendar-picker-indicator{cursor:pointer;border-radius:50%;padding:4px;background-color:var(--soft)}
+input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
+.trow{background:var(--bg1);border:1px solid var(--line);border-radius:22px;padding:10px;margin:0 0 8px;overflow:hidden}
+.tdate{display:grid;gap:2px;min-width:0}
+.tdate small{font:700 12px var(--fb);color:var(--mut);padding-left:12px}
+@media (max-width:560px){.trow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.trow>div:first-child,.trow>:first-child{grid-column:1/-1}}
