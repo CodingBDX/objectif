@@ -180,7 +180,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} />)
             : <div className="empty">{fav ? "Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici." : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? `Aucun profil à ${city} pour le moment. Sois le premier : crée ton profil !` : "Aucun profil ne correspond à votre recherche.") : "Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil »."}</div>}
         </div>
-        {shown < list.length && <div className="more" ref={sentinel}><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}
+        {shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{list.length - shown} profils à venir</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}
       </main>
 
       <aside className="aside" aria-label="Filtres">

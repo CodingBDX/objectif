@@ -46,7 +46,7 @@ export default function Admin() {
   }
   async function mark(table: "reports" | "messages", id: number, v: any) { await sb.from(table).update(v).eq("id", id); table === "reports" ? loadReports() : loadMessages(); }
 
-  if (state === "load") return <section className="gut"><p className="note" style={{ minHeight: 400, opacity: 0 }} aria-busy="true">Chargement…</p></section>;
+  if (state === "load") return <section className="gut"><p className="note">Chargement…</p></section>;
   if (state === "no") return (
     <section className="gut"><div className="pfc" style={{ maxWidth: 560 }}><div className="panel regp"><h1 className="regh">Accès réservé</h1>
       <p className="note">Ce compte n’est pas administrateur. Pour te donner l’accès, ajoute ton compte dans la table « admins » (voir le fichier migration-admin.sql).</p>
