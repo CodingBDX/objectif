@@ -8,6 +8,31 @@ type Row = { day: string; views: number; calls: number; copies: number; socials:
 type Me = { name: string; vip: boolean; photos: string[] | null; video: string | null; bio: string | null; phone: string | null; instagram: string | null; snapchat: string | null; tiktok: string | null; site: string | null; specialties: string[] | null; h24: boolean | null; hours: unknown };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
 const sum = (r: Row[], k: keyof Row) => r.reduce((a, x) => a + (x[k] as number), 0);
+type VRes = { niveau: "aucun" | "attention" | "danger"; signalements: number };
+const VLOOK = { aucun: ["#1e8a4c", "#e6f7ec", "🟢 Aucun signalement"], attention: ["#b36b00", "#fff2d9", "🟠 Attention : 1 signalement"], danger: ["#c0213d", "#ffe3e8", "🔴 Danger : plusieurs signalements"] } as const;
+function VerifyCard() {
+  const [num, setNum] = useState(""); const [res, setRes] = useState<VRes | null>(null); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
+  const check = async (e: React.FormEvent) => {
+    e.preventDefault(); setErr(""); setRes(null);
+    if (num.replace(/\D/g, "").length < 8) { setErr("Entre un numéro complet."); return; }
+    setBusy(true); const { data, error } = await supabaseBrowser().rpc("check_client", { p_phone: num }); setBusy(false);
+    if (error) { setErr(/invalide/i.test(error.message) ? "Numéro invalide." : error.message); return; }
+    setRes((data as VRes[])[0] || null);
+  };
+  const L = res ? VLOOK[res.niveau] : null;
+  return (
+    <section className="dcard">
+      <h3>🛡️ Vérifier un numéro</h3>
+      <form onSubmit={check} style={{ display: "grid", gap: 8 }}>
+        <input type="tel" inputMode="tel" autoComplete="off" placeholder="06 12 34 56 78" aria-label="Numéro à vérifier" value={num} onChange={(e) => setNum(e.target.value)} />
+        <button className="btn" type="submit" disabled={busy}>{busy ? "Vérification…" : "Vérifier"}</button>
+      </form>
+      {err && <p className="note" role="alert" style={{ color: "#c0213d", margin: 0 }}>{err}</p>}
+      {res && L && <div role="status" style={{ background: L[1], color: L[0], border: `2px solid ${L[0]}`, borderRadius: 16, padding: "10px 14px", font: "700 16px var(--fd)" }}>{L[2]}</div>}
+      <p className="note" style={{ margin: 0 }}><Link href="/verifier">Voir le détail ou signaler un client →</Link></p>
+    </section>
+  );
+}
 const JOURS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 const BAR = ["#ff9ac8", "#ffc27a", "#ffe08a", "#b5e3a8", "#a8d0f7", "#d9b8f5", "#ff7fb5"];
 const empty = (d: string): Row => ({ day: d, views: 0, calls: 0, copies: 0, socials: 0 });
@@ -101,6 +126,7 @@ export default function StatsPanel() {
               <ul>{parts.map((p) => <li key={p.n}><i style={{ background: p.c }} />{p.n}<b>{contacts ? Math.round((p.v / contacts) * 100) : 0} %</b></li>)}</ul></div>
             <p className="note" style={{ margin: "8px 0 0" }}>Taux de contact : <b>{v ? Math.round((contacts / v) * 100) + " %" : "–"}</b> (contacts ÷ vues)</p>
           </section>
+          <VerifyCard />
           <section className="dcard">
             <h3>Profil complet : {done}/{tips.length}</h3>
             <div className="prog"><i style={{ width: (done / tips.length) * 100 + "%" }} /></div>
