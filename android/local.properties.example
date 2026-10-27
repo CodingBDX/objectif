@@ -1,0 +1,4 @@
+# Copie ce fichier en "local.properties" (Android Studio le crée aussi) et remplis ces deux lignes avec TES valeurs Supabase
+# (Supabase > Project Settings > API : Project URL et clé "anon / publishable"). Jamais la clé service_role.
+SUPABASE_URL=https://xxxxxxxx.supabase.co
+SUPABASE_KEY=sb_publishable_xxxxxxxx
