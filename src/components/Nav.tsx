@@ -25,8 +25,8 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
         <button className="burger" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} onClick={() => setOpen(!open)}>
           <svg className="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
-        <div className="gs-mob"><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
         <div className="navmenu" onClick={(e) => { if ((e.target as HTMLElement).closest("a,button")) close(); }}>
+          <div className="gs-mob"><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
           <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />Annuaire</Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte"><Ic n="pin" />Carte</Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1"><Ic n="heart" />Favoris <span className="cn">{favs.length}</span></Link>

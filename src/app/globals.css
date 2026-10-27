@@ -774,11 +774,10 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
 .msearch .dsearch{margin-bottom:6px}
 @media (max-width:700px){.msbar{display:flex;margin:0 0 14px}.panel.msearch.on{display:block;margin:0 0 14px}.srch .aside{display:none}}
 
-/* Recherche toujours visible tout en haut sur mobile (hors menu burger) */
+/* Recherche en haut du menu burger (au-dessus de Annuaire) sur mobile */
 .gs-desk{display:contents}.gs-mob{display:none}
 @media (max-width:900px){
  .gs-desk{display:none}
- .nav .gut{flex-wrap:wrap}
- .gs-mob{display:block;order:5;flex:1 0 100%;min-width:0}
+ .gs-mob{display:block;min-width:0}
  .gs-mob .sp{max-width:none;width:100%;margin:0}
 }
