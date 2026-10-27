@@ -556,8 +556,9 @@ body{overflow-x:clip}
 
 /* tons des encarts : normal = blanc rosé, VIP = champagne doré, livecam = violet (déjà défini plus haut) */
 .card:not(.isvip):not(.live):not(.off){background:linear-gradient(180deg,#ffffff,#fff5fa)}
-.card.isvip:not(.live):not(.off){background:linear-gradient(180deg,#fff9e6,#ffeaf1);border:1.5px solid #e6b94a;box-shadow:0 8px 26px rgba(224,169,42,.32)}
-.card.isvip:not(.live):not(.off) .tag{background:rgba(230,185,74,.22);color:#7a5200}
-.card.isvip:not(.live):not(.off) .ln h3{color:#8a5a00}
-.card.isvip:not(.live):not(.off) .meta svg{color:#d1991f}
-.card.isvip:not(.live):not(.off):hover{box-shadow:0 12px 32px rgba(224,169,42,.45)}
+.card.isvip:not(.live):not(.off){background:#ffe0ee;border:1.5px solid var(--pink);box-shadow:0 8px 26px rgba(238,79,151,.34)}
+.card.isvip:not(.live):not(.off) .cover{background:#ffe0ee}
+.card.isvip:not(.live):not(.off) .tag{background:rgba(238,79,151,.2);color:#a3175f}
+.card.isvip:not(.live):not(.off) .ln h3,.card.isvip:not(.live):not(.off) .avl.on{color:#a3175f}
+.card.isvip:not(.live):not(.off) .meta svg{color:var(--pink)}
+.card.isvip:not(.live):not(.off):hover{box-shadow:0 12px 32px rgba(238,79,151,.5)}
