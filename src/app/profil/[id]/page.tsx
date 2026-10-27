@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
-import { cap, CATS, isNew, Profile, showTarif } from "@/lib/types";
+import { cap, CATS, isNew, Profile, showTarif, SPECIALTIES } from "@/lib/types";
 import { avail, DAYL, dShort, MS, nowP, todayP, tripsOf } from "@/lib/avail";
 import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
@@ -17,7 +17,7 @@ import { TrackLink, TrackView } from "@/components/Track";
 import { GPATH, siteUrl, slug } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-const get = async (id: string) => { const { data } = await supabaseServer().from("profiles").select("*").eq("id", id).maybeSingle(); return data as Profile | null; };
+const get = async (id: string) => { const { data } = await supabaseServer().from("profiles").select("*").eq("id", id).maybeSingle(); const p = data as Profile | null; if (p) p.specialties = (p.specialties || []).filter((x) => SPECIALTIES.includes(x)); return p; };
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const p = await get(params.id);
   if (!p) return {};
