@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { DICT } from "./dict";
 import { DICT2 } from "./dict2";
 import { DICT3 } from "./dict3";
+import { DICT4 } from "./dict4";
 import { PT } from "./dict_pt";
 
 export type Lang = "fr" | "en" | "es" | "pt";
@@ -20,7 +21,7 @@ export function useT() {
   useEffect(() => { const f = () => setL(cur); subs.add(f); cur = stored(); try { document.documentElement.lang = cur; } catch {} f(); return () => { subs.delete(f); }; }, []);
   const tr = (s: string, vars?: Record<string, string | number>) => {
     let o = s;
-    if (lang !== "fr") { const k = IDX[lang]; o = DICT2[s]?.[k] || DICT3[s]?.[k] || (lang === "pt" ? PT[s] : DICT[s]?.[k]) || s; }
+    if (lang !== "fr") { const k = IDX[lang]; o = DICT2[s]?.[k] || DICT3[s]?.[k] || DICT4[s]?.[k] || (lang === "pt" ? PT[s] : DICT[s]?.[k]) || s; }
     if (vars) for (const k of Object.keys(vars)) o = o.split(`{${k}}`).join(String(vars[k]));
     return o;
   };
@@ -29,6 +30,8 @@ export function useT() {
 
 /** Pour les composants serveur : affiche un texte français traduit selon la langue choisie. */
 export function Tr({ k, vars }: { k: string; vars?: Record<string, string | number> }) { const { tr } = useT(); return <>{tr(k, vars)}</>; }
+
+export function TDate({ iso }: { iso: string }) { const { locale } = useT(); return <>{new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Paris" })}</>; }
 
 export function LangSwitch() {
   const { lang } = useT();
