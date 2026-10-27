@@ -141,10 +141,18 @@ export default function Admin() {
               <h3>Activité récente</h3>
               {activity.length === 0 ? <p className="note">Rien pour le moment.</p> : <ul className="dl">{activity.map((a, i) => <li key={i}><span>{a.i} <b>{a.title}</b> · {a.sub}</span><b style={{ whiteSpace: "nowrap" }}>{ago(a.t)}</b></li>)}</ul>}
             </section>
-            <section className="dcard">
-              <h3>Profils à modérer</h3>
-              <ul className="dl">{profiles.slice(0, 5).map((p) => <li key={p.id}><span><Link href={`/profil/${p.id}`}><b>{p.name}</b></Link> · {p.city}{p.paused && " · masqué"}</span><b>{p.vip ? "VIP" : p.verified ? "Vérifié" : "Nouveau"}</b></li>)}</ul>
-              <button type="button" className="btn ghost" onClick={() => setTab("profiles")}>Voir tous les profils</button>
+            <section className="dcard" style={{ gridColumn: "1 / -1", display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                <h3 style={{ margin: 0 }}>Profils à modérer</h3>
+                <button type="button" className="btn ghost" onClick={() => setTab("profiles")}>Voir tous les profils →</button>
+              </div>
+              {profiles.slice(0, 8).map((p) => (
+                <div key={p.id} className="dprow">
+                  <div style={{ flex: "1 1 200px", minWidth: 0 }}><Link href={`/profil/${p.id}`}><b>{p.name}</b></Link><div className="note">{CATS[p.genre]} · {p.city} · {fmt(p.created_at)}{p.paused && " · masqué"}</div></div>
+                  <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>
+                  <label className="ck"><input type="checkbox" checked={p.verified} onChange={(e) => setProfile(p, { verified: e.target.checked })} /> Vérifié</label>
+                  <label className="ck"><input type="checkbox" checked={p.paused} onChange={(e) => setProfile(p, { paused: e.target.checked })} /> Masqué</label>
+                </div>))}
             </section>
           </div>
         </>)}

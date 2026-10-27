@@ -571,3 +571,6 @@ body{overflow-x:clip}
 .dz b{font:700 17px var(--fd);color:var(--btn)}.dz span{font-size:14px;color:var(--mut);font-weight:600;max-width:46ch}
 .dzp{display:block;width:100%;max-width:320px;height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
 .dzp u{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--btn));transition:width .25s}
+
+/* Admin : ligne de profil dans le tableau de bord */
+.dprow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-radius:18px;background:var(--soft)}
