@@ -102,7 +102,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             </div>}
           </aside>
         </div>
-        <Comments profileId={p.id} ownerId={p.id} />
+        <div className="pgrid cmrow"><Comments profileId={p.id} ownerId={p.id} /></div>
       </div>
     </section>
   );

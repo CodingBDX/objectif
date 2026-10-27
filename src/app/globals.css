@@ -747,3 +747,6 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
   .rtt{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
   .rtb,.rtb.pv{margin:0;padding:6px 2px;min-height:42px;font-size:13px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 }
+
+/* Commentaires : même largeur que l'encart Présentation (colonne de gauche) */
+.cmrow{margin-top:8px}.cmrow>.cm{margin-top:0}
