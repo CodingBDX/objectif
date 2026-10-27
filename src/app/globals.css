@@ -750,3 +750,12 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
 
 /* Commentaires : même largeur que l'encart Présentation (colonne de gauche) */
 .cmrow{margin-top:8px}.cmrow>.cm{margin-top:0}
+
+/* Mobile : « Mes statistiques » et 7 jours / 30 jours sur la même ligne, alignés */
+@media (max-width:700px){
+  #stats.dtop{flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px}
+  #stats .dsub{font-size:18px;line-height:1.2;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  #stats .dtopr{flex:0 0 auto;margin:0}
+  #stats .drange{padding:3px}
+  #stats .drange button{padding:6px 11px;min-height:36px;font-size:13px;white-space:nowrap}
+}
