@@ -64,7 +64,7 @@ export default function MyProfile() {
     setBusy(true); setMsg(null); setVMsg({ t: "⏳ Envoi de la vidéo en cours…", ok: true });
     try { setVideo(await up(file)); setVMsg({ t: "✔ Vidéo ajoutée.", ok: true }); } catch (e: any) { setVMsg({ t: "Envoi impossible : " + e.message }); } setBusy(false);
   }
-  const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3;
+  const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3; const maxS = vip ? 30 : 5;
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
 
   async function save(e: React.FormEvent) {
@@ -76,7 +76,7 @@ export default function MyProfile() {
     setBusy(true);
     const row = { name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
-      tarif_visible: tshow, tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec, photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
+      tarif_visible: tshow, tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     setBusy(false);
     if (error) setMsg({ t: error.message }); else { location.href = `/profil/${uid}`; }
@@ -133,9 +133,9 @@ export default function MyProfile() {
               {kind === "createur" && <label className="f">Profil (obligatoire)<select value={f.genre} onChange={set("genre")} required>
                 <option value="" disabled>Choisir…</option><option value="fille">Fille</option><option value="homme">Homme</option><option value="trans">Trans</option></select></label>}
             </div>
-            <div className="f"><span style={L}>Spécialités (jusqu’à 6) <span style={{ fontWeight: 600 }}>{spec.length}/6</span></span>
+            <div className="f"><span style={L}>{`Spécialités (jusqu’à ${maxS})`}{!vip && " · 30 en VIP"} <span style={{ fontWeight: 600 }}>{spec.length}/{maxS}</span></span>
               <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
-                return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < 6 ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
+                return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < maxS ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
 </section><section className="dcard"><h3>Où te trouver ?</h3><div className="f"><span style={L}>Ville (tape les premières lettres)</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label="Ville" placeholder="Ex. Lyon" /></div>
             <div className="f"><span style={L}>{`Villes supplémentaires (jusqu’à ${maxM}, optionnel)`}{!vip && " · 6 en VIP"}</span>
               <div className="row3">{more.slice(0, maxM).map((m, i) => <CityInput key={i} value={m} placeholder={`Ville ${i + 2}`} label={`Ville supplémentaire ${i + 1}`} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} />)}</div></div>
