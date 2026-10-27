@@ -109,6 +109,14 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     const io = new IntersectionObserver((es) => { if (es[0].isIntersecting) setShown((s) => Math.min(s + PAGE, list.length)); }, { rootMargin: "600px" });
     io.observe(el); return () => io.disconnect();
   }, [shown, list.length]);
+  const slides = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = slides.current; if (!el || hl.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let stop = false; const halt = () => { stop = true; };
+    el.addEventListener("touchstart", halt, { passive: true }); el.addEventListener("pointerdown", halt);
+    const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.82; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 4000);
+    return () => clearInterval(t);
+  }, [hl]);
   const open = (id: string) => r.push(`/profil/${id}`);
   const setCity = (c: string) => r.push(c ? `/?ville=${encodeURIComponent(c)}` : "/");
   const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setDur(60); r.push("/"); };
@@ -126,6 +134,12 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       </aside>
 
       <main style={{ minWidth: 0 }}>
+        {hl.length > 0 && <section className="mhl" aria-label="Mis en avant">
+          <h2><Ic n="star" s={20} />Mis en avant</h2>
+          <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={`Voir le profil de ${p.name}`}>
+            <i style={p.photos[0] ? { backgroundImage: `url('${thumbUrl(p.photos[0])}')` } : undefined} />
+            <span>{p.vip && <em><Ic n="crown" s={13} />VIP</em>}<b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div>
+        </section>}
         <section className="panel top" aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">10</span><span className="t3">3</span> des villes</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol></section>
         <div className="panel msearch"><h2><Ic n="search" s={20} />Rechercher</h2>
@@ -170,7 +184,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       </main>
 
       <aside className="aside" aria-label="Filtres">
-        <div className="panel"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + (ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
+        <div className="panel hlp"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + (ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
           <div>{hl.map((p) => <button key={p.id} className="hl" onClick={() => open(p.id)}><i style={p.photos[0] ? { backgroundImage: `url('${p.photos[0]}')` } : undefined} /><span><b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div></div>
         <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />Rechercher</h2>
           <SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => r.push(`/ville/${slug(c)}`)} onProfile={open} onTag={(t) => { setTag(t); }} /></div>

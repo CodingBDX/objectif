@@ -488,3 +488,18 @@ body{overflow-x:clip}
 .sugl li{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sugl em{font-style:normal;font-size:12px;font-weight:700;color:var(--mut);min-width:96px}
 .sugl li span{flex:1;min-width:0}.sugl li small{margin-left:auto}
+
+.mhl{display:none}
+@media (max-width:700px){
+ .hlp{display:none}
+ .mhl{display:block;margin:0 0 14px}
+ .mhl h2{display:flex;align-items:center;gap:8px;font:600 20px var(--fd);margin:0 0 8px}.mhl h2 .ic{color:var(--pink)}
+ .mhs{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .mhs::-webkit-scrollbar{display:none}
+ .mslide{position:relative;flex:0 0 82%;scroll-snap-align:start;height:210px;border:0;padding:0;border-radius:26px;overflow:hidden;background:var(--soft);box-shadow:var(--sh);text-align:left;cursor:pointer}
+ .mslide i{position:absolute;inset:0;background-size:cover;background-position:center}
+ .mslide::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(60,10,40,.78))}
+ .mslide span{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;display:grid;gap:2px;color:#fff}
+ .mslide b{font:700 20px var(--fd)}.mslide small{font-size:14px;font-weight:600;opacity:.92}
+ .mslide em{font-style:normal;justify-self:start;display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#ffe29a,#ffb3d1);color:#6b3a00;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;margin-bottom:4px}
+}
