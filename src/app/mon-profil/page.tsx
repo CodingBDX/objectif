@@ -108,6 +108,7 @@ export default function MyProfile() {
         <div className="dhi">{isNewP ? "Bienvenue 👋" : `Salut, ${(f.name || "").split(" ")[0]} 👋`}</div>
         <nav>
           {!isNewP && <Link href="/statistiques">📊 Statistiques</Link>}
+          {!isNewP && <Link href="/verifier">🛡️ Vérifier un client</Link>}
           <Link className="on" href="/mon-profil">✏️ Mon profil</Link>
           {!isNewP && <Link href={`/profil/${uid}`}>👀 Voir ma page</Link>}
           <Link href="/">🏠 Annuaire</Link>
