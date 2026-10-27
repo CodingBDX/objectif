@@ -147,7 +147,6 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       </aside>
 
       <main style={{ minWidth: 0 }}>
-        {searchMode ? null : <SearchLink cls="msbar" />}
         {hl.length > 0 && <section className="mhl" aria-label="Mis en avant">
           <h2><Ic n="star" s={20} />Mis en avant</h2>
           <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={`Voir le profil de ${p.name}`}>
