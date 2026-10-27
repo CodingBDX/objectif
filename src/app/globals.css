@@ -658,3 +658,5 @@ h1{animation:hfade .5s ease both}
 
 .masso span{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid var(--pink);box-shadow:0 4px 12px rgba(214,51,132,.45);font-size:19px}
 .mapw.dash{padding-block:20px}
+
+.eph.vid{width:170px;height:96px}.eph.vid video{width:100%;height:100%;object-fit:cover;display:block;background:#000}

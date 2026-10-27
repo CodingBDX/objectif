@@ -15,7 +15,7 @@ export default function MyProfile() {
   const [uid, setUid] = useState(""); const [loaded, setLoaded] = useState(false); const [isNewP, setIsNewP] = useState(true);
   const [f, setF] = useState({ name: "", genre: "", city: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
-  const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
+  const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
@@ -189,9 +189,16 @@ export default function MyProfile() {
             </label>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
 </section><section className="dcard"><h3>Vidéo</h3>{kind === "livecam" && <label className="f">Lien de ton live (obligatoire pour un profil livecam)<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
-            <label className="f"><span>Vidéo de présentation (une seule, 20 Mo maximum)</span><input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} /></label>
+            <p className="note" style={{ margin: "0 0 6px" }}><b>Ma vidéo ({video ? 1 : 0}/1)</b> · une seule vidéo de présentation, 20 Mo maximum. ✕ pour la supprimer.</p>
+            {video && <div className="edph"><div className="eph vid"><video src={video + "#t=0.1"} muted playsInline preload="metadata" aria-label="Aperçu de ma vidéo" />
+              <span className="fst">Vidéo</span>
+              <button type="button" className="rm" aria-label="Supprimer la vidéo" title="Supprimer" onClick={() => { setVideo(null); setVMsg(null); }}>✕</button></div></div>}
+            {!video && <label className={`dz${vdrag ? " drag" : ""}`} onDragOver={(e) => { e.preventDefault(); setVdrag(true); }} onDragLeave={() => setVdrag(false)} onDrop={(e) => { e.preventDefault(); setVdrag(false); if (!busy) addVideo(e.dataTransfer.files?.[0]); }}>
+              <input type="file" accept="video/mp4,video/webm,video/quicktime" disabled={busy} onChange={(e) => { addVideo(e.target.files?.[0]); e.target.value = ""; }} />
+              <b>🎬 {busy ? "Envoi en cours…" : "Choisir une vidéo"}</b>
+              <span>Sélectionne ta vidéo dans ta galerie{"\u00A0"}— ou glisse-la ici sur ordinateur. MP4, WebM ou MOV, 20 Mo maximum.</span>
+            </label>}
             {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
-            {video && <label className="chk"><input type="checkbox" onChange={(e) => e.target.checked && setVideo(null)} /> <span>🎬 Vidéo actuelle : cocher pour la supprimer</span></label>}
 
 </section><section className="dcard"><h3>Disponibilités</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>Mes heures de disponibilité (optionnel)</strong>
               <p className="note">Coche les jours où tu es joignable. Ton profil affichera « Dispo » pendant ces heures et sera grisé en dehors.</p>
