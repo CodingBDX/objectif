@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CountUp from "@/components/CountUp";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -15,6 +15,7 @@ const empty = (d: string): Row => ({ day: d, views: 0, calls: 0, copies: 0, soci
 export default function StatsPanel() {
   const sb = supabaseBrowser();
   const [rows, setRows] = useState<Row[]>([]); const [me, setMe] = useState<Me | null>(null); const [coms, setComs] = useState(0); const [uid, setUid] = useState("");
+  const chips = useRef<HTMLDivElement>(null);
   const [range, setRange] = useState<7 | 30>(7); const [ready, setReady] = useState(false); const [noProfile, setNoProfile] = useState(false);
   useEffect(() => { (async () => {
     const { data: { user } } = await sb.auth.getUser();
@@ -28,6 +29,15 @@ export default function StatsPanel() {
     const { count } = await sb.from("comments").select("id", { count: "exact", head: true }).eq("profile_id", user.id); setComs(count || 0);
     setReady(true);
   })(); }, []);
+
+  // Mobile : les pastilles défilent toutes seules comme « Mis en avant » jusqu'au premier toucher
+  useEffect(() => {
+    const el = chips.current; if (!el || !window.matchMedia("(max-width:700px)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let stop = false; const halt = () => { stop = true; };
+    el.addEventListener("touchstart", halt, { passive: true }); el.addEventListener("pointerdown", halt);
+    const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.6; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - el.clientWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 3000);
+    return () => { clearInterval(t); el.removeEventListener("touchstart", halt); el.removeEventListener("pointerdown", halt); };
+  }, [ready]);
 
   if (!ready) return <section className="gut"><p className="note">Chargement…</p></section>;
   if (noProfile || !me) return <section className="gut"><div className="pfc" style={{ maxWidth: 560 }}><div className="panel regp"><h1 className="regh">Mes statistiques</h1><p className="note">Crée d’abord ton profil pour voir tes statistiques.</p><Link className="btn" href="/mon-profil">Créer mon profil</Link></div></div></section>;
@@ -65,7 +75,7 @@ export default function StatsPanel() {
             <div className="drange" role="group" aria-label="Période"><button aria-pressed={range === 7} onClick={() => setRange(7)}>7 jours</button><button aria-pressed={range === 30} onClick={() => setRange(30)}>30 jours</button></div>
           </div></div>
 
-        <div className="dchips">
+        <div className="dchips" ref={chips}>
           <div className="dch" title={trend === null ? "Vues du profil" : `Vues du profil (${trend >= 0 ? "+" : ""}${trend} % vs période précédente)`}><i aria-hidden="true">👁</i><b><CountUp to={v} /></b><span>Vues</span>{trend !== null && <small className={trend < 0 ? "neg" : ""}>{trend >= 0 ? "▲" : "▼"} {Math.abs(trend)} %</small>}</div>
           <div className="dch" title="Appels : clics sur ton numéro"><i aria-hidden="true">📞</i><b><CountUp to={calls} /></b><span>Appels</span></div>
           <div className="dch" title="Réseaux : clics sur tes liens"><i aria-hidden="true">🔗</i><b><CountUp to={socials} /></b><span>Réseaux</span></div>
