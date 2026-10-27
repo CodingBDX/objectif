@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CountUp from "@/components/CountUp";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -15,6 +15,7 @@ const empty = (d: string): Row => ({ day: d, views: 0, calls: 0, copies: 0, soci
 export default function StatsPanel() {
   const sb = supabaseBrowser();
   const [rows, setRows] = useState<Row[]>([]); const [me, setMe] = useState<Me | null>(null); const [coms, setComs] = useState(0); const [uid, setUid] = useState("");
+  const [tip, setTip] = useState(false); const tipRef = useRef<HTMLDivElement>(null);
   const [range, setRange] = useState<7 | 30>(7); const [ready, setReady] = useState(false); const [noProfile, setNoProfile] = useState(false);
   useEffect(() => { (async () => {
     const { data: { user } } = await sb.auth.getUser();
@@ -28,6 +29,14 @@ export default function StatsPanel() {
     const { count } = await sb.from("comments").select("id", { count: "exact", head: true }).eq("profile_id", user.id); setComs(count || 0);
     setReady(true);
   })(); }, []);
+
+  useEffect(() => {
+    if (!tip) return;
+    const d = (e: MouseEvent) => { if (tipRef.current && !tipRef.current.contains(e.target as Node)) setTip(false); };
+    const k = (e: KeyboardEvent) => { if (e.key === "Escape") setTip(false); };
+    document.addEventListener("mousedown", d); document.addEventListener("keydown", k);
+    return () => { document.removeEventListener("mousedown", d); document.removeEventListener("keydown", k); };
+  }, [tip]);
 
   if (!ready) return <section className="gut"><p className="note">Chargement…</p></section>;
   if (noProfile || !me) return <section className="gut"><div className="pfc" style={{ maxWidth: 560 }}><div className="panel regp"><h1 className="regh">Mes statistiques</h1><p className="note">Crée d’abord ton profil pour voir tes statistiques.</p><Link className="btn" href="/mon-profil">Créer mon profil</Link></div></div></section>;
@@ -61,14 +70,24 @@ export default function StatsPanel() {
   return (
     <>
         <div className="dtop" id="stats"><h2 className="dsub">📊 Mes statistiques</h2>
-          <div className="drange" role="group" aria-label="Période"><button aria-pressed={range === 7} onClick={() => setRange(7)}>7 jours</button><button aria-pressed={range === 30} onClick={() => setRange(30)}>30 jours</button></div></div>
+          <div className="dtopr">
+            <div className="tipw" ref={tipRef}>
+              <button type="button" className="tipb" aria-expanded={tip} aria-label="À retenir" title="À retenir" onClick={() => setTip(!tip)}>💡</button>
+              {tip && <div className="tipp" role="dialog" aria-label="À retenir"><b>À retenir</b>
+                <ul className="dl">
+                  <li><span>🏆 Meilleur jour</span><b>{best.views ? `${new Date(best.day + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "short" })} · ${best.views}` : "–"}</b></li>
+                  <li><span>📋 Numéro copié</span><b>{copies}</b></li>
+                  <li><span>📅 Moyenne</span><b>{(v / range).toFixed(1).replace(".", ",")} vue/jour</b></li>
+                </ul></div>}
+            </div>
+            <div className="drange" role="group" aria-label="Période"><button aria-pressed={range === 7} onClick={() => setRange(7)}>7 jours</button><button aria-pressed={range === 30} onClick={() => setRange(30)}>30 jours</button></div>
+          </div></div>
 
-
-        <div className="dtiles">
-          <div className="dt t1"><i>👁</i><span>Vues du profil</span><b><CountUp to={v} /></b><small className={trend !== null && trend < 0 ? "neg" : ""}>{trend === null ? "pas de comparaison" : `${trend >= 0 ? "+" : ""}${trend} % vs période préc.`}</small></div>
-          <div className="dt t2"><i>📞</i><span>Appels</span><b><CountUp to={calls} /></b><small>clics sur ton numéro</small></div>
-          <div className="dt t3"><i>🔗</i><span>Réseaux</span><b><CountUp to={socials} /></b><small>clics sur tes liens</small></div>
-          <div className="dt t4"><i>💬</i><span>Commentaires</span><b><CountUp to={coms} /></b><small>au total</small></div>
+        <div className="dchips">
+          <div className="dch" title={trend === null ? "Vues du profil" : `Vues du profil (${trend >= 0 ? "+" : ""}${trend} % vs période précédente)`}><i aria-hidden="true">👁</i><b><CountUp to={v} /></b><span>Vues</span>{trend !== null && <small className={trend < 0 ? "neg" : ""}>{trend >= 0 ? "▲" : "▼"} {Math.abs(trend)} %</small>}</div>
+          <div className="dch" title="Appels : clics sur ton numéro"><i aria-hidden="true">📞</i><b><CountUp to={calls} /></b><span>Appels</span></div>
+          <div className="dch" title="Réseaux : clics sur tes liens"><i aria-hidden="true">🔗</i><b><CountUp to={socials} /></b><span>Réseaux</span></div>
+          <div className="dch" title="Commentaires au total"><i aria-hidden="true">💬</i><b><CountUp to={coms} /></b><span>Com.</span></div>
         </div>
 
         <div className="dgrid">
@@ -86,14 +105,6 @@ export default function StatsPanel() {
             <div className="dn"><div className="donut" style={{ background: `conic-gradient(${stops})` }} role="img" aria-label={`Contacts : ${calls} appels, ${copies} copies, ${socials} réseaux`}><b>{contacts}</b></div>
               <ul>{parts.map((p) => <li key={p.n}><i style={{ background: p.c }} />{p.n}<b>{contacts ? Math.round((p.v / contacts) * 100) : 0} %</b></li>)}</ul></div>
             <p className="note" style={{ margin: "8px 0 0" }}>Taux de contact : <b>{v ? Math.round((contacts / v) * 100) + " %" : "–"}</b> (contacts ÷ vues)</p>
-          </section>
-          <section className="dcard">
-            <h3>À retenir</h3>
-            <ul className="dl">
-              <li><span>🏆 Meilleur jour</span><b>{best.views ? `${new Date(best.day + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "short" })} · ${best.views}` : "–"}</b></li>
-              <li><span>📋 Numéro copié</span><b>{copies}</b></li>
-              <li><span>📅 Moyenne</span><b>{(v / range).toFixed(1).replace(".", ",")} vue/jour</b></li>
-            </ul>
           </section>
           <section className="dcard">
             <h3>Profil complet : {done}/{tips.length}</h3>
