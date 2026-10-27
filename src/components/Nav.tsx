@@ -7,9 +7,9 @@ import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; cities: string[] };
+type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; cities: string[]; isAdmin?: boolean };
 
-function Inner({ loggedIn, hasProfile, vip, name, userId, cities }: P) {
+function Inner({ loggedIn, hasProfile, vip, name, userId, cities, isAdmin }: P) {
   const [open, setOpen] = useState(false);
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
@@ -34,6 +34,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, cities }: P) {
             <select aria-label="Choisir une ville" value={sp.get("ville") || ""} onChange={(e) => r.push(e.target.value ? `/ville/${slug(e.target.value)}` : "/")}>
               <option value="">Choisir une ville</option>{cities.map((c) => <option key={c}>{c}</option>)}
             </select></div>
+          {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
           {loggedIn ? (<>
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>Mon profil</Link>
             <button className="nl" onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}>👤 {name || "Moi"} · Quitter</button>

@@ -17,8 +17,10 @@ export const dynamic = "force-dynamic";
 export default async function Root({ children }: { children: React.ReactNode }) {
   const sb = supabaseServer();
   const { data: { user } } = await sb.auth.getUser();
+  let isAdmin = false;
   let me: { name: string; vip: boolean; paused: boolean } | null = null;
   if (user) { const { data } = await sb.from("profiles").select("name,vip,paused").eq("id", user.id).maybeSingle(); me = data; }
+  if (user) { const { data: ad } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle(); isAdmin = !!ad; }
   const { data: cs } = await sb.from("profiles").select("city,more").eq("paused", false);
   const cities = Array.from(new Set((cs || []).flatMap((c: any) => [c.city, ...(c.more || [])]).filter(Boolean))).sort((a: any, b: any) => a.localeCompare(b, "fr")) as string[];
   return (
@@ -29,7 +31,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "HeyPapi", url: siteUrl(), inLanguage: "fr" }) }} />
-        <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} cities={cities} />
+        <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} cities={cities} isAdmin={isAdmin} />
         {me?.paused && (
           <div className="pbanner" role="status"><span>⏸ Ton annonce « {me.name} » est en pause{me.vip ? " (même en VIP)" : ""} : elle n’apparaît plus dans l’annuaire.</span>
             <Link href="/mon-profil?reactiver=1">▶ Réactiver mon annonce</Link></div>
