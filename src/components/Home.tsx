@@ -40,7 +40,7 @@ function Card({ p, onOpen, delay }: { p: Profile; onOpen: () => void; delay?: nu
           ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? "Disponible 24h/24, 7j/7" : "Disponible jusqu’à " + a.until}</div>
           : <div className="meta"><Ic n="clock" s={15} />Indisponible{a.next ? " · reprend " + a.next : ""}</div>)}
         <div className="meta"><Ic n={CIC[p.genre] || "camera"} s={15} />{lab(p) ? lab(p) + " · " : ""}{p.photos.length} photos</div>
-        {p.tarif ? <div className="meta"><Ic n="rose" s={15} />dès <b>{p.tarif}</b></div> : null}
+        {(p.tarif_30 || p.tarif_60) ? <div className="meta"><Ic n="rose" s={15} />{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
         <div className="tags">{p.specialties.slice(0, 2).map((t) => <span className="tag" key={t}>{cap(t)}</span>)}</div>
       </div>
     </article>
@@ -87,9 +87,9 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
 
   const list = useMemo(() => {
     const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || cityList(p).includes(city)) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
-      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (!!p.tarif && (tar === 999 ? p.tarif > 300 : p.tarif <= tar)))
+      && (!fav || favs.includes(p.id)) && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (!!p.tarif_60 && (tar === 999 ? p.tarif_60 > 300 : p.tarif_60 <= tar)))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
-    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? (a.tarif || 1e9) - (b.tarif || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
+    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? (a.tarif_60 || 1e9) - (b.tarif_60 || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, tar, city, fav, favs]);
@@ -130,8 +130,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div>
           <h2 style={{ marginTop: 18 }}><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
-          <div className="row"><span>Tarif (à partir de)</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
+          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif 1 h croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Tarif pour 1 h</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>
@@ -172,8 +172,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <div className="sp" style={{ maxWidth: "none", margin: 0 }}><input type="search" placeholder="Nom, style, ville…" aria-label="Rechercher" value={q} onChange={(e) => setQ(e.target.value)} /><Ic n="search" /></div></div>
           <h2 className="fh"><Ic n="sliders" s={20} />Filtres<button className="clear" onClick={clear}>Tout effacer</button></h2>
           <div className="row"><span>Profil</span><select aria-label="Profil" value={type} onChange={(e) => setType(e.target.value)}><option value="tous">Tous les profils</option><option value="fille">Filles</option><option value="homme">Hommes</option><option value="trans">Trans</option><option value="livecam">Livecam</option></select></div>
-          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
-          <div className="row"><span>Tarif (à partir de)</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
+          <div className="row"><span>Trier par</span><select aria-label="Tri" value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">Plus récents</option><option value="az">Nom (A à Z)</option><option value="tarif">Tarif 1 h croissant</option><option value="vus">Plus vus (30 jours)</option><option value="media">Plus de contenus</option></select></div>
+          <div className="row"><span>Tarif pour 1 h</span><select aria-label="Tarif" value={tar} onChange={(e) => setTar(Number(e.target.value))}><option value={0}>Tous les tarifs</option><option value={100}>🌹 100 maximum</option><option value={200}>🌹 200 maximum</option><option value={300}>🌹 300 maximum</option><option value={999}>🌹 plus de 300</option></select></div>
           <label className="ck"><input type="checkbox" checked={vid} onChange={(e) => setVid(e.target.checked)} /> Avec vidéo de présentation</label>
           <label className="ck"><input type="checkbox" checked={ver} onChange={(e) => setVer(e.target.checked)} /> Profils vérifiés uniquement</label>
           <label className="ck"><input type="checkbox" checked={now} onChange={(e) => setNow(e.target.checked)} /> Disponibles maintenant</label>

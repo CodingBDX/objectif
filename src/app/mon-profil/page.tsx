@@ -15,7 +15,7 @@ export default function MyProfile() {
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
-  const [tarif, setTarif] = useState(""); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
+  const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
@@ -30,7 +30,7 @@ export default function MyProfile() {
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
       setBio(data.bio); setMore([...(data.more || []), "", "", ""].slice(0, 3)); setSpec(data.specialties); setPhotos(data.photos); setVideo(data.video);
-      setTarif(data.tarif ? String(data.tarif) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
+      setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); }
     }
@@ -66,7 +66,7 @@ export default function MyProfile() {
     setBusy(true);
     const row = { name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
-      tarif: tarif ? Math.max(0, Math.min(10000, Math.round(Number(tarif)))) : null, specialties: spec, photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
+      tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec, photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     setBusy(false);
     if (error) setMsg({ t: error.message }); else { location.href = `/profil/${uid}`; }
@@ -137,7 +137,7 @@ export default function MyProfile() {
               <span className="note">Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.</span></div>
 </section><section className="dcard"><h3>Présentation et contact</h3><label className="f">Présentation<textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={2000} rows={5} /></label>
             <div className="row2"><label className="f">Site ou réseau (optionnel)<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
-            <label className="f">Tarif « à partir de » (optionnel, nombre uniquement) 🌹<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 150" value={tarif} onChange={(e) => setTarif(e.target.value)} /></label>
+            <div className="f"><span style={L}>Tarifs 🌹 (optionnel, nombres uniquement)</span><div className="row2"><label className="f">Pour 30 minutes<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" value={t30} onChange={(e) => setT30(e.target.value)} /></label><label className="f">Pour 1 heure<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 150" value={t60} onChange={(e) => setT60(e.target.value)} /></label></div></div>
             <label className="f">Numéro de téléphone (optionnel)<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
             <div className="f"><span style={L}>Réseaux sociaux (optionnel, ton pseudo sans @)</span>
               <div className="row3"><input maxLength={31} placeholder="Instagram" aria-label="Pseudo Instagram" value={f.instagram} onChange={set("instagram")} />

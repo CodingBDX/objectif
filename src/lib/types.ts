@@ -8,7 +8,7 @@ export type Profile = {
   id: string; name: string; genre: Genre; city: string; more: string[]; specialties: string[]; bio: string;
   phone: string | null; instagram: string | null; snapchat: string | null; tiktok: string | null; site: string | null;
   h24: boolean; hours: Hours; trips: Trip[];
-  photos: string[]; video: string | null; vlink: string | null; vip: boolean; verified: boolean; paused: boolean; created_at: string; views?: number; tarif?: number | null;
+  photos: string[]; video: string | null; vlink: string | null; vip: boolean; verified: boolean; paused: boolean; created_at: string; views?: number; tarif?: number | null; tarif_30?: number | null; tarif_60?: number | null;
 };
 export const lab = (p: Profile) => CATS[p.genre] || "";
 export const isNew = (p: Profile) => { const d = Date.now() - new Date(p.created_at).getTime(); return d >= 0 && d < 30 * 864e5; };
