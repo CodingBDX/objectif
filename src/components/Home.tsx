@@ -9,6 +9,8 @@ import Ic from "./Ic";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
 import SearchBox from "./SearchBox";
+import dynamic from "next/dynamic";
+const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">Chargement de la carte…</p> });
 import { useFavs } from "@/lib/favs";
 import { avail, tripsOf } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile } from "@/lib/types";
@@ -53,7 +55,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
-  const [view, setView] = useState<"cards" | "list">("cards"); const [shown, setShown] = useState(PAGE);
+  const [view, setView] = useState<"cards" | "list" | "map">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
   const city = initialCity || sp.get("ville") || (canNear ? near : "");
@@ -85,7 +87,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
   useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, city, fav]);
-  const chView = (v: "cards" | "list") => { setView(v); try { localStorage.setItem("objectif_vue", v); } catch {} };
+  const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
+  const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string }[] }> = {}; list.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 6) c.p.push({ id: p.id, name: p.name, sub: lab(p) }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
 
   const list = useMemo(() => {
     const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || cityList(p).includes(city)) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
@@ -159,6 +162,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
             <button type="button" aria-pressed={view === "cards"} title="Affichage en cartes" aria-label="Cartes" onClick={() => chView("cards")}><Ic n="grid" /></button>
             <button type="button" aria-pressed={view === "list"} title="Affichage en liste" aria-label="Liste" onClick={() => chView("list")}>
               <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="18" height="6" rx="2" /></svg></button>
+            <button type="button" aria-pressed={view === "map"} title="Affichage sur la carte" aria-label="Carte" onClick={() => chView("map")}><Ic n="pin" /></button>
           </div>
         </div>
         {geoMsg && <p className="note" role="alert" style={{ margin: "0 0 12px", color: "var(--btn)", fontWeight: 700 }}>{geoMsg}</p>}
@@ -175,11 +179,12 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <span>📍 Profils près de toi : <b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>Voir tous les profils</button></div>}
         {city && <NearbyCities profiles={profiles} city={city} type={type} />}
         {intro && <p className="note" style={{ margin: "0 0 12px" }}>{intro}</p>}
-        <div className={`grid${view === "list" ? " lst" : ""}`}>
+        {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">Aucun profil à afficher sur la carte.</div>)}
+        <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} />)
             : <div className="empty">{fav ? "Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici." : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? `Aucun profil à ${city} pour le moment. Sois le premier : crée ton profil !` : "Aucun profil ne correspond à votre recherche.") : "Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil »."}</div>}
         </div>
-        {shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{list.length - shown} profils à venir</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}
+        {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{list.length - shown} profils à venir</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>Voir plus</button></div>}
       </main>
 
       <aside className="aside" aria-label="Filtres">
