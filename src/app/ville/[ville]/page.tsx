@@ -5,6 +5,7 @@ import Home from "@/components/Home";
 import { allProfiles, cityBySlug } from "@/lib/data";
 import { cityList } from "@/lib/types";
 import CityIntro from "@/components/CityIntro";
+import CityAssos from "@/components/CityAssos";
 import { regionMap } from "@/lib/cityinfo";
 
 export const dynamic = "force-dynamic";
@@ -15,5 +16,5 @@ export async function generateMetadata({ params }: { params: { ville: string } }
 export default async function Page({ params }: { params: { ville: string } }) {
   const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville); if (!city) notFound();
   const regions = await regionMap(profiles);
-  return <Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Créateurs à ${city}`} intro={<Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>Chargement des infos de la ville…</p>}><CityIntro city={city} profiles={profiles} /></Suspense>} /></Suspense>;
+  return <Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Créateurs à ${city}`} intro={<><Suspense fallback={null}><CityAssos city={city} /></Suspense><Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>Chargement des infos de la ville…</p>}><CityIntro city={city} profiles={profiles} /></Suspense></>} /></Suspense>;
 }

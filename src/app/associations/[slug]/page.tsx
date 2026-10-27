@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { publicAssos } from "@/lib/public";
+import { assosForViewer } from "@/lib/assosServer";
+import AssoGate from "@/components/AssoGate";
 import { assoCities } from "@/lib/assos";
 import AssoShell from "@/components/AssoShell";
 
 export const dynamic = "force-dynamic";
-const find = async (s: string) => (await publicAssos()).find((a) => a.slug === s);
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const a = await find(params.slug); if (!a) return {};
-  return { title: `${a.name} · ${a.city}`, description: a.description.slice(0, 155) || `Association à ${a.city}`, alternates: { canonical: `/associations/${a.slug}` } };
+  return { title: "Association", robots: { index: false, follow: false } };
 }
 const web = (u: string | null) => (u && /^https?:\/\//i.test(u) ? u : null);
 export default async function Page({ params }: { params: { slug: string } }) {
-  const a = await find(params.slug); if (!a) notFound();
+  const { allowed, list } = await assosForViewer();
+  if (!allowed) return <AssoShell title="Association" active="liste"><AssoGate /></AssoShell>;
+  const a = list.find((x) => x.slug === params.slug); if (!a) notFound();
   const site = web(a.site);
   return (
     <AssoShell title={a.name} active="liste" top={<Link className="btn ghost" href={`/associations?ville=${encodeURIComponent(a.city)}`}>← Associations à {a.city}</Link>}>
       <section className="dcard" style={{ display: "grid", gap: 12 }}>
-        <div className="note">📍 {assoCities(a).join(" · ")}{a.region ? ` · ${a.region}` : ""}</div>
+        <div className="note">📍 {a.national ? "Toute la France" : assoCities(a).join(" · ")}{a.region ? ` · ${a.region}` : ""}</div>
         {a.description && <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{a.description}</p>}
         {a.services.length > 0 && <div><b>Ce qu’elle propose</b><div className="tags" style={{ marginTop: 6 }}>{a.services.map((s) => <span className="tag" key={s}>{s}</span>)}</div></div>}
       </section>

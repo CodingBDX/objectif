@@ -6,6 +6,7 @@ import { allProfiles, cityBySlug } from "@/lib/data";
 import { GFROM, GPATH, GTITLE } from "@/lib/site";
 import { cityList } from "@/lib/types";
 import CityIntro from "@/components/CityIntro";
+import CityAssos from "@/components/CityAssos";
 import { regionMap } from "@/lib/cityinfo";
 
 export const dynamic = "force-dynamic";
@@ -18,5 +19,5 @@ export default async function Page({ params }: { params: { genre: string; ville:
   if (!g || !city) notFound();
   const n = profiles.filter((p) => p.genre === g && cityList(p).includes(city)).length;
   const regions = await regionMap(profiles);
-  return <Suspense><Home region={regions[city] || ""} regions={regions} key={g + params.ville} profiles={profiles} initialType={g} initialCity={city} h1={`Profils ${GTITLE[g]} à ${city}`} intro={<Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>{`${n} profil${n > 1 ? "s" : ""} ${GTITLE[g].toLowerCase()} à ${city}. `}</p>}><CityIntro city={city} profiles={profiles} lead={`${n} profil${n > 1 ? "s" : ""} ${GTITLE[g].toLowerCase()} à ${city}. `} /></Suspense>} /></Suspense>;
+  return <Suspense><Home region={regions[city] || ""} regions={regions} key={g + params.ville} profiles={profiles} initialType={g} initialCity={city} h1={`Profils ${GTITLE[g]} à ${city}`} intro={<><Suspense fallback={null}><CityAssos city={city} /></Suspense><Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>{`${n} profil${n > 1 ? "s" : ""} ${GTITLE[g].toLowerCase()} à ${city}. `}</p>}><CityIntro city={city} profiles={profiles} lead={`${n} profil${n > 1 ? "s" : ""} ${GTITLE[g].toLowerCase()} à ${city}. `} /></Suspense></>} /></Suspense>;
 }
