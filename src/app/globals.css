@@ -322,3 +322,7 @@ fieldset.fs[hidden]{display:none}
 }
 @media (max-width:560px){.row2{grid-template-columns:1fr}.hero{padding:20px}.nl{padding:10px 12px}}
 @media (prefers-reduced-motion:reduce){.slide,.card,.th{transition:none}.slide{transform:none}.demo{animation:none}}.pbanner a{background:var(--card);color:var(--btn);border-radius:999px;padding:6px 16px;font:700 14px var(--fb);min-height:36px;display:inline-flex;align-items:center}
+
+/* Liens : pas de soulignement, couleur héritée (le site d’origine utilisait des boutons) */
+a{color:inherit;text-decoration:none}
+a:hover,a:focus{text-decoration:none}
