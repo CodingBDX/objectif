@@ -11,7 +11,7 @@ export const PT: Record<string, string> = {
   "Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi.": "Conta criada! Clica no link recebido por e-mail para confirmar e depois entra.",
   "E-mail ou mot de passe incorrect.": "E-mail ou palavra-passe incorretos.",
   "Chargement…": "A carregar…", "Bienvenue 👋": "Bem-vinda 👋", "Salut, {n} 👋": "Olá, {n} 👋",
-  "📊 Statistiques": "📊 Estatísticas", "🛡️ Vérifier un client": "🛡️ Verificar um cliente", "✏️ Mon profil": "✏️ O meu perfil", "👀 Voir ma page": "👀 Ver a minha página", "📖 Annuaire": "🏠 Diretório", "✉️ Contact": "✉️ Contacto",
+  "📊 Statistiques": "📊 Estatísticas", "🛡️ Vérifier un client": "🛡️ Verificar um cliente", "✏️ Mon profil": "✏️ O meu perfil", "👀 Voir ma page": "👀 Ver a minha página", "📖 Annuaire": "📖 Diretório", "✉️ Contact": "✉️ Contacto",
   "Passe en VIP": "Passa a VIP", "Plus de visibilité dans l’annuaire.": "Mais visibilidade no diretório.", "Devenir VIP": "Tornar-me VIP",
   "Mon espace": "O meu espaço", "✏️ Modifier mon profil": "✏️ Editar o meu perfil", "▶ Réactiver mon annonce": "▶ Reativar o meu anúncio", "⏸ Mettre mon annonce en pause": "⏸ Pausar o meu anúncio", "Voir mon profil": "Ver o meu perfil",
   "Choisis le type de profil qui te correspond.": "Escolhe o tipo de perfil que te corresponde.", "Type de profil": "Tipo de perfil",
