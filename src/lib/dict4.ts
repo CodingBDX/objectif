@@ -13,5 +13,6 @@ export const DICT4: Record<string, [string, string, string]> = {
   "du {a} au {b}": ["from {a} to {b}", "del {a} al {b}", "de {a} a {b}"], "le {a}": ["on {a}", "el {a}", "a {a}"],
   "Elle dort": ["She’s sleeping", "Está durmiendo", "Está a dormir"], "Il dort": ["He’s sleeping", "Está durmiendo", "Está a dormir"],
   "(retour le {d} à {h})": ["(back on {d} at {h})", "(vuelve el {d} a las {h})", "(volta a {d} às {h})"],
+  "🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ": ["🔒 Social networks are reserved for VIP profiles: they are not shown on your profile. ", "🔒 Las redes sociales están reservadas a los perfiles VIP: no se muestran en tu perfil. ", "🔒 As redes sociais são reservadas aos perfis VIP: não aparecem no teu perfil. "],
   "Copier": ["Copy", "Copiar", "Copiar"], "Copié ✔": ["Copied ✔", "Copiado ✔", "Copiado ✔"], "🔗 Copier le lien du profil": ["🔗 Copy profile link", "🔗 Copiar el enlace del perfil", "🔗 Copiar o link do perfil"],
 };

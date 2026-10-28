@@ -219,9 +219,10 @@ export default function MyProfile() {
             <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="row2"><label className="f">{tr("Pour 30 minutes")}<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" value={t30} disabled={!vip} onChange={(e) => setT30(e.target.value)} /></label><label className="f">{tr("Pour 1 heure")}<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 150" value={t60} disabled={!vip} onChange={(e) => setT60(e.target.value)} /></label></div>{vip && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
             <label className="f">{tr("Numéro de téléphone (optionnel)")}<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
             <div className="f"><span style={L}>{tr("Réseaux sociaux (optionnel, ton pseudo sans @)")}</span>
-              <div className="row3"><input maxLength={31} placeholder="Instagram" aria-label={tr("Pseudo Instagram")} value={f.instagram} onChange={set("instagram")} />
-                <input maxLength={31} placeholder="Snapchat" aria-label={tr("Pseudo Snapchat")} value={f.snapchat} onChange={set("snapchat")} />
-                <input maxLength={31} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} /></div></div>
+              {!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}
+              <div className="row3"><input maxLength={31} disabled={!vip} placeholder="Instagram" aria-label={tr("Pseudo Instagram")} value={f.instagram} onChange={set("instagram")} />
+                <input maxLength={31} disabled={!vip} placeholder="Snapchat" aria-label={tr("Pseudo Snapchat")} value={f.snapchat} onChange={set("snapchat")} />
+                <input maxLength={31} disabled={!vip} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} /></div></div>
             <p className="note">{tr("Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.")}</p>
 
 </section><section className="dcard"><h3>{tr("Mes photos")}</h3><div>

@@ -63,7 +63,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}/profil/${p.id}`, dateCreated: p.created_at,
         mainEntity: { "@type": "Person", name: p.name, description: plain(p.bio).slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
           homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } }, knowsAbout: p.specialties,
-          sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
+          sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return p.vip && h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/"><Tr k="← Tous les profils" /></Link><h1 className="pbn">{p.name}</h1>
         <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}<Heart id={p.id} />{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
@@ -73,7 +73,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
           {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
           {p.phone && !asleep && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
-          {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
+          {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!p.vip || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
       <div className="pfc">
