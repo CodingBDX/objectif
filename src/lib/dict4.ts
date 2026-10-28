@@ -11,5 +11,7 @@ export const DICT4: Record<string, [string, string, string]> = {
   "En ce moment": ["Right now", "Ahora mismo", "Neste momento"], "Tarifs": ["Rates", "Tarifas", "Tarifas"], "30 minutes : ": ["30 minutes: ", "30 minutos: ", "30 minutos: "], "1 heure : ": ["1 hour: ", "1 hora: ", "1 hora: "],
   "Disponible à toute heure, tous les jours.": ["Available at any time, every day.", "Disponible a cualquier hora, todos los días.", "Disponível a qualquer hora, todos os dias."],
   "du {a} au {b}": ["from {a} to {b}", "del {a} al {b}", "de {a} a {b}"], "le {a}": ["on {a}", "el {a}", "a {a}"],
+  "Elle dort": ["She’s sleeping", "Está durmiendo", "Está a dormir"], "Il dort": ["He’s sleeping", "Está durmiendo", "Está a dormir"],
+  "(retour le {d} à {h})": ["(back on {d} at {h})", "(vuelve el {d} a las {h})", "(volta a {d} às {h})"],
   "Copier": ["Copy", "Copiar", "Copiar"], "Copié ✔": ["Copied ✔", "Copiado ✔", "Copiado ✔"], "🔗 Copier le lien du profil": ["🔗 Copy profile link", "🔗 Copiar el enlace del perfil", "🔗 Copiar o link do perfil"],
 };

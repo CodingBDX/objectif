@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
 import { cap, CATS, isNew, Profile, showTarif } from "@/lib/types";
 import { publicSpecialties } from "@/lib/public";
-import { avail, DAYL, dShort, MS, nowP, todayP, tripsOf } from "@/lib/avail";
+import { avail, DAYL, dShort, MS, nextOpen, nowP, todayP, tripsOf } from "@/lib/avail";
 import Ic from "@/components/Ic";
 import Heart from "@/components/Heart";
 import Slider from "@/components/Slider";
@@ -48,6 +48,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   const mine = user?.id === p.id;
   const a = avail(p); const trips = tripsOf(p); const td = todayP(); const nd = nowP().d;
   const live = p.genre === "livecam";
+  const asleep = !p.vip && !mine && !!a && !a.on;
+  const back = asleep ? nextOpen(p) : null;
   let st: { views_total: number; views_today: number; last_seen_day: string | null } | null = null;
   try { const { data } = await sb.rpc("profile_public_stats", { p_id: p.id }); const r = Array.isArray(data) ? data[0] : data; if (r) st = { views_total: Number(r.views_total), views_today: Number(r.views_today), last_seen_day: r.last_seen_day }; } catch {}
   const nbd = (iso: string) => Math.round((new Date(td + "T12:00:00").getTime() - new Date(iso + "T12:00:00").getTime()) / 864e5);
@@ -69,7 +71,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
         <div className="pcontact">
           {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
-          {p.phone && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
+          {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
+          {p.phone && !asleep && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
@@ -107,7 +110,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 return <div className="trip" key={i}><div className="tcal"><b>{MS[+m - 1]}</b><span>{+d}</span></div>
                   <div className="tinf"><Link href={`/ville/${slug(x.city)}`}>{x.city}</Link>{now && <span className="tnow"><Tr k="En ce moment" /></span>}
                     <em>{x.to !== x.from ? <Tr k="du {a} au {b}" vars={{ a: dShort(x.from), b: dShort(x.to) }} /> : <Tr k="le {a}" vars={{ a: dShort(x.from) }} />}</em></div></div>; })}</div>}
-            {showTarif(p) ? <div className="panel"><h3 className="ph"><Ic n="rose" s={18} /><Tr k="Tarifs" /></h3>{p.tarif_30 ? <div className="meta"><Ic n="rose" s={15} /><Tr k="30 minutes : " /><b>{p.tarif_30}</b></div> : null}{p.tarif_60 ? <div className="meta"><Ic n="rose" s={15} /><Tr k="1 heure : " /><b>{p.tarif_60}</b></div> : null}</div> : null}
+            {showTarif(p) && (p.tarif_30 || p.tarif_60) ? <div className="rates">{p.tarif_30 ? <span><Ic n="rose" s={18} />30 min <b>{p.tarif_30}</b></span> : null}{p.tarif_60 ? <span><Ic n="rose" s={18} />1 h <b>{p.tarif_60}</b></span> : null}</div> : null}
             {a && (p.h24 || Object.values(p.hours || {}).some((h) => h && h[0] && h[1])) && <div className="panel"><h3 className="ph"><Ic n="clock" s={18} /><Tr k="Disponibilités" /></h3>
               {a ? (<>
                 {a.on ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? <Tr k="Disponible 24h/24, 7j/7" /> : <Tr k="Disponible jusqu’à {u}" vars={{ u: a.until || "" }} />}</div>

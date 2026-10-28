@@ -858,3 +858,10 @@ h1.pbn{margin:0}
  .nav .burger{margin-left:0}
  .nav .logo{margin-right:0}
 }
+
+/* Tarifs en simple ligne (roses) et message "elle dort" */
+.rates{display:flex;flex-wrap:wrap;gap:10px;padding:0 4px}
+.rates span{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border-radius:999px;padding:6px 14px;font-weight:600;color:var(--ink)}
+.rates .ic{color:var(--pink)}.rates b{font:700 16px var(--fd);color:var(--btn)}
+.pcontact .pph.zz{padding:6px 14px;gap:8px;flex-wrap:wrap;justify-content:center}
+.pcontact .pph.zz small{color:var(--mut);font-weight:600;font-size:13px}
