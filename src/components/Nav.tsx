@@ -10,9 +10,9 @@ import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
-type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean; escort?: boolean; paused?: boolean };
+type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean; escort?: boolean; paused?: boolean; lodg?: boolean };
 
-function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort, paused }: P) {
+function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort, paused, lodg }: P) {
     const [open, setOpen] = useState(false);
   const { tr } = useT(); const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
@@ -33,7 +33,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
           <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />{tr("Annuaire")}</Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte" aria-label={tr("Carte")} title={tr("Carte")}><Ic n="pin" /><span className="nlt">{tr("Carte")}</span></Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1" aria-label={tr("Favoris")} title={tr("Favoris")}><Ic n="heart" /><span className="nlt">{tr("Favoris")}</span> <span className="cn">{favs.length}</span></Link>
-          <Link className={`nl${path?.startsWith("/logements") ? " on" : ""}`} href="/logements">🏠 <span className="nlt">{tr("Logements")}</span></Link>
+          {lodg && <Link className={`nl${path?.startsWith("/logements") ? " on" : ""}`} href="/logements">🏠 <span className="nlt">{tr("Logements")}</span></Link>}
           {escort && <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title={tr("Associations et soutien par ville")}>🤝 <span className="nlt">{tr("Associations")}</span></Link>}
           <Link className="nl" href="/contact" aria-label={tr("Nous contacter")} title={tr("Nous contacter")}>
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">{tr("Contact")}</span>
@@ -46,7 +46,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
             {hasProfile && vip && <PauseBtn id={userId} paused={!!paused} />}
             {hasProfile && <Link className={`nl${path === "/verifier" ? " on" : ""}`} href="/verifier" title={tr("Vérifier un client")}>🛡️ <span className="nlt">{tr("Vérifier un client")}</span></Link>}
             {hasProfile && <Link className={`nl own${path === "/mon-profil" ? " on" : ""}`} href="/mon-profil" title={tr("Modifier mon profil")}>✏️ <span className="nlt">{tr("Modifier mon profil")}</span></Link>}
-            {hasProfile && <Link className={`nl own${path === "/mon-logement" ? " on" : ""}`} href="/mon-logement" title={tr("Mon logement")}>🏠 <span className="nlt">{tr("Mon logement")}</span></Link>}
+            {hasProfile && lodg && <Link className={`nl own${path === "/mon-logement" ? " on" : ""}`} href="/mon-logement" title={tr("Mon logement")}>🏠 <span className="nlt">{tr("Mon logement")}</span></Link>}
             {hasProfile && <Link className="nl own" href="/mon-profil#stats" title={tr("Mes statistiques")}>📊 <span className="nlt">{tr("Mes statistiques")}</span></Link>}
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>{tr("Mon profil")}</Link>
             <button className="nl" onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}>👤 {name || tr("Moi")} · {tr("Quitter")}</button>

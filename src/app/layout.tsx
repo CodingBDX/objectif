@@ -26,7 +26,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
   const sb = supabaseServer();
   const { data: { user } } = await sb.auth.getUser();
   const [me, isAdmin, all] = await Promise.all([
-    user ? sb.from("profiles").select("name,vip,paused,genre").eq("id", user.id).maybeSingle().then((r: any) => r.data as { name: string; vip: boolean; paused: boolean; genre: string } | null) : Promise.resolve(null),
+    user ? sb.from("profiles").select("name,vip,verified,paused,genre").eq("id", user.id).maybeSingle().then((r: any) => r.data as { name: string; vip: boolean; verified: boolean; paused: boolean; genre: string } | null) : Promise.resolve(null),
     user ? sb.from("admins").select("id").eq("id", user.id).maybeSingle().then((r: any) => !!r.data) : Promise.resolve(false),
     publicProfiles()
   ]);
@@ -44,7 +44,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "Sex-Escorte", url: siteUrl(), inLanguage: "fr" }) }} />
         <Splash /><NavProgress />
         <AgeGate />
-        <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} index={index} isAdmin={isAdmin} escort={escort} paused={!!me?.paused} />
+        <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} index={index} isAdmin={isAdmin} escort={escort} paused={!!me?.paused} lodg={!!(isAdmin || (me?.vip && me?.verified))} />
         {me && <PauseBanner id={user!.id} name={me.name} vip={me.vip} paused={me.paused} />}
         {me && !me.vip && <VipBanner paused={me.paused} />}
         {children}

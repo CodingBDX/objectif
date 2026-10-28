@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
+import { canSeeLodgings } from "@/lib/lodgingServer";
 import LodgingEditor from "@/components/LodgingEditor";
 import { Tr } from "@/lib/i18n";
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Mon logement", robots: { index: fals
 export default async function Page() {
   const { data: { user } } = await supabaseServer().auth.getUser();
   if (!user) redirect("/connexion");
+  if (!(await canSeeLodgings())) notFound();
   return (
     <section className="gut">
       <div className="pbar"><Link className="btn ghost" href="/mon-profil"><Tr k="← Modifier mon profil" /></Link><h1 className="pbn"><Tr k="🏠 Mon logement" /></h1></div>

@@ -15,7 +15,8 @@ export default async function Page() {
   const cities = Object.values(by).sort((a, b) => b.n - a.n);
   const { allowed, list } = await assosForViewer();
   const assos: MapAsso[] = allowed ? list.filter((a) => a.address).map((a) => ({ slug: a.slug, name: a.name, address: a.address as string, city: a.city, phone: a.phone })) : [];
-  const ld = (await canSeeLodgings()) ? await publicLodgings("profile_id,title,city,area,lat,lon,price_day,price_week,price_month", true) : [];
+  const lodgOk = await canSeeLodgings();
+  const ld = lodgOk ? await publicLodgings("profile_id,title,city,area,lat,lon,price_day,price_week,price_month", true) : [];
   const lodgings: MapLodging[] = ld.map((l: any) => ({ id: l.profile_id, title: l.title, city: l.city, area: l.area, lat: Number(l.lat), lon: Number(l.lon), day: l.price_day, week: l.price_week, month: l.price_month }));
   return (
     <div className="dash gut mapw">
@@ -25,7 +26,7 @@ export default async function Page() {
         <nav>
           <Link className="on" href="/carte">🗺 Carte des profils</Link>
           <Link href="/">🏠 Annuaire</Link>
-          <Link href="/logements">🏠 Logements</Link>
+          {lodgOk && <Link href="/logements">🏠 Logements</Link>}
           <Link href="/?pm=1">📍 Près de moi</Link>
           <Link href="/?fav=1">💗 Favoris</Link>
           {allowed && <Link href="/associations">🤝 Associations</Link>}

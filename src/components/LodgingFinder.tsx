@@ -23,11 +23,11 @@ export default function LodgingFinder() {
     }
     setReady(true);
   })(); /* eslint-disable-next-line */ }, []);
-  if (!ready) return null;
+  if (!ready || !ok) return null;
   return (
     <section className="dcard" id="logements" style={{ display: "grid", gap: 12 }}>
       <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}><Ic n="star" s={20} />{tr("🏠 Logements")}</h3>
-      {ok ? <LodgingSearch items={items} strip /> : <p className="note" style={{ margin: 0 }}>{tr("🔒 Les logements sont réservés aux profils VIP et vérifiés.")}</p>}
+      <LodgingSearch items={items} strip />
       <div className="acts"><Link className="btn ghost" href="/mon-logement">{tr("Mon logement")}</Link><Link className="btn ghost" href="/logements">{tr("Voir tous les logements")}</Link></div>
     </section>
   );
