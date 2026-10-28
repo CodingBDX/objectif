@@ -969,3 +969,24 @@ h1.pbn{margin:0}
  .gs-desk .langsw button{min-width:34px;font-size:12px;padding:0 6px}
  .nav .btn{height:44px;padding:0 16px;white-space:nowrap;flex:none}
 }
+
+/* Rejoindre : animations douces (transform / opacité uniquement) */
+@keyframes rjup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes rjfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes rjglow{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.5);opacity:0}}
+@keyframes rjpop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.rjh>*{animation:rjup .7s cubic-bezier(.2,.7,.2,1) both}
+.rjh>:nth-child(2){animation-delay:.08s}.rjh>:nth-child(3){animation-delay:.16s}.rjh>:nth-child(4){animation-delay:.24s}.rjh>:nth-child(5){animation-delay:.32s}
+.rjh{position:relative;overflow:hidden}
+.rjh::before,.rjh::after{content:"💖";position:absolute;font-size:26px;opacity:.5;pointer-events:none;animation:rjfloat 4s ease-in-out infinite}
+.rjh::before{left:7%;top:16%}.rjh::after{content:"✨";right:8%;bottom:18%;animation-delay:1.2s}
+.rja .btn:not(.ghost){position:relative}
+.rja .btn:not(.ghost)::after{content:"";position:absolute;inset:0;border-radius:inherit;border:2px solid var(--pink);animation:rjglow 2.2s ease-out infinite;pointer-events:none}
+.rjc{animation:rjup .6s cubic-bezier(.2,.7,.2,1) both;transition:transform .25s,box-shadow .25s}
+.rjc:nth-child(2){animation-delay:.1s}.rjc:nth-child(3){animation-delay:.2s}.rjc:nth-child(4){animation-delay:.3s}
+.rjc:hover{transform:translateY(-5px)}
+.rjc:hover .rje{animation:rjfloat 1.2s ease-in-out infinite}
+.rjst li{animation:rjup .6s both}.rjst li:nth-child(2){animation-delay:.12s}.rjst li:nth-child(3){animation-delay:.24s}
+.rjn{animation:rjpop .5s cubic-bezier(.3,1.6,.5,1) both}.rjst li:nth-child(2) .rjn{animation-delay:.15s}.rjst li:nth-child(3) .rjn{animation-delay:.3s}
+.rjf .btn{animation:rjfloat 3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.rjh>*,.rjh::before,.rjh::after,.rjc,.rjst li,.rjn,.rjf .btn,.rja .btn::after{animation:none!important}.rjc:hover{transform:none}}
