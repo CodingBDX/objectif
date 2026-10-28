@@ -28,7 +28,7 @@ export const DICT: Record<string, [string, string]> = {
   "🛡️ Vérifier un client": ["🛡️ Check a client", "🛡️ Verificar a un cliente"],
   "✏️ Mon profil": ["✏️ My profile", "✏️ Mi perfil"],
   "👀 Voir ma page": ["👀 View my page", "👀 Ver mi página"],
-  "🏠 Annuaire": ["🏠 Directory", "🏠 Directorio"],
+  "📖 Annuaire": ["🏠 Directory", "🏠 Directorio"],
   "✉️ Contact": ["✉️ Contact", "✉️ Contacto"],
   "Passe en VIP": ["Go VIP", "Hazte VIP"],
   "Plus de visibilité dans l’annuaire.": ["More visibility in the directory.", "Más visibilidad en el directorio."],

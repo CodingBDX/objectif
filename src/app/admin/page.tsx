@@ -156,7 +156,7 @@ export default function Admin() {
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
           {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
-          <Link href="/">🏠 Annuaire</Link>
+          <Link href="/">📖 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
           <span>{nNew} signalement{nNew > 1 ? "s" : ""} · {nMsg} message{nMsg > 1 ? "s" : ""}</span>

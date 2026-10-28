@@ -11,7 +11,7 @@ export default function LodgingShell({ title, cities, children }: { title: strin
         <nav>
           <Link className="on" href="/logements"><Tr k="📋 Tous les logements" /></Link>
           <Link href="/mon-logement"><Tr k="✏️ Mon logement" /></Link>
-          <Link href="/"><Tr k="🏠 Annuaire" /></Link>
+          <Link href="/"><Tr k="📖 Annuaire" /></Link>
           <Link href="/contact"><Tr k="✉️ Contact" /></Link>
         </nav>
         {cities && cities.length > 0 && <nav aria-label="Villes">

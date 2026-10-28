@@ -25,7 +25,7 @@ export default async function Page() {
         <div className="dhi">Carte</div>
         <nav>
           <Link className="on" href="/carte">🗺 Carte des profils</Link>
-          <Link href="/">🏠 Annuaire</Link>
+          <Link href="/">📖 Annuaire</Link>
           {lodgOk && <Link href="/logements">🏠 Logements</Link>}
           <Link href="/?pm=1">📍 Près de moi</Link>
           <Link href="/?fav=1">💗 Favoris</Link>

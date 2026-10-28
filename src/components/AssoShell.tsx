@@ -12,7 +12,7 @@ export default function AssoShell({ title, active, cities, extra, children, avat
         <nav>
           {list && <Link className={active === "liste" ? "on" : ""} href="/associations">📋 Toutes les associations</Link>}
           <Link className={active === "fiche" ? "on" : ""} href="/mon-association">✏️ Ma fiche association</Link>
-          <Link href="/">🏠 Annuaire</Link>
+          <Link href="/">📖 Annuaire</Link>
           <Link href="/contact">✉️ Contact</Link>
         </nav>
         {cities && cities.length > 0 && <nav aria-label="Villes">

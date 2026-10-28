@@ -163,7 +163,7 @@ export default function MyProfile() {
           <a href="#profil">{tr("✏️ Mon profil")}</a>
           {!isNewP && vip && verif && <Link href="/mon-logement">{tr("🏠 Mon logement")}</Link>}
           {!isNewP && <Link href={`/profil/${uid}`}>{tr("👀 Voir ma page")}</Link>}
-          <Link href="/">{tr("🏠 Annuaire")}</Link>
+          <Link href="/">{tr("📖 Annuaire")}</Link>
           <Link href="/contact">{tr("✉️ Contact")}</Link>
         </nav>
         {!isNewP && !vip && <div className="dvip"><div className="crown">👑</div><b>{tr("Passe en VIP")}</b><span>{tr("Plus de visibilité dans l’annuaire.")}</span><VipPrices /><Link className="dbtn pink" href="/contact?s=vip">{tr("Devenir VIP")}</Link></div>}
