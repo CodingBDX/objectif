@@ -1030,3 +1030,7 @@ h1.pbn{margin:0}
 .nbmore:hover{background:var(--soft)}
 .nearb.all .nbub{display:inline-flex!important}
 @media (min-width:1101px){.nearb:not(.big) .nbmore{display:none}}
+
+.topnear{margin-top:12px;justify-self:center}
+.panel.top.topx{justify-items:stretch}
+.panel.top.topx .topnear,.panel.top.topx .topmore{justify-self:center}

@@ -66,6 +66,7 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Voir toutes les villes ({n})": ["See all cities ({n})", "Ver todas las ciudades ({n})", "Ver todas as cidades ({n})"],
   "Voir plus ({n})": ["See more ({n})", "Ver más ({n})", "Ver mais ({n})"],
   "Voir moins": ["See less", "Ver menos", "Ver menos"],
+  "Villes près de moi": ["Cities near me", "Ciudades cerca de mí", "Cidades perto de mim"],
   "Voir plus de villes": ["See more cities", "Ver más ciudades", "Ver mais cidades"],
   "Voir moins de villes": ["See fewer cities", "Ver menos ciudades", "Ver menos cidades"],
   "Numéro WhatsApp (obligatoire)": ["WhatsApp number (required)", "Número de WhatsApp (obligatorio)", "Número de WhatsApp (obrigatório)"],
