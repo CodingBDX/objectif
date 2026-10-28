@@ -10,7 +10,7 @@ import { WARNING } from "@/lib/lodging";
 export type LItem = { id: string; title: string; city: string; area: string | null; lat: number | null; lon: number | null; photo: string; day: number | null; week: number | null; month: number | null; owner: string };
 const RADII = [0, 10, 25, 50, 100, 200, 100000];
 
-export default function LodgingSearch({ items }: { items: LItem[] }) {
+export default function LodgingSearch({ items, strip }: { items: LItem[]; strip?: boolean }) {
   const { tr } = useT(); const [city, setCity] = useState(""); const [r, setR] = useState(25); const [c0, setC0] = useState<[number, number] | null>(null);
   const pick = async (v: string) => { setC0(v ? await cityCentre(v) : null); };
   const list = useMemo(() => {
@@ -31,7 +31,11 @@ export default function LodgingSearch({ items }: { items: LItem[] }) {
           <label className="f">{tr("Distance autour de la ville")}
             <select value={r} onChange={(e) => setR(Number(e.target.value))}>{RADII.map((x) => <option key={x} value={x}>{x === 0 ? tr("Cette ville seulement") : x >= 100000 ? tr("Toute la France") : `${x} km`}</option>)}</select></label></div>
       </section>
-      {list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ne correspond pour le moment.")}</p> :
+      {strip && list.length > 0 ? <div className="lstrip">{list.map((l) => (
+          <Link key={l.id} href={`/logements/${l.id}`} className="lslide" aria-label={l.title}>
+            <i>{l.photo ? <img src={l.photo} alt="" loading="lazy" /> : null}</i>
+            <b>{l.title}</b><small>{l.city}{l.day ? ` · ${l.day} €` : l.week ? ` · ${l.week} €` : l.month ? ` · ${l.month} €` : ""}</small></Link>))}</div> : null}
+      {strip && list.length > 0 ? null : list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ne correspond pour le moment.")}</p> :
         <div className="lgrid">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lcard">
             {l.photo ? <img src={l.photo} alt="" loading="lazy" /> : <span className="lph" />}

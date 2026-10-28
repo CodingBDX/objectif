@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import StatsPanel from "@/components/StatsPanel";
+import LodgingFinder from "@/components/LodgingFinder";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { SPECIALTIES, Trip } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
@@ -165,6 +166,7 @@ export default function MyProfile() {
       <main className="dmain dedit">
         <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
         {!isNewP && <StatsPanel />}
+        {!isNewP && <LodgingFinder />}
         {!isNewP && <h2 className="dsub" id="profil">{tr("✏️ Modifier mon profil")}</h2>}
         <div className="dform0">
           {!isNewP && <div className="acts dacts">

@@ -82,4 +82,5 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Mon logement": ["My listing", "Mi alojamiento", "O meu alojamento"],
   "← Modifier mon profil": ["← Edit my profile", "← Editar mi perfil", "← Editar o meu perfil"],
   "🏠 Mon logement": ["🏠 My listing", "🏠 Mi alojamiento", "🏠 O meu alojamento"],
+  "Voir tous les logements": ["See all listings", "Ver todos los alojamientos", "Ver todos os alojamentos"],
 };
