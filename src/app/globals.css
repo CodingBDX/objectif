@@ -37,7 +37,8 @@ button{cursor:pointer}
  .navmenu .sp{max-width:none;flex:none;width:100%;margin-left:0}
 }
 .nav .gut{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:12px}
-.logo{display:flex;align-items:center;gap:8px;font:700 28px/1 var(--fd);color:var(--pink);letter-spacing:-.01em;border:0;background:none;padding:0;margin-right:10px}
+.logo{display:flex;align-items:center;gap:6px;font:700 clamp(18px,5.2vw,24px)/1 var(--fd);color:var(--pink);letter-spacing:-.01em;border:0;background:none;padding:0;margin-right:10px}
+.logo .lt{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}.logo small{font-size:.62em;font-weight:600;opacity:.75;letter-spacing:0}.logo .ic{flex:none}
 .vipn{font-weight:600}
 .nl{display:flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--ink);padding:10px 16px;border-radius:999px;font:600 15px var(--fb);min-height:44px}
 .nl:hover{background:var(--soft)}
@@ -856,7 +857,7 @@ h1.pbn{margin:0}
  .lang-bar .langsw{margin:0;padding:2px}
  .lang-bar .langsw button{min-width:34px;min-height:34px;font-size:12px;padding:0 6px}
  .nav .burger{margin-left:0}
- .nav .logo{margin-right:0}
+ .nav .logo{margin-right:0;min-width:0;flex:0 1 auto}
 }
 
 /* Tarifs en simple ligne (roses) et message "elle dort" */
