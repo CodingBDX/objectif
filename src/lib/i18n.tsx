@@ -21,7 +21,7 @@ export function useT() {
   useEffect(() => { const f = () => setL(cur); subs.add(f); cur = stored(); try { document.documentElement.lang = cur; } catch {} f(); return () => { subs.delete(f); }; }, []);
   const tr = (s: string, vars?: Record<string, string | number>) => {
     let o = s;
-    if (lang !== "fr") { const k = IDX[lang]; o = DICT2[s]?.[k] || DICT3[s]?.[k] || DICT4[s]?.[k] || (lang === "pt" ? PT[s] : DICT[s]?.[k]) || s; }
+    if (lang !== "fr") { const k = IDX[lang]; o = DICT2[s]?.[k] || DICT3[s]?.[k] || DICT4[s]?.[k] || (lang === "pt" ? PT[s] : DICT[s]?.[k as 0 | 1]) || s; }
     if (vars) for (const k of Object.keys(vars)) o = o.split(`{${k}}`).join(String(vars[k]));
     return o;
   };

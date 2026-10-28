@@ -109,7 +109,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             {showTarif(p) ? <div className="panel"><h3 className="ph"><Ic n="rose" s={18} /><Tr k="Tarifs" /></h3>{p.tarif_30 ? <div className="meta"><Ic n="rose" s={15} /><Tr k="30 minutes : " /><b>{p.tarif_30}</b></div> : null}{p.tarif_60 ? <div className="meta"><Ic n="rose" s={15} /><Tr k="1 heure : " /><b>{p.tarif_60}</b></div> : null}</div> : null}
             {a && (p.h24 || Object.values(p.hours || {}).some((h) => h && h[0] && h[1])) && <div className="panel"><h3 className="ph"><Ic n="clock" s={18} /><Tr k="Disponibilités" /></h3>
               {a ? (<>
-                {a.on ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? <Tr k="Disponible 24h/24, 7j/7" /> : <Tr k="Disponible jusqu’à {u}" vars={{ u: a.until }} />}</div>
+                {a.on ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? <Tr k="Disponible 24h/24, 7j/7" /> : <Tr k="Disponible jusqu’à {u}" vars={{ u: a.until || "" }} />}</div>
                   : <div className="meta"><Ic n="clock" s={15} /><Tr k="Indisponible" />{a.next ? <Tr k=" · reprend {n}" vars={{ n: a.next }} /> : null}</div>}
                 {p.h24 ? <p className="note h24n"><Tr k="Disponible à toute heure, tous les jours." /></p> :
                   <div className="hrs">{DAYL.map((n, d) => { const h = p.hours[d]; return <div key={n} className={d === nd ? "today" : ""}><span><Tr k={n} /></span><span className={h ? "" : "cl"}>{h ? `${h[0]} – ${h[1]}` : <Tr k="Indisponible" />}</span></div>; })}</div>}

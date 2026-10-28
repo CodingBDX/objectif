@@ -9,10 +9,10 @@ import Ic from "./Ic";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
 import SearchBox from "./SearchBox";
-import { useT } from "@/lib/i18n";
+import { useT, Tr } from "@/lib/i18n";
 const SearchLink = ({ cls = "" }: { cls?: string }) => { const { tr } = useT(); return <Link href="/recherche" className={`sp sbox slink ${cls}`} aria-label={tr("Ouvrir la recherche")}><Ic n="search" /><span>{tr("Ville, profil, spécialité…")}</span></Link>; };
 import dynamic from "next/dynamic";
-const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note">{tr("Chargement de la carte…")}</p> });
+const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note"><Tr k="Chargement de la carte…" /></p> });
 import { useFavs } from "@/lib/favs";
 import { avail, tripsOf, todayP, dShort } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile, showTarif, LANGS, ETHNIES, HAIRS, EYES, BRAS } from "@/lib/types";
@@ -49,7 +49,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
           <Heart id={p.id} /></div>
         <div className="meta"><Ic n="pin" s={15} />{p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>
         {a && (a.on
-          ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? tr("Disponible 24h/24, 7j/7") : tr("Disponible jusqu’à {u}", { u: a.until })}</div>
+          ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? tr("Disponible 24h/24, 7j/7") : tr("Disponible jusqu’à {u}", { u: a.until || "" })}</div>
           : <div className="meta"><Ic n="clock" s={15} />{tr("Indisponible")}{a.next ? tr(" · reprend {n}", { n: a.next }) : ""}</div>)}
         <div className="meta"><Ic n={CIC[p.genre] || "camera"} s={15} />{lab(p) ? lab(p) + " · " : ""}{p.photos.length} photos</div>
         {showTarif(p) ? <div className="meta"><Ic n="rose" s={15} />{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
