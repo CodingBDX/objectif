@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useRef, useState, useEffect } from "react";
 import Ic from "./Ic";
+import { EXTRA_CITIES } from "@/lib/extraCities";
 import { cap, cityList, lab, Profile } from "@/lib/types";
 
 type Sug = { k: "ville" | "profil" | "spec"; label: string; sub?: string; v: string };
@@ -20,6 +21,7 @@ export default function SearchBox({ profiles, q, setQ, onCity, onProfile, onTag 
     const has = (s: string) => norm(s).includes(n);
     const starts = (s: string) => (norm(s).startsWith(n) ? 0 : 1);
     const v = idx.c.filter(([x]) => has(x)).sort((a, b) => starts(a[0]) - starts(b[0]) || b[1] - a[1]).slice(0, 3).map(([x, k]) => ({ k: "ville" as const, label: x, sub: `${k} profil${k > 1 ? "s" : ""}`, v: x }));
+    EXTRA_CITIES.forEach((e) => { if (has(e.nom) && !v.some((y) => norm(y.label) === norm(e.nom))) v.push({ k: "ville" as const, label: e.nom, sub: "Principauté", v: e.nom }); });
     const s = idx.t.filter(([x]) => has(x)).sort((a, b) => starts(a[0]) - starts(b[0]) || b[1] - a[1]).slice(0, 3).map(([x, k]) => ({ k: "spec" as const, label: cap(x), sub: `${k} profil${k > 1 ? "s" : ""}`, v: x }));
     const p = profiles.filter((x) => has(x.name)).sort((a, b) => starts(a.name) - starts(b.name)).slice(0, 4).map((x) => ({ k: "profil" as const, label: x.name, sub: [lab(x), x.city].filter(Boolean).join(" · "), v: x.id }));
     return [...v, ...p, ...s];

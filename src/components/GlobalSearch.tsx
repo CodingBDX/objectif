@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Ic from "./Ic";
 import { slug } from "@/lib/site";
 import { useT } from "@/lib/i18n";
+import { extraMatches } from "@/lib/extraCities";
 
 export type SIndex = { c: [string, number][]; t: [string, number][]; p: { id: string; name: string; sub: string }[] };
 type Sug = { k: "ville" | "profil" | "spec" | "fr"; label: string; sub?: string; url: string };
@@ -33,7 +34,8 @@ export default function GlobalSearch({ index, onGo }: { index: SIndex; onGo: (ur
     const has = (s: string) => norm(s).includes(n); const st = (s: string) => (norm(s).startsWith(n) ? 0 : 1);
     const v = index.c.filter(([c]) => has(c)).sort((a, b) => st(a[0]) - st(b[0]) || b[1] - a[1]).slice(0, 3).map(([c, k]) => ({ k: "ville" as const, label: c, sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/recherche?ville=${encodeURIComponent(c)}` }));
     const known = new Set(index.c.map(([c]) => slug(c)));
-    const fr = api.filter((x) => !known.has(slug(x.nom))).slice(0, 3).map((x) => ({ k: "fr" as const, label: x.nom, sub: x.departement ? `${x.departement.nom} (${x.departement.code})` : "", url: `/recherche?ville=${encodeURIComponent(x.nom)}` }));
+    const extra: Commune[] = extraMatches(q.trim()).map((e) => ({ nom: e.nom, departement: { code: "MC", nom: "Principauté" } }));
+    const fr = [...extra, ...api.filter((x) => !extra.some((e) => slug(e.nom) === slug(x.nom)))].filter((x) => !known.has(slug(x.nom))).slice(0, 3).map((x) => ({ k: "fr" as const, label: x.nom, sub: x.departement ? `${x.departement.nom} (${x.departement.code})` : "", url: `/recherche?ville=${encodeURIComponent(x.nom)}` }));
     const p = index.p.filter((x) => has(x.name)).sort((a, b) => st(a.name) - st(b.name)).slice(0, 4).map((x) => ({ k: "profil" as const, label: x.name, sub: x.sub, url: `/profil/${x.id}` }));
     const s = index.t.filter(([t]) => has(t)).sort((a, b) => st(a[0]) - st(b[0]) || b[1] - a[1]).slice(0, 3).map(([t, k]) => ({ k: "spec" as const, label: cap(t), sub: `${k} profil${k > 1 ? "s" : ""}`, url: `/recherche?tag=${encodeURIComponent(t)}` }));
     return [...v, ...fr, ...p, ...s];
