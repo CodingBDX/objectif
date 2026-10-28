@@ -9,7 +9,7 @@ import CityInput from "@/components/CityInput";
 import RichEditor from "@/components/RichEditor";
 import { refreshListings } from "@/app/actions";
 import { useT, LangSwitch } from "@/lib/i18n";
-import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT } from "@/lib/types";
+import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 
 type Hours = Record<string, [string, string] | null>;
 const L = { fontSize: 14, fontWeight: 700, color: "var(--mut)" } as const;
@@ -24,7 +24,7 @@ export default function MyProfile() {
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [specList, setSpecList] = useState<string[]>(SPECIALTIES); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
-  const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
+  const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
@@ -45,7 +45,7 @@ export default function MyProfile() {
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
       setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SL.includes(x))); setPhotos(data.photos); setVideo(data.video);
-      setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
+      setRates(rateList(data).map((r) => ({ d: r.d, p: String(r.p) }))); setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); window.dispatchEvent(new CustomEvent("hp-pause", { detail: false })); await refreshListings(); }
     }
@@ -125,9 +125,10 @@ export default function MyProfile() {
     let region: string | null | undefined;
     try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
     const num = (v: string, a: number, b: number) => { const n = Math.round(Number(v)); return v && n >= a && n <= b ? n : null; };
+    const cleanRates = rates.map((r) => ({ d: r.d, p: Math.max(0, Math.min(10000, Math.round(Number(r.p)))) })).filter((r) => r.p > 0 && RATE_OPTS.some((o) => o[0] === r.d)).filter((r, i, a) => a.findIndex((x) => x.d === r.d) === i).slice(0, 8);
     const row = { ...(region !== undefined ? { region } : {}), age: nAge, receives: recv, travels: trav, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
-      tarif_visible: tshow, tarif_30: t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
+      tarif_visible: tshow, rates: vip ? cleanRates : [], tarif_30: vip ? (cleanRates.find((r) => r.d === "30min")?.p ?? null) : t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: vip ? (cleanRates.find((r) => r.d === "1h")?.p ?? null) : t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     if (!error) await refreshListings();
     setBusy(false);
@@ -216,7 +217,11 @@ export default function MyProfile() {
             <p className="note" style={{ margin: 0 }}>{tr("Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.")}</p>
 </section><section className="dcard"><h3>{tr("Présentation et contact")}</h3><div className="f"><span style={L}>{tr("Présentation")}</span><RichEditor label={tr("Présentation")} value={bio} onChange={setBio} /></div>
             <div className="row2"><label className="f">{tr("Site ou réseau (optionnel)")}<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
-            <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="row2"><label className="f">{tr("Pour 30 minutes")}<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" value={t30} disabled={!vip} onChange={(e) => setT30(e.target.value)} /></label><label className="f">{tr("Pour 1 heure")}<input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 150" value={t60} disabled={!vip} onChange={(e) => setT60(e.target.value)} /></label></div>{vip && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
+            <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="rlist">{rates.map((r, i) => <div className="rrow" key={i}>
+                <select aria-label={tr("Durée")} value={r.d} disabled={!vip} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, d: e.target.value } : x)))}>{RATE_OPTS.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select>
+                <input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" aria-label={tr("Prix")} value={r.p} disabled={!vip} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, p: e.target.value } : x)))} />
+                <button type="button" className="rrm" disabled={!vip} aria-label={tr("Retirer ce tarif")} title={tr("Retirer ce tarif")} onClick={() => setRates(rates.filter((_, j) => j !== i))}>✕</button></div>)}
+                {vip && rates.length < 8 && <button type="button" className="btn ghost" onClick={() => setRates([...rates, { d: RATE_OPTS.find((o) => !rates.some((r) => r.d === o[0]))?.[0] || "1h", p: "" }])}>{tr("+ Ajouter un tarif")}</button>}</div>{vip && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
             <label className="f">{tr("Numéro de téléphone (optionnel)")}<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
             <div className="f"><span style={L}>{tr("Réseaux sociaux (optionnel, ton pseudo sans @)")}</span>
               {!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}

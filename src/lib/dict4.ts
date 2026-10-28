@@ -14,5 +14,7 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Elle dort": ["She’s sleeping", "Está durmiendo", "Está a dormir"], "Il dort": ["He’s sleeping", "Está durmiendo", "Está a dormir"],
   "(retour le {d} à {h})": ["(back on {d} at {h})", "(vuelve el {d} a las {h})", "(volta a {d} às {h})"],
   "🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ": ["🔒 Social networks are reserved for VIP profiles: they are not shown on your profile. ", "🔒 Las redes sociales están reservadas a los perfiles VIP: no se muestran en tu perfil. ", "🔒 As redes sociais são reservadas aos perfis VIP: não aparecem no teu perfil. "],
+  "Soirée": ["Evening", "Velada", "Serão"], "Nuit": ["Night", "Noche", "Noite"], "Week-end": ["Weekend", "Fin de semana", "Fim de semana"],
+  "+ Ajouter un tarif": ["+ Add a rate", "+ Añadir una tarifa", "+ Adicionar uma tarifa"], "Prix": ["Price", "Precio", "Preço"], "Retirer ce tarif": ["Remove this rate", "Quitar esta tarifa", "Remover esta tarifa"],
   "Copier": ["Copy", "Copiar", "Copiar"], "Copié ✔": ["Copied ✔", "Copiado ✔", "Copiado ✔"], "🔗 Copier le lien du profil": ["🔗 Copy profile link", "🔗 Copiar el enlace del perfil", "🔗 Copiar o link do perfil"],
 };

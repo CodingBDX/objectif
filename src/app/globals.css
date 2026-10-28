@@ -865,3 +865,10 @@ h1.pbn{margin:0}
 .rates .ic{color:var(--pink)}.rates b{font:700 16px var(--fd);color:var(--btn)}
 .pcontact .pph.zz{padding:6px 14px;gap:8px;flex-wrap:wrap;justify-content:center}
 .pcontact .pph.zz small{color:var(--mut);font-weight:600;font-size:13px}
+
+/* Plusieurs tarifs */
+.rlist{display:grid;gap:8px}
+.rrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;gap:8px;align-items:center}
+.rrow select,.rrow input{min-width:0;width:100%}
+.rrm{border:0;border-radius:50%;width:44px;height:44px;background:var(--soft);color:var(--btn);font-weight:700;cursor:pointer}
+.panel.pi .rates{margin:0 0 12px}
