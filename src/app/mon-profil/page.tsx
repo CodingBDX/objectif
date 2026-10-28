@@ -228,14 +228,12 @@ export default function MyProfile() {
                 <button type="button" className="rrm" disabled={!canRate} aria-label={tr("Retirer ce tarif")} title={tr("Retirer ce tarif")} onClick={() => setRates(rates.filter((_, j) => j !== i))}>✕</button></div>)}
                 {canRate && rates.length < 8 && <button type="button" className="btn ghost" onClick={() => setRates([...rates, { d: RATE_OPTS.find((o) => !rates.some((r) => r.d === o[0]))?.[0] || "1h", p: "" }])}>{tr("+ Ajouter un tarif")}</button>}</div>{canRate && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
             <label className="f">{isLive ? tr("Numéro WhatsApp (optionnel)") : tr("Numéro de téléphone (optionnel)")}<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
-            {isLive && <div className="f"><span style={L}>{tr("Paiement (optionnel)")}</span><div className="row2">
-              <input maxLength={80} placeholder={tr("Wero : numéro ou e-mail")} aria-label={tr("Wero : numéro ou e-mail")} value={wero} onChange={(e) => setWero(e.target.value)} />
-              <input maxLength={80} placeholder={tr("PayPal : lien paypal.me ou e-mail")} aria-label={tr("PayPal : lien paypal.me ou e-mail")} value={paypal} onChange={(e) => setPaypal(e.target.value)} /></div></div>}
+
             <div className="f"><span style={L}>{tr("Réseaux sociaux (optionnel, ton pseudo sans @)")}</span>
               {!socOk && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}
-              <div className="row3">{!isLive && <input maxLength={31} disabled={!socOk} placeholder="Instagram" aria-label={tr("Pseudo Instagram")} value={f.instagram} onChange={set("instagram")} />}
+              <div className="row3"><input maxLength={31} disabled={!socOk} placeholder="Instagram" aria-label={tr("Pseudo Instagram")} value={f.instagram} onChange={set("instagram")} />
                 <input maxLength={31} disabled={!socOk} placeholder="Snapchat" aria-label={tr("Pseudo Snapchat")} value={f.snapchat} onChange={set("snapchat")} />
-                {!isLive && <input maxLength={31} disabled={!socOk} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} />}</div></div>
+                <input maxLength={31} disabled={!socOk} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} /></div></div>
             <p className="note">{tr("Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.")}</p>
 
 </section><section className="dcard"><h3>{tr("Mes photos")}</h3><div>
