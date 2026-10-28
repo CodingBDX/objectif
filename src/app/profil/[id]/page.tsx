@@ -48,7 +48,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   const mine = user?.id === p.id;
   const a = avail(p); const trips = tripsOf(p); const td = todayP(); const nd = nowP().d;
   const live = p.genre === "livecam";
-  const asleep = !p.vip && !mine && !!a && !a.on;
+  const asleep = !mine && !!a && !a.on;
   const back = asleep ? nextOpen(p) : null;
   let st: { views_total: number; views_today: number; last_seen_day: string | null } | null = null;
   try { const { data } = await sb.rpc("profile_public_stats", { p_id: p.id }); const r = Array.isArray(data) ? data[0] : data; if (r) st = { views_total: Number(r.views_total), views_today: Number(r.views_today), last_seen_day: r.last_seen_day }; } catch {}
