@@ -33,6 +33,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
           <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />{tr("Annuaire")}</Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte"><Ic n="pin" />{tr("Carte")}</Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1"><Ic n="heart" />{tr("Favoris")} <span className="cn">{favs.length}</span></Link>
+          <Link className={`nl${path?.startsWith("/logements") ? " on" : ""}`} href="/logements">🏠 <span className="nlt">{tr("Logements")}</span></Link>
           {escort && <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title={tr("Associations et soutien par ville")}>🤝 <span className="nlt">{tr("Associations")}</span></Link>}
           <Link className="nl" href="/contact" aria-label={tr("Nous contacter")} title={tr("Nous contacter")}>
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">{tr("Contact")}</span>

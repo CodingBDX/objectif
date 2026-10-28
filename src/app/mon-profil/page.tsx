@@ -12,6 +12,7 @@ import { useT } from "@/lib/i18n";
 import { tooFar, MAX_KM_VIP, MAX_KM_STD } from "@/lib/dist";
 import { LIVE_CITY } from "@/lib/types";
 import VipPrices from "@/components/VipPrices";
+import LodgingEditor from "@/components/LodgingEditor";
 import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 
 type Hours = Record<string, [string, string] | null>;
@@ -278,6 +279,7 @@ export default function MyProfile() {
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
             <button className="dbtn" type="submit" disabled={busy}>{busy ? tr("Patiente…") : isNewP ? tr("Publier mon profil") : tr("Enregistrer")}</button></section>
           </fieldset></form>}
+          {!isNewP && uid && <LodgingEditor uid={uid} />}
           {!isNewP && <section className="dcard dzone" id="supprimer"><h3>{tr("🗑 Supprimer mon profil et mes données")}</h3>
             <p className="note" style={{ margin: "0 0 10px" }}>{tr("Efface définitivement ton profil, tes photos et ta vidéo, tes commentaires, tes signalements de numéros et ton compte de connexion. C’est irréversible.")}</p>
             {!delAsk ? <button type="button" className="btn ghost" onClick={() => setDelAsk(true)}>{tr("Supprimer mon compte…")}</button> : <div style={{ display: "grid", gap: 8 }}>

@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -19,6 +19,7 @@ export default function Admin() {
   const [state, setState] = useState<"load" | "no" | "ok">("load");
   const [tab, setTab] = useState<Tab>("dash");
   const [reports, setReports] = useState<any[]>([]); const [profiles, setProfiles] = useState<any[]>([]); const [messages, setMessages] = useState<any[]>([]);
+  const [lodgs, setLodgs] = useState<any[]>([]); const [lAddr, setLAddr] = useState<Record<string, string>>({});
   const [vipEnd, setVipEnd] = useState<Record<string, { until: string; paused_at: string | null }>>({});
   const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
@@ -68,6 +69,15 @@ export default function Admin() {
     const { error } = await sb.rpc("admin_set_profile", { p_id: p.id, p_vip: n.vip, p_verified: n.verified, p_paused: n.paused });
     if (error) setErr(error.message); else { loadProfiles(); loadReports(); loadCounts(); loadExtra(); }
   }
+  const loadLodgs = useCallback(async () => {
+    const { data } = await sb.from("lodgings").select("*").order("updated_at", { ascending: false }).limit(200); const l = data || [];
+    const ids = l.map((x: any) => x.profile_id);
+    const [{ data: ps }, { data: ad }] = await Promise.all([ids.length ? sb.from("profiles").select("id,name,vip,verified").in("id", ids) : Promise.resolve({ data: [] as any[] }), ids.length ? sb.from("lodging_private").select("profile_id,address").in("profile_id", ids) : Promise.resolve({ data: [] as any[] })]);
+    const nm = new Map((ps || []).map((x: any) => [x.id, x]));
+    setLodgs(l.map((x: any) => ({ ...x, owner: nm.get(x.profile_id) }))); setLAddr(Object.fromEntries((ad || []).map((a: any) => [a.profile_id, a.address])));
+  }, []);
+  useEffect(() => { if (state === "ok") loadLodgs(); }, [state, loadLodgs]);
+  async function setLodg(id: string, status: string) { setErr(""); const { error } = await sb.rpc("admin_set_lodging", { p_id: id, p_status: status }); if (error) setErr(error.message); else loadLodgs(); }
   async function giveVip(id: string, days: number) {
     setErr(""); const { error } = await sb.rpc("admin_set_vip", { p_id: id, p_days: days });
     if (error) setErr(error.message); else { loadProfiles(); loadCounts(); loadExtra(); }
@@ -130,7 +140,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
           <Link href="/">🏠 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -254,6 +264,23 @@ export default function Admin() {
             </div>); })}
         </div>)}
 
+        {tab === "lodgings" && (<div style={{ display: "grid", gap: 10 }}>
+          <h2 style={{ margin: 0 }}>Logements</h2>
+          {lodgs.length === 0 && <p className="note">Aucun logement pour le moment.</p>}
+          {lodgs.map((x) => (
+            <div className="dcard" key={x.profile_id} style={{ display: "grid", gap: 8 }}>
+              <div><b>{x.title}</b> · {x.city}{x.area ? ` (${x.area})` : ""} · <span className="note">{x.status === "pending" ? "⏳ en attente" : x.status === "approved" ? "✅ publié" : "❌ refusé"}</span></div>
+              <div className="note">Propriétaire : <Link href={`/profil/${x.profile_id}`}>{x.owner?.name || "?"}</Link> · {x.owner?.vip ? "VIP" : "non VIP"} · {x.owner?.verified ? "vérifié" : "non vérifié"} · Adresse privée : {lAddr[x.profile_id] || "—"}</div>
+              <div className="note">Jour {x.price_day ?? "—"} · Semaine {x.price_week ?? "—"} · Mois {x.price_month ?? "—"}</div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{(x.photos || []).map((u: string) => <img key={u} src={u} alt="" width={80} height={80} style={{ objectFit: "cover", borderRadius: 8 }} />)}</div>
+              {x.description && <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{x.description}</p>}
+              <div className="acts">
+                {x.status !== "approved" && <button className="btn" onClick={() => setLodg(x.profile_id, "approved")}>✓ Valider</button>}
+                {x.status !== "rejected" && <button className="btn ghost" onClick={() => setLodg(x.profile_id, "rejected")}>✕ Refuser</button>}
+                <Link className="btn ghost" href={`/logements/${x.profile_id}`}>Voir</Link>
+              </div>
+            </div>))}
+        </div>)}
         {tab === "assos" && (<div style={{ display: "grid", gap: 10 }}>
           <p className="note" style={{ margin: 0 }}>Avant de valider : appelle ou écris à l’association pour vérifier qu’elle existe vraiment. Une modification par l’association la remet en attente.</p>
           {assos.length === 0 && <p className="note">Aucune fiche (ou <code>migration-associations.sql</code> pas encore lancé).</p>}
