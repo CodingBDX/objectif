@@ -22,7 +22,7 @@ export default function MyProfile() {
   const [hair, setHair] = useState(""); const [eyes, setEyes] = useState(""); const [bra, setBra] = useState(""); const [smoker, setSmoker] = useState(""); const [drinker, setDrinker] = useState("");
   const [age, setAge] = useState(""); const [hcm, setHcm] = useState(""); const [wkg, setWkg] = useState(""); const [eth, setEth] = useState(""); const [langs, setLangs] = useState<string[]>([]);
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
-  const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
+  const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [specList, setSpecList] = useState<string[]>(SPECIALTIES); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
@@ -34,6 +34,8 @@ export default function MyProfile() {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) { location.href = "/connexion"; return; }
     setUid(user.id);
+    const sl = await sb.from("specialties").select("name").order("position").order("name");
+    const SL: string[] = !sl.error && sl.data?.length ? sl.data.map((r: { name: string }) => r.name) : SPECIALTIES; setSpecList(SL);
     const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
     const { data: mem } = await sb.from("members").select("pseudo").eq("id", user.id).maybeSingle();
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); }
@@ -42,7 +44,7 @@ export default function MyProfile() {
       setRecv(!!data.receives); setTrav(!!data.travels);
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
-      setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SPECIALTIES.includes(x))); setPhotos(data.photos); setVideo(data.video);
+      setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SL.includes(x))); setPhotos(data.photos); setVideo(data.video);
       setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); window.dispatchEvent(new CustomEvent("hp-pause", { detail: false })); await refreshListings(); }
@@ -187,7 +189,7 @@ export default function MyProfile() {
               <label className="f">{tr("Nom ou nom de studio")}<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
             </div>
             <div className="f"><span style={L}>{tr("Spécialités (jusqu’à {n})", { n: maxS })}{!vip && tr(" · 30 en VIP")} <span style={{ fontWeight: 600 }}>{spec.length}/{maxS}</span></span>
-              <div className="bub" role="group">{SPECIALTIES.map((s) => { const on = spec.includes(s);
+              <div className="bub" role="group">{specList.map((s) => { const on = spec.includes(s);
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < maxS ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
 </section><section className="dcard"><h3>{tr("Où te trouver ?")}</h3><div className="f"><span style={L}>{tr("Ville (tape les premières lettres)")}</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div>
             <div className="f"><span style={L}>{tr("Villes supplémentaires (jusqu’à {n}, optionnel)", { n: maxM })}{!vip && tr(" · 6 en VIP")}</span>

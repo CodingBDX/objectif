@@ -3,9 +3,10 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import CountUp from "@/components/CountUp";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { CATS } from "@/lib/types";
+import { CATS, SPECIALTIES } from "@/lib/types";
+import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "clients" | "assos" | "journal";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -21,6 +22,7 @@ export default function Admin() {
   const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
   const [cnt, setCnt] = useState<{ total: number; vip: number; paused: number; month: number; g: Record<string, number> }>({ total: 0, vip: 0, paused: 0, month: 0, g: {} });
+  const [specs, setSpecs] = useState<string[]>([]); const [specDb, setSpecDb] = useState(true); const [specEd, setSpecEd] = useState<Record<string, string>>({}); const [specNew, setSpecNew] = useState(""); const [specUse, setSpecUse] = useState<Record<string, number>>({}); const [specOk, setSpecOk] = useState("");
   const [rej, setRej] = useState<Record<string, string>>({}); const [q, setQ] = useState(""); const [onlyNew, setOnlyNew] = useState(true); const [sure, setSure] = useState(""); const [err, setErr] = useState("");
 
   const loadReports = useCallback(async () => {
@@ -75,6 +77,17 @@ export default function Admin() {
     const { error } = await sb.from("associations").update({ status, admin_note: status === "rejected" ? (rej[a.id] || null) : null }).eq("id", a.id);
     if (error) setErr(error.message); else loadAssos();
   }
+  async function loadSpecs() {
+    const { data, error } = await sb.from("specialties").select("name").order("position").order("name");
+    if (error) { setSpecDb(false); setSpecs(SPECIALTIES); return; } setSpecDb(true); setSpecs((data || []).map((r: any) => r.name)); setSpecEd({});
+    const u = await sb.from("profiles").select("specialties").limit(5000); const c: Record<string, number> = {};
+    (u.data || []).forEach((p: any) => (p.specialties || []).forEach((x: string) => { c[x] = (c[x] || 0) + 1; })); setSpecUse(c);
+  }
+  useEffect(() => { if (state === "ok") loadSpecs(); }, [state]);
+  async function specCall(fn: string, args: Record<string, unknown>, ok: string) {
+    setErr(""); setSpecOk(""); const { error } = await sb.rpc(fn, args);
+    if (error) { setErr(error.message); return; } setSpecOk(ok); setSure(""); await loadSpecs(); await refreshListings(); loadExtra();
+  }
   async function delClient(id: number) { await sb.from("client_reports").delete().eq("id", id); loadExtra(); }
 
   if (state === "load") return <section className="gut"><p className="note">Chargement…</p></section>;
@@ -100,7 +113,7 @@ export default function Admin() {
     ...profiles.slice(0, 8).map((p) => ({ t: p.created_at, i: "👤", title: "Nouveau profil", sub: `${p.name} · ${p.city}` })),
   ].sort((a, b) => +new Date(b.t) - +new Date(a.t)).slice(0, 8);
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions" };
 
   return (
     <div className="dash gut">
@@ -108,7 +121,7 @@ export default function Admin() {
         <div className="dav">A</div>
         <div className="dhi">Administration</div>
         <nav>
-          {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}
+          {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
           {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}
           <Link href="/">🏠 Annuaire</Link>
         </nav>
@@ -207,6 +220,30 @@ export default function Admin() {
               <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{m.body}</p>
               <div className="acts"><button className="btn ghost" onClick={() => mark("messages", m.id, { done: !m.done })}>{m.done ? "Rouvrir" : "✓ Marquer traité"}</button></div>
             </div>))}
+        </div>)}
+
+        {tab === "specs" && (<div style={{ display: "grid", gap: 10 }}>
+          {!specDb && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>Lance d’abord <code>migration-specialites-admin.sql</code> dans Supabase pour pouvoir modifier la liste.</p>}
+          <p className="note" style={{ margin: 0 }}>Renommer change le mot partout, y compris sur les profils qui l’avaient choisi. Supprimer le retire aussi des profils. L’ordre ici est celui de la page « Mon profil ». {specs.length} spécialité{specs.length > 1 ? "s" : ""}.</p>
+          {specOk && <p className="note" role="status" style={{ margin: 0, fontWeight: 700 }}>✓ {specOk}</p>}
+          <form className="dcard" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", padding: "10px 16px" }}
+            onSubmit={(e) => { e.preventDefault(); const n = specNew.trim(); if (n) specCall("admin_add_specialty", { p_name: n }, `« ${n} » ajoutée`).then(() => setSpecNew("")); }}>
+            <input aria-label="Nouvelle spécialité" placeholder="Nouvelle spécialité…" maxLength={40} value={specNew} onChange={(e) => setSpecNew(e.target.value)} style={{ flex: "1 1 220px" }} disabled={!specDb} />
+            <button className="btn" disabled={!specDb || !specNew.trim()}>＋ Ajouter</button>
+          </form>
+          {specs.map((x, i) => { const v = specEd[x] ?? x; const changed = v.trim() !== x && !!v.trim(); return (
+            <div className="dcard" key={x} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", padding: "8px 16px" }}>
+              <input aria-label={`Nom de la spécialité ${x}`} maxLength={40} value={v} disabled={!specDb} style={{ flex: "1 1 200px" }}
+                onChange={(e) => setSpecEd({ ...specEd, [x]: e.target.value })}
+                onKeyDown={(e) => { if (e.key === "Enter" && changed) specCall("admin_rename_specialty", { p_old: x, p_new: v.trim() }, `« ${x} » renommée en « ${v.trim()} »`); }} />
+              <span className="note" style={{ whiteSpace: "nowrap" }}>{specUse[x] || 0} profil{(specUse[x] || 0) > 1 ? "s" : ""}</span>
+              {changed && <button className="btn" onClick={() => specCall("admin_rename_specialty", { p_old: x, p_new: v.trim() }, `« ${x} » renommée en « ${v.trim()} »`)}>✓ Renommer</button>}
+              <button className="btn ghost" aria-label={`Monter ${x}`} disabled={!specDb || i === 0} onClick={() => specCall("admin_move_specialty", { p_name: x, p_dir: -1 }, `« ${x} » déplacée`)}>↑</button>
+              <button className="btn ghost" aria-label={`Descendre ${x}`} disabled={!specDb || i === specs.length - 1} onClick={() => specCall("admin_move_specialty", { p_name: x, p_dir: 1 }, `« ${x} » déplacée`)}>↓</button>
+              {sure === "s" + x
+                ? <><button className="btn" onClick={() => specCall("admin_delete_specialty", { p_name: x }, `« ${x} » supprimée`)}>Confirmer</button><button className="btn ghost" onClick={() => setSure("")}>Annuler</button></>
+                : <button className="btn ghost" aria-label={`Supprimer ${x}`} disabled={!specDb} onClick={() => setSure("s" + x)}>🗑</button>}
+            </div>); })}
         </div>)}
 
         {tab === "assos" && (<div style={{ display: "grid", gap: 10 }}>

@@ -7,5 +7,6 @@ export async function refreshListings() {
   const { data: { user } } = await supabaseServer().auth.getUser();
   if (!user) return;
   revalidateTag("profiles");
+  revalidateTag("specialties");
   revalidatePath("/", "layout");
 }

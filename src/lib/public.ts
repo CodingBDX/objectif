@@ -5,18 +5,26 @@ import { Profile, SPECIALTIES } from "./types";
 /** Lectures publiques (sans cookies) mises en cache 30 s côté serveur : la navigation entre pages devient quasi instantanée. */
 const anon = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
 
+/** Liste des spécialités (modifiable dans l'admin). Si la table n'existe pas encore, on garde la liste intégrée au site. */
+export const publicSpecialties = unstable_cache(async (): Promise<string[]> => {
+  const { data, error } = await anon().from("specialties").select("name").order("position").order("name");
+  const l = (data || []).map((r: { name: string }) => r.name);
+  return error || !l.length ? SPECIALTIES : l;
+}, ["public-specialties"], { revalidate: 30, tags: ["profiles", "specialties"] });
+
 export const publicProfiles = unstable_cache(async (): Promise<Profile[]> => {
   const sb = anon();
-  const [a, b, c] = await Promise.all([
+  const [a, b, c, spec] = await Promise.all([
     sb.from("profiles").select("*").eq("paused", false).order("created_at", { ascending: false }).limit(1000),
     sb.rpc("popular_views"),
-    sb.rpc("popular_favs")
+    sb.rpc("popular_favs"),
+    publicSpecialties()
   ]);
   const ps = (a.data || []) as Profile[];
   const rows = (b.data || []) as { profile_id: string; views: number }[];
   const m = new Map<string, number>(rows.map((x) => [x.profile_id, Number(x.views)] as [string, number]));
   const f = new Map<string, number>(((c.data || []) as { profile_id: string; favs: number }[]).map((x) => [x.profile_id, Number(x.favs)] as [string, number]));
-  ps.forEach((p) => { p.views = m.get(p.id) || 0; p.favs = f.get(p.id) || 0; p.specialties = (p.specialties || []).filter((x) => SPECIALTIES.includes(x)); });
+  ps.forEach((p) => { p.views = m.get(p.id) || 0; p.favs = f.get(p.id) || 0; p.specialties = (p.specialties || []).filter((x) => spec.includes(x)); });
   return ps;
 }, ["public-profiles"], { revalidate: 30, tags: ["profiles"] });
 
