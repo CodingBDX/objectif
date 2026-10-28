@@ -1,5 +1,6 @@
 import { Tr } from "@/lib/i18n";
 import "./globals.css";
+import { Fredoka, Quicksand } from "next/font/google";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -12,6 +13,8 @@ import NavProgress from "@/components/NavProgress";
 import { siteUrl } from "@/lib/site";
 import { publicProfiles } from "@/lib/public";
 import { lab } from "@/lib/types";
+const fredoka = Fredoka({ subsets: ["latin", "latin-ext"], weight: ["500", "600", "700"], display: "swap", variable: "--f-fd" });
+const quicksand = Quicksand({ subsets: ["latin", "latin-ext"], weight: ["500", "600", "700"], display: "swap", variable: "--f-fb" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -35,13 +38,10 @@ export default async function Root({ children }: { children: React.ReactNode }) 
   all.forEach((p) => { if (p.genre !== "livecam") cc[p.city] = (cc[p.city] || 0) + 1; p.specialties.forEach((x) => { const k = x.toLowerCase(); tc[k] = (tc[k] || 0) + 1; }); });
   const index = { c: Object.entries(cc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")) as [string, number][], t: Object.entries(tc).sort((a, b) => b[1] - a[1]) as [string, number][], p: all.map((p) => ({ id: p.id, name: p.name, sub: [lab(p), p.city].filter(Boolean).join(" · ") })) };
   return (
-    <html lang="fr" data-theme="light">
+    <html lang="fr" data-theme="light" className={`${fredoka.variable} ${quicksand.variable}`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {process.env.NEXT_PUBLIC_SUPABASE_URL && <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} crossOrigin="anonymous" />}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" />
       </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "Sex-Escorte", url: siteUrl(), inLanguage: "fr" }) }} />

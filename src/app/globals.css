@@ -1,7 +1,7 @@
 :root{
  --bg:#ffeef6;--bg1:#fff4fa;--bg2:#ffdcec;--card:#ffffff;--ink:#5c1a43;--mut:#94607f;--pink:#ee4f97;--btn:#d63384;--btnt:#ffffff;
  --live:#9a5cc8;--livet:#ffffff;--livebg:#f1e6fb;--livetx:#6b3a99;--offbg:#f3e2ec;--offln:#d9b9cb;--soft:#ffe1ef;--line:#f9cde2;--navbg:rgba(255,244,250,.9);--ov:rgba(255,244,250,.9);--sh:0 8px 26px rgba(238,79,151,.13);
- --fd:"Fredoka","Quicksand",system-ui,sans-serif;--fb:"Quicksand",system-ui,-apple-system,"Segoe UI",sans-serif;
+ --fd:var(--f-fd),"Fredoka","Quicksand",system-ui,sans-serif;--fb:var(--f-fb),"Quicksand",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
  --bg:#1c0f18;--bg1:#241320;--bg2:#2c1226;--card:#2c1826;--ink:#ffe8f3;--mut:#d6a3bf;--pink:#ff6fb0;--btn:#ff6fb0;--btnt:#2a0f20;
