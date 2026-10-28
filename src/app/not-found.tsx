@@ -10,7 +10,7 @@ export default function NotFound() {
         <div className="nf4"><span>4</span><span>0</span><span>4</span></div>
         <i className="nfh1" /><i className="nfh2" /><i className="nfh3" />
       </div>
-      <h1 id="nfh" className="nft">{"Hey Papi…".split("").map((c, i) => <span key={i} style={{ animationDelay: `${i * 90}ms` }}>{c === " " ? " " : c}</span>)}</h1>
+      <h1 id="nfh" className="nft">{"sex-escorte.com".split("").map((c, i) => <span key={i} style={{ animationDelay: `${i * 90}ms` }}>{c === " " ? " " : c}</span>)}</h1>
       <p className="note">Cette page s’est faite la belle. Elle n’existe pas ou plus.</p>
       <div className="acts" style={{ justifyContent: "center" }}>
         <Link className="btn" href="/">Retour à l’annuaire</Link>
