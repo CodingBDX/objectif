@@ -3,7 +3,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { useT, LangSwitch } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 
 function Form() {
   const { tr } = useT();
@@ -25,7 +25,7 @@ function Form() {
   }
   return (
     <section className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/">{tr("← Retour à l’annuaire")}</Link><LangSwitch /></div>
+      <div className="pbar"><Link className="btn ghost" href="/">{tr("← Retour à l’annuaire")}</Link></div>
       <div className="pfc" style={{ maxWidth: 520 }}>
         <div className="panel regp">
           <h1 className="regh">{signup ? tr("Créer mon profil") : tr("Se connecter")}</h1>
