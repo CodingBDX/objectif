@@ -1012,3 +1012,12 @@ h1.pbn{margin:0}
 .rjsf li .rje{flex:none}
 .rjsf li div{display:grid;gap:3px;min-width:0}.rjsf li div span{color:var(--mut);line-height:1.5}
 @media (prefers-reduced-motion:reduce){.rjsf li{animation:none!important}.rjsf li:hover{transform:none}}
+
+/* Accueil uniquement : Top France étendu (18 villes sur ordinateur, 12 sur tablette, 6 sur mobile, toutes avec « Voir plus ») */
+.panel.top.topx li:nth-child(n+7){display:list-item}
+.panel.top.topx li:nth-child(n+19){display:none}
+@media (min-width:701px) and (max-width:1100px){.panel.top.topx li:nth-child(n+13){display:none}}
+@media (max-width:700px){.panel.top.topx li:nth-child(n+4){display:list-item}.panel.top.topx li:nth-child(n+7){display:none}}
+.panel.top.topx.all li{display:list-item!important}
+.topmore{margin-top:12px;justify-self:center}
+.panel.top.topx{display:grid}
