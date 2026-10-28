@@ -15,6 +15,10 @@ const BENEFITS: [string, string, string][] = [
   ["⏸️", "Tu gardes la main", "Mets ton profil en pause en un clic. Tes photos restent à toi, tu les retires quand tu veux."],
   ["👑", "VIP pour être vue", "Mise en avant, plusieurs tarifs, accès à la carte des logements réservée aux profils VIP et vérifiés."],
 ];
+const SAFE: [string, string, string][] = [
+  ["🚩", "Signalement de numéros", "Un client t’a harcelée ou arnaquée ? Signale son numéro. Avant chaque rendez-vous, vérifie en quelques secondes s’il a déjà été signalé par d’autres profils."], ["💬", "Commentaires sous contrôle", "Pour commenter, un membre doit renseigner son numéro de téléphone. S’il a déjà été signalé, son commentaire s’affiche en rouge avec le nombre de signalements."], ["📍", "Pas de faux profils « partout en France »", "Les villes de déplacement sont limitées à une distance raisonnable de ta ville de base. Fini les profils fantômes et les arnaques à l’annonce."], ["✅", "Profils vérifiés par des humains", "Le badge vérifié s’obtient avec une photo datée, contrôlée par notre équipe. La photo est supprimée dès qu’on a répondu."],
+  ["🏠", "Logements sécurisés", "Une section logements visible uniquement des profils VIP vérifiés. L’adresse reste privée et chaque annonce est validée avant publication."], ["📅", "Un calendrier de disponibilités", "Indique tes horaires et tes déplacements à venir : tes clients savent quand te contacter, et toi seule décides."], ["🗑️", "Tes données t’appartiennent", "Supprime ton profil, tes photos et tes informations en quelques clics, définitivement."],
+];
 const STEPS: [string, string][] = [
   ["Crée ton compte", "Une adresse e-mail et un mot de passe, rien d’autre."],
   ["Compose ton profil", "Ajoute tes photos, ta présentation et tes tarifs. Tu choisis ce que tu montres."],
@@ -34,6 +38,12 @@ export default function Page() {
 
       <section className="rjg" aria-label="Avantages">
         {BENEFITS.map(([e, t, d]) => <article key={t} className="panel rjc"><span className="rje" aria-hidden="true">{e}</span><h2><Tr k={t} /></h2><p><Tr k={d} /></p></article>)}
+      </section>
+
+      <section className="panel rjsf" aria-label="Sécurité">
+        <h2><Tr k="Pensé pour te protéger, concrètement" /></h2>
+        <p className="rjsi"><Tr k="Sex-Escorte n’est pas un annuaire de plus : chaque fonctionnalité a été pensée pour réduire les risques pour les escortes." /></p>
+        <ul>{SAFE.map(([e, t, d]) => <li key={t}><span className="rje" aria-hidden="true">{e}</span><div><strong><Tr k={t} /></strong><span><Tr k={d} /></span></div></li>)}</ul>
       </section>
 
       <section className="panel rjst">
