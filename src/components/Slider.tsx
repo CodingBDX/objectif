@@ -34,7 +34,7 @@ export default function Slider({ imgs, vip, video }: { imgs: string[]; vip: bool
         <dialog id="lb" open style={{ position: "fixed", inset: 0, margin: "auto", zIndex: 60 }} onClick={() => setLb(false)}>
           <button className="x" style={{ position: "absolute", right: 8, top: 8 }} aria-label="Fermer" onClick={() => setLb(false)}>✕</button>
           {items[i].v ? <><video controls autoPlay playsInline src={items[i].src} onClick={(e) => e.stopPropagation()} onLoadedMetadata={(e) => setVbad(!e.currentTarget.videoWidth)} />{vbad && <p className="vbad" onClick={(e) => e.stopPropagation()}>Ton navigateur ne peut pas afficher l’image de cette vidéo (format HEVC / H.265). Essaie sur un téléphone ou avec Safari.</p>}</> : <img id="lbi" src={items[i].src} alt="" />}
-          <span className="wm">© HeyPapi</span>
+          <span className="wm">© Sex-Escorte</span>
         </dialog>
       )}
     </>

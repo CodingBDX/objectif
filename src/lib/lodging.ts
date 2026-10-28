@@ -5,4 +5,4 @@ export type Lodging = {
 };
 export const busyList = (l: { busy?: Busy[] | null }) => (Array.isArray(l.busy) ? l.busy : []).filter((b) => b && /^\d{4}-\d{2}-\d{2}$/.test(b.from) && /^\d{4}-\d{2}-\d{2}$/.test(b.to || b.from));
 export const isBusy = (l: { busy?: Busy[] | null }, iso: string) => busyList(l).some((b) => iso >= b.from && iso <= (b.to || b.from));
-export const WARNING = "Les propriétaires de logements sont des profils VIP et vérifiés par HeyPapi. Ce qui se passe ensuite (visite, prix, paiement, conditions) ne regarde que les personnes concernées : HeyPapi n’intervient pas dans la location et ne perçoit aucune commission. Reste prudent(e) : ne verse jamais d’acompte avant d’avoir vu le logement.";
+export const WARNING = "Les propriétaires de logements sont des profils VIP et vérifiés par Sex-Escorte. Ce qui se passe ensuite (visite, prix, paiement, conditions) ne regarde que les personnes concernées : Sex-Escorte n’intervient pas dans la location et ne perçoit aucune commission. Reste prudent(e) : ne verse jamais d’acompte avant d’avoir vu le logement.";

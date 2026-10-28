@@ -14,7 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import kotlin.concurrent.thread
 
-/** Écran unique : connexion avec le compte HeyPapi, puis deux autorisations (affichage par-dessus les autres applications + filtrage d'appels). */
+/** Écran unique : connexion avec le compte Sex-Escorte, puis deux autorisations (affichage par-dessus les autres applications + filtrage d'appels). */
 class MainActivity : ComponentActivity() {
     private lateinit var root: LinearLayout
     private val roleLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { render() }
@@ -29,10 +29,10 @@ class MainActivity : ComponentActivity() {
 
     private fun render() {
         root.removeAllViews()
-        root.addView(t("🛡️ HeyPapi Shield", 24f, true))
+        root.addView(t("🛡️ Sex-Escorte Shield", 24f, true))
         if (BuildConfig.SUPABASE_URL.isEmpty()) { root.addView(t("Configuration manquante : renseigne SUPABASE_URL et SUPABASE_KEY dans local.properties, puis recompile.")); return }
         if (!Api.loggedIn(this)) {
-            root.addView(t("Connecte-toi avec ton compte HeyPapi (le même que sur le site). Il faut avoir un profil."))
+            root.addView(t("Connecte-toi avec ton compte Sex-Escorte (le même que sur le site). Il faut avoir un profil."))
             val mail = EditText(this).apply { hint = "E-mail"; inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS or android.text.InputType.TYPE_CLASS_TEXT }
             val pw = EditText(this).apply { hint = "Mot de passe"; inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD }
             val msg = t("", 14f)
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
         root.addView(t(if (role) "✔ Application de filtrage d'appels : activée" else "✖ Application de filtrage d'appels : à activer"))
         if (!role) root.addView(btn("Activer le filtrage d'appels") { roleLauncher.launch((getSystemService(Context.ROLE_SERVICE) as RoleManager).createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)) })
         if (overlay && role) root.addView(t("Tout est prêt. Quand tu reçois un appel, un bandeau vert, orange ou rouge s'affiche par-dessus l'écran d'appel. L'appel sonne toujours normalement.", 15f))
-        root.addView(t("Les numéros sont envoyés de façon sécurisée à ton compte HeyPapi pour être comparés ; ils ne sont pas conservés en clair.", 12f))
+        root.addView(t("Les numéros sont envoyés de façon sécurisée à ton compte Sex-Escorte pour être comparés ; ils ne sont pas conservés en clair.", 12f))
         root.addView(btn("Se déconnecter") { Api.logout(this); render() })
     }
 }

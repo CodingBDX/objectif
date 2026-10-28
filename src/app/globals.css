@@ -110,7 +110,7 @@ select{background:var(--card);border:1px solid var(--line);border-radius:999px;p
 .cover{position:relative;aspect-ratio:1/.86;max-width:100%;border-radius:20px;overflow:hidden;background:var(--card)}
 .mos{position:absolute;inset:0;display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;gap:4px}
 .mos div{background-size:cover;background-position:center;position:relative}
-:root{--wm:"© HeyPapi"}
+:root{--wm:"© Sex-Escorte"}
 .wm{position:absolute}
 .mos div::after,.slide::after,.video::after{content:var(--wm)}
 .mos div::after,.slide::after,.video::after,.wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:rgba(255,255,255,.55);font:700 11px/1 var(--fb);letter-spacing:.08em;text-transform:uppercase;text-shadow:0 1px 3px rgba(0,0,0,.65);pointer-events:none;z-index:2;white-space:nowrap}
@@ -825,7 +825,7 @@ h1.pbn{margin:0}
 .pst>div{background:none;border-radius:0;padding:0;min-width:104px;gap:3px}
 .pst i{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:var(--card);box-shadow:0 0 0 2px var(--pink),var(--sh);font-size:24px;margin-bottom:6px}
 
-/* Page 404 HeyPapi */
+/* Page 404 Sex-Escorte */
 .nf{display:grid;justify-items:center;text-align:center;gap:14px;padding-block:40px 60px}
 .nfw{position:relative;display:grid;justify-items:center;width:min(100%,360px);padding-top:10px}
 .nflogo{fill:none;stroke:var(--pink);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:90;stroke-dashoffset:90;animation:nfdraw 1.6s ease forwards,nfflo 3.2s ease-in-out 1.6s infinite}

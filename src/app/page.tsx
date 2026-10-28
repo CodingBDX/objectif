@@ -5,7 +5,7 @@ import { allProfiles } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: { absolute: "HeyPapi, annuaire des escortes populaire, sexy, numéro un" },
+  title: { absolute: "Sex-Escorte, annuaire des escortes populaire, sexy, numéro un" },
   description: "Trouve des escortes près de chez toi. Profils vérifiés, photos, disponibilités et agenda des villes visitées. 50 % reversés aux associations.",
   alternates: { canonical: "/" }
 };

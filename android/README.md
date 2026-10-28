@@ -1,6 +1,6 @@
-# HeyPapi Shield (Android)
+# Sex-Escorte Shield (Android)
 
-Application qui affiche, par-dessus l'écran d'un appel entrant, si le numéro a été signalé par d'autres profils HeyPapi
+Application qui affiche, par-dessus l'écran d'un appel entrant, si le numéro a été signalé par d'autres profils Sex-Escorte
 (🟢 aucun signalement · 🟠 attention · 🔴 danger). L'appel sonne toujours normalement : l'application n'en bloque aucun.
 
 ## Préparer
@@ -10,7 +10,7 @@ Application qui affiche, par-dessus l'écran d'un appel entrant, si le numéro a
 4. Branche un téléphone Android 10 ou plus (mode développeur) et clique sur ▶ Run.
 
 ## Utiliser
-1. Ouvre l'application, connecte-toi avec ton compte HeyPapi (celui qui a un profil).
+1. Ouvre l'application, connecte-toi avec ton compte Sex-Escorte (celui qui a un profil).
 2. Touche « Autoriser l'affichage », puis « Activer le filtrage d'appels » et accepte.
 3. Fais-toi appeler : le bandeau apparaît en haut de l'écran d'appel.
 

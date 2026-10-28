@@ -14,9 +14,9 @@ import { lab } from "@/lib/types";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
-  openGraph: { siteName: "HeyPapi", locale: "fr_FR", type: "website" },
+  openGraph: { siteName: "Sex-Escorte", locale: "fr_FR", type: "website" },
   twitter: { card: "summary_large_image" },
-  title: { default: "HeyPapi, annuaire des escortes populaire, sexy, numéro un", template: "%s · HeyPapi" },
+  title: { default: "Sex-Escorte, annuaire des escortes populaire, sexy, numéro un", template: "%s · Sex-Escorte" },
   description: "Annuaire des escortes : profils vérifiés, photos, disponibilités et villes visitées. 50 % reversés aux associations."
 };
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" />
       </head>
       <body>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "HeyPapi", url: siteUrl(), inLanguage: "fr" }) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "WebSite", name: "Sex-Escorte", url: siteUrl(), inLanguage: "fr" }) }} />
         <Splash /><NavProgress />
         <AgeGate />
         <Nav loggedIn={!!user} hasProfile={!!me} vip={!!me?.vip} name={me?.name || ""} userId={user?.id || ""} index={index} isAdmin={isAdmin} escort={escort} paused={!!me?.paused} />

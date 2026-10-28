@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
-const SITE = "HeyPapi";
+const SITE = "Sex-Escorte";
 const esc = (s: string) => s.replace(/[<>&"']/g, "");
 
 export async function POST(req: Request) {
