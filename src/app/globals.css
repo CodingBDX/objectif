@@ -1024,3 +1024,9 @@ h1.pbn{margin:0}
 
 /* Accueil : liste dépliée de toutes les villes, défilante pour rester compacte */
 .panel.top.topx.all ol{max-height:min(70vh,560px);overflow-y:auto;padding-right:4px;overscroll-behavior:contain}
+
+/* Villes proches : « Voir plus » déroule toutes les villes à moins de 100 km */
+.nbmore{min-height:38px;padding:0 14px;border-radius:999px;border:1px dashed var(--pink);background:transparent;color:var(--btn);font:700 14px var(--fb)}
+.nbmore:hover{background:var(--soft)}
+.nearb.all .nbub{display:inline-flex!important}
+@media (min-width:1101px){.nearb:not(.big) .nbmore{display:none}}

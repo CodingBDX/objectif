@@ -64,6 +64,8 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Alerte désactivée.": ["Alert turned off.", "Alerta desactivada.", "Alerta desativado."],
   "🔔 Je cherche un logement à {c} : préviens-moi par e-mail quand il y en a un.": ["🔔 I'm looking for accommodation in {c}: e-mail me when one is available.", "🔔 Busco alojamiento en {c}: avísame por e-mail cuando haya uno.", "🔔 Procuro alojamento em {c}: avisa-me por e-mail quando houver um."],
   "Voir toutes les villes ({n})": ["See all cities ({n})", "Ver todas las ciudades ({n})", "Ver todas as cidades ({n})"],
+  "Voir plus ({n})": ["See more ({n})", "Ver más ({n})", "Ver mais ({n})"],
+  "Voir moins": ["See less", "Ver menos", "Ver menos"],
   "Voir plus de villes": ["See more cities", "Ver más ciudades", "Ver mais cidades"],
   "Voir moins de villes": ["See fewer cities", "Ver menos ciudades", "Ver menos cidades"],
   "Numéro WhatsApp (obligatoire)": ["WhatsApp number (required)", "Número de WhatsApp (obligatorio)", "Número de WhatsApp (obrigatório)"],
