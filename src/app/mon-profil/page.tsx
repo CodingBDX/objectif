@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import StatsPanel from "@/components/StatsPanel";
+import VerifRequest from "@/components/VerifRequest";
 import LodgingFinder from "@/components/LodgingFinder";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { SPECIALTIES, Trip } from "@/lib/types";
@@ -104,6 +105,7 @@ export default function MyProfile() {
   async function deleteAll() {
     setDelBusy(true); setDelMsg("");
     try {
+      try { const { data: vf } = await sb.storage.from("verif").list(uid, { limit: 100 }); if (vf?.length) await sb.storage.from("verif").remove(vf.map((f) => `${uid}/${f.name}`)); } catch {}
       for (let guard = 0; guard < 20; guard++) {
         const { data: files } = await sb.storage.from("media").list(uid, { limit: 100 });
         if (!files || !files.length) break;
@@ -258,7 +260,7 @@ export default function MyProfile() {
               {prog >= 0 && <i className="dzp"><u style={{ width: Math.round(prog * 100) + "%" }} /></i>}
             </label>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
-</section><section className="dcard"><h3>{tr("Vidéo")}</h3>{kind === "livecam" && <label className="f">{tr("Lien de ton live (obligatoire pour un profil livecam)")}<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
+</section>{!isNewP && kind !== "membre" && <VerifRequest uid={uid} verified={verif} />}<section className="dcard"><h3>{tr("Vidéo")}</h3>{kind === "livecam" && <label className="f">{tr("Lien de ton live (obligatoire pour un profil livecam)")}<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Ma vidéo")} ({video ? 1 : 0}/1)</b>{tr(" · une seule vidéo de présentation, 20 Mo maximum. ✕ pour la supprimer.")}</p>
             {video && <div className="edph"><div className="eph vid"><video src={video + "#t=0.1"} muted playsInline preload="metadata" aria-label={tr("Aperçu de ma vidéo")} />
               <span className="fst">{tr("Vidéo")}</span>

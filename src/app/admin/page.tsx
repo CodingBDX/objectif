@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -19,6 +19,7 @@ export default function Admin() {
   const [state, setState] = useState<"load" | "no" | "ok">("load");
   const [tab, setTab] = useState<Tab>("dash");
   const [reports, setReports] = useState<any[]>([]); const [profiles, setProfiles] = useState<any[]>([]); const [messages, setMessages] = useState<any[]>([]);
+  const [verifs, setVerifs] = useState<any[]>([]);
   const [lodgs, setLodgs] = useState<any[]>([]); const [lAddr, setLAddr] = useState<Record<string, string>>({});
   const [vipEnd, setVipEnd] = useState<Record<string, { until: string; paused_at: string | null }>>({});
   const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
@@ -52,6 +53,9 @@ export default function Admin() {
   }, []);
   const loadExtra = useCallback(async () => {
     const a = await sb.from("client_reports").select("id,category,note,created_at,profiles(name)").order("created_at", { ascending: false }).limit(200); setClients(a.error ? [] : a.data || []);
+    const v = await sb.from("verif_requests").select("profile_id,path,status,created_at,profiles(name,city)").eq("status", "pending").order("created_at"); 
+    const vr = v.error ? [] : (v.data || []) as any[];
+    setVerifs(await Promise.all(vr.map(async (x) => ({ ...x, url: x.path ? (await sb.storage.from("verif").createSignedUrl(x.path, 600)).data?.signedUrl : null }))));
     const j = await sb.from("audit_log").select("*").order("id", { ascending: false }).limit(100); setJournal(j.error ? [] : j.data || []);
   }, []);
 
@@ -130,8 +134,14 @@ export default function Admin() {
     ...messages.slice(0, 8).map((m) => ({ t: m.created_at, i: "✉️", title: "Message de contact", sub: m.subject })),
     ...profiles.slice(0, 8).map((p) => ({ t: p.created_at, i: "👤", title: "Nouveau profil", sub: `${p.name} · ${p.city}` })),
   ].sort((a, b) => +new Date(b.t) - +new Date(a.t)).slice(0, 8);
+  async function decideVerif(x: any, ok: boolean) {
+    setErr(""); const { error } = await sb.rpc("admin_decide_verif", { p_id: x.profile_id, p_ok: ok, p_note: ok ? "" : (rej["v" + x.profile_id] || "") });
+    if (error) { setErr(error.message); return; }
+    if (x.path) await sb.storage.from("verif").remove([x.path]);
+    setVerifs((l) => l.filter((y) => y.profile_id !== x.profile_id)); loadProfiles(); refreshListings();
+  }
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", lodgings: "Logements" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", verifs: "Demandes de vérification", lodgings: "Logements" };
 
   return (
     <div className="dash gut">
@@ -140,7 +150,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
           <Link href="/">🏠 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -262,6 +272,18 @@ export default function Admin() {
                 ? <><button className="btn" onClick={() => specCall("admin_delete_specialty", { p_name: x }, `« ${x} » supprimée`)}>Confirmer</button><button className="btn ghost" onClick={() => setSure("")}>Annuler</button></>
                 : <button className="btn ghost" aria-label={`Supprimer ${x}`} disabled={!specDb} onClick={() => setSure("s" + x)}>🗑</button>}
             </div>); })}
+        </div>)}
+
+        {tab === "verifs" && (<div style={{ display: "grid", gap: 10 }}>
+          <p className="note" style={{ margin: 0 }}>Vérifie que la personne tient un papier avec « sex-escorte.com » et la date du jour, visage visible, et qu’elle ressemble aux photos du profil. La photo est supprimée dès ta décision.</p>
+          {verifs.length === 0 && <p className="note">Aucune demande en attente.</p>}
+          {verifs.map((x) => (
+            <div className="dcard" key={x.profile_id} style={{ display: "grid", gap: 8 }}>
+              <div><Link href={`/profil/${x.profile_id}`}><b>{x.profiles?.name || "?"}</b></Link> · {x.profiles?.city} · <span className="note">{ago(x.created_at)}</span></div>
+              {x.url ? <a href={x.url} target="_blank" rel="noopener noreferrer"><img src={x.url} alt="" style={{ maxWidth: "100%", maxHeight: 420, borderRadius: 12, objectFit: "contain" }} /></a> : <p className="note">Photo introuvable.</p>}
+              <input placeholder="Motif du refus (facultatif)" maxLength={300} value={rej["v" + x.profile_id] || ""} onChange={(e) => setRej((r) => ({ ...r, ["v" + x.profile_id]: e.target.value }))} />
+              <div className="acts"><button className="btn" onClick={() => decideVerif(x, true)}>✓ Vérifier le profil</button><button className="btn ghost" onClick={() => decideVerif(x, false)}>✕ Refuser</button></div>
+            </div>))}
         </div>)}
 
         {tab === "lodgings" && (<div style={{ display: "grid", gap: 10 }}>
