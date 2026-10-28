@@ -28,7 +28,7 @@ export default function MyProfile() {
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [specList, setSpecList] = useState<string[]>(SPECIALTIES); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
-  const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
+  const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [verif, setVerif] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [farMsg, setFarMsg] = useState(""); const [wero, setWero] = useState(""); const [paypal, setPaypal] = useState("");
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
@@ -48,7 +48,7 @@ export default function MyProfile() {
       setRecv(!!data.receives); setTrav(!!data.travels);
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
-      setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SL.includes(x))); setPhotos(data.photos); setVideo(data.video);
+      setBio(data.bio); setVip(!!data.vip); setVerif(!!data.verified); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SL.includes(x))); setPhotos(data.photos); setVideo(data.video);
       setWero(data.pay_wero || ""); setPaypal(data.pay_paypal || ""); setRates(rateList(data).map((r) => ({ d: r.d, p: String(r.p) }))); setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); window.dispatchEvent(new CustomEvent("hp-pause", { detail: false })); await refreshListings(); }
@@ -157,6 +157,7 @@ export default function MyProfile() {
           {!isNewP && <a href="#stats">{tr("📊 Statistiques")}</a>}
           {!isNewP && <Link href="/verifier">{tr("🛡️ Vérifier un client")}</Link>}
           <a href="#profil">{tr("✏️ Mon profil")}</a>
+          {!isNewP && vip && verif && <Link href="/mon-logement">{tr("🏠 Mon logement")}</Link>}
           {!isNewP && <Link href={`/profil/${uid}`}>{tr("👀 Voir ma page")}</Link>}
           <Link href="/">{tr("🏠 Annuaire")}</Link>
           <Link href="/contact">{tr("✉️ Contact")}</Link>
