@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Tr } from "@/lib/i18n";
+import Faq from "@/components/Faq";
 
 export const metadata: Metadata = {
   title: "Rejoindre Sex-Escorte",
@@ -39,6 +40,8 @@ export default function Page() {
         <h2><Tr k="Comment ça marche" /></h2>
         <ol>{STEPS.map(([t, d], i) => <li key={t}><b className="rjn">{i + 1}</b><div><strong><Tr k={t} /></strong><span><Tr k={d} /></span></div></li>)}</ol>
       </section>
+
+      <Faq />
 
       <section className="rjf">
         <h2><Tr k="Prête à rejoindre Sex-Escorte ?" /></h2>

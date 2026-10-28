@@ -12,7 +12,7 @@ import { regionMap } from "@/lib/cityinfo";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { genre: string; ville: string } }): Promise<Metadata> {
   const g = GFROM[params.genre]; const city = cityBySlug(await allProfiles(), params.ville); if (!g || !city) return {};
-  return { title: `Profils ${GTITLE[g]} à ${city}`, description: `Profils ${GTITLE[g].toLowerCase()} à ${city} : photographes, vidéastes et artistes. Portfolios, disponibilités et agenda.`, alternates: { canonical: `/genre/${GPATH[g]}/${params.ville}` } };
+  return { title: `Escortes ${GTITLE[g].toLowerCase()} à ${city}`, description: `Escortes ${GTITLE[g].toLowerCase()} à ${city} : photos, tarifs, disponibilités et agenda des passages. Profils majeurs et protégés des arnaqueurs.`, alternates: { canonical: `/genre/${GPATH[g]}/${params.ville}` } };
 }
 export default async function Page({ params }: { params: { genre: string; ville: string } }) {
   const g = GFROM[params.genre]; const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville) || cityFromSlug(params.ville);

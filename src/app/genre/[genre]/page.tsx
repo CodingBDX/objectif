@@ -8,7 +8,7 @@ import { GFROM, GPATH, GTITLE } from "@/lib/site";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { genre: string } }): Promise<Metadata> {
   const g = GFROM[params.genre]; if (!g) return {};
-  return { title: `Créateurs ${GTITLE[g]}`, description: `Annuaire des profils ${GTITLE[g].toLowerCase()} : photographes, vidéastes et artistes. Portfolios, disponibilités et villes visitées.`, alternates: { canonical: `/genre/${GPATH[g]}` } };
+  return { title: g === "livecam" ? "Escortes livecam" : `Escortes ${GTITLE[g].toLowerCase()}`, description: `Annuaire des escortes ${g === "livecam" ? "livecam" : GTITLE[g].toLowerCase()} : photos, tarifs, disponibilités et villes visitées. Profils majeurs et protégés des arnaqueurs.`, alternates: { canonical: `/genre/${GPATH[g]}` } };
 }
 export default async function Page({ params }: { params: { genre: string } }) {
   const g = GFROM[params.genre]; if (!g) notFound();

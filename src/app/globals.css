@@ -941,3 +941,7 @@ h1.pbn{margin:0}
 .rjn{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--btn);color:var(--btnt);font:700 16px var(--fd)}
 .rjf{text-align:center;display:grid;justify-items:center;gap:8px;padding:30px 18px;border-radius:30px;background:var(--soft);border:1px solid var(--line)}
 .rjf p{margin:0 0 6px;color:var(--mut);font-weight:600}
+.faqd{border-top:1px solid var(--line);padding:10px 0}.faqd:first-of-type{border-top:0}
+.faqd summary{cursor:pointer;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:10px;min-height:32px;align-items:center}
+.faqd summary::-webkit-details-marker{display:none}.faqd summary::after{content:"+";color:var(--btn);font-size:22px;line-height:1}
+.faqd[open] summary::after{content:"–"}
