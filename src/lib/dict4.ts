@@ -24,5 +24,7 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Numéro WhatsApp (optionnel)": ["WhatsApp number (optional)", "Número de WhatsApp (opcional)", "Número de WhatsApp (opcional)"],
   "Wero : numéro ou e-mail": ["Wero: number or e-mail", "Wero: número o correo", "Wero: número ou e-mail"], "PayPal : lien paypal.me ou e-mail": ["PayPal: paypal.me link or e-mail", "PayPal: enlace paypal.me o correo", "PayPal: link paypal.me ou e-mail"],
   "Pas de ville pour un profil livecam : ton profil apparaît uniquement dans la section Livecam.": ["No city for a livecam profile: your profile only appears in the Livecam section.", "Sin ciudad para un perfil livecam: tu perfil solo aparece en la sección Livecam.", "Sem cidade para um perfil livecam: o teu perfil aparece apenas na secção Livecam."],
+  "Passe en VIP : tarifs, réseaux sociaux, 20 photos et plus de visibilité.": ["Go VIP: rates, social networks, 20 photos and more visibility.", "Hazte VIP: tarifas, redes sociales, 20 fotos y más visibilidad.", "Passa a VIP: tarifas, redes sociais, 20 fotos e mais visibilidade."],
+  "Fermer": ["Close", "Cerrar", "Fechar"],
   "Copier": ["Copy", "Copiar", "Copiar"], "Copié ✔": ["Copied ✔", "Copiado ✔", "Copiado ✔"], "🔗 Copier le lien du profil": ["🔗 Copy profile link", "🔗 Copiar el enlace del perfil", "🔗 Copiar o link do perfil"],
 };
