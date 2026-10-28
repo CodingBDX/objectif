@@ -5,7 +5,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
 
 const CATS: Record<string, string> = { harcelement: "Harcèlement", menaces: "Menaces", impaye: "Impayé / arnaque", faux_rdv: "Faux rendez-vous", non_respect: "Non-respect des règles", autre: "Autre" };
-type Res = { niveau: "aucun" | "attention" | "danger"; signalements: number; dernier: string | null; categories: string[] };
+type Res = { niveau: "aucun" | "attention" | "danger"; signalements: number; dernier: string | null; categories: string[]; moi?: boolean };
 const LOOK = {
   aucun: { c: "#1e8a4c", bg: "#e6f7ec", t: "Aucun signalement", d: "Ce numéro n’a pas été signalé par d’autres profils. Reste prudent(e) quand même." },
   attention: { c: "#b36b00", bg: "#fff2d9", t: "Attention", d: "1 profil a signalé ce numéro." },
@@ -62,6 +62,7 @@ export default function Verifier() {
           <div role="status" style={{ background: L.bg, color: L.c, borderRadius: 18, padding: "14px 16px", border: `2px solid ${L.c}` }}>
             <div style={{ font: "700 20px var(--fd)" }}>{res.niveau === "danger" ? "🔴" : res.niveau === "attention" ? "🟠" : "🟢"} {tr(L.t)}{res.signalements ? " · " + tr("{n} signalement(s)", { n: res.signalements }) : ""}</div>
             <div style={{ marginTop: 4 }}>{tr(L.d)}</div>
+            {res.moi && <div style={{ marginTop: 8, fontWeight: 700 }}>{tr("📌 Tu as signalé ce numéro. Ton propre signalement n’est pas compté dans ce résultat : seuls les signalements des autres profils le sont.")}</div>}
             {res.categories?.length > 0 && <div style={{ marginTop: 6, fontWeight: 600 }}>{tr("Motifs : {m}", { m: res.categories.map((c) => tr(CATS[c] || c)).join(", ") })}</div>}
             {res.dernier && <div style={{ marginTop: 2, fontSize: 13 }}>{tr("Dernier signalement : {d}", { d: fr(res.dernier, locale) })}</div>}
           </div>
