@@ -13,3 +13,14 @@ export async function publicLodgings(cols: string, withGeo = false) {
   const ok = new Map((owners || []).filter((o: any) => o.vip && o.verified && !o.paused).map((o: any) => [o.id, o.name as string]));
   return rows.filter((l) => ok.has(l.profile_id)).map((l) => ({ ...l, owner: ok.get(l.profile_id) as string }));
 }
+
+/** Seuls les profils VIP ET vérifiés (et les admins) peuvent voir les logements. */
+export async function canSeeLodgings(): Promise<boolean> {
+  const sb = supabaseServer();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return false;
+  const a = await sb.rpc("is_admin");
+  if (a.data) return true;
+  const { data: p } = await sb.from("profiles").select("vip,verified").eq("id", user.id).maybeSingle();
+  return !!(p && p.vip && p.verified);
+}

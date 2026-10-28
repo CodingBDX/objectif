@@ -4,7 +4,7 @@ import { allProfiles } from "@/lib/data";
 import { lab } from "@/lib/types";
 import { assosForViewer } from "@/lib/assosServer";
 import MapView, { MapCity, MapAsso, MapLodging } from "@/components/MapView";
-import { publicLodgings } from "@/lib/lodgingServer";
+import { publicLodgings, canSeeLodgings } from "@/lib/lodgingServer";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Carte des profils", description: "Carte de France des profils : trouve les escortes près de chez toi.", alternates: { canonical: "/carte" } };
@@ -15,7 +15,7 @@ export default async function Page() {
   const cities = Object.values(by).sort((a, b) => b.n - a.n);
   const { allowed, list } = await assosForViewer();
   const assos: MapAsso[] = allowed ? list.filter((a) => a.address).map((a) => ({ slug: a.slug, name: a.name, address: a.address as string, city: a.city, phone: a.phone })) : [];
-  const ld = await publicLodgings("profile_id,title,city,area,lat,lon,price_day,price_week,price_month", true);
+  const ld = (await canSeeLodgings()) ? await publicLodgings("profile_id,title,city,area,lat,lon,price_day,price_week,price_month", true) : [];
   const lodgings: MapLodging[] = ld.map((l: any) => ({ id: l.profile_id, title: l.title, city: l.city, area: l.area, lat: Number(l.lat), lon: Number(l.lon), day: l.price_day, week: l.price_week, month: l.price_month }));
   return (
     <div className="dash gut mapw">

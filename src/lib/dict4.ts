@@ -76,4 +76,6 @@ export const DICT4: Record<string, [string, string, string]> = {
   "✔ Enregistré. Ton logement sera visible après validation.": ["✔ Saved. Your listing will be visible after approval.", "✔ Guardado. Tu alojamiento será visible tras la validación.", "✔ Guardado. O teu alojamento ficará visível após validação."],
   "Logement supprimé.": ["Listing deleted.", "Alojamiento eliminado.", "Alojamento eliminado."],
   "Copier": ["Copy", "Copiar", "Copiar"], "Copié ✔": ["Copied ✔", "Copiado ✔", "Copiado ✔"], "🔗 Copier le lien du profil": ["🔗 Copy profile link", "🔗 Copiar el enlace del perfil", "🔗 Copiar o link do perfil"],
+  "🔒 Les logements sont réservés aux profils VIP et vérifiés.": ["🔒 Listings are reserved for VIP and verified profiles.", "🔒 Los alojamientos están reservados a perfiles VIP y verificados.", "🔒 Os alojamentos são reservados a perfis VIP e verificados."],
+  "Passe VIP et fais vérifier ton profil pour consulter les logements et en proposer un.": ["Go VIP and get your profile verified to browse listings and offer one.", "Hazte VIP y verifica tu perfil para ver los alojamientos y ofrecer uno.", "Torna-te VIP e verifica o teu perfil para ver os alojamentos e propor um."],
 };
