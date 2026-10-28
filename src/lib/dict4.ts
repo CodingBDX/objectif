@@ -120,4 +120,9 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Les profils signalés peuvent être masqués, les arnaqueurs sont bannis, et le site refuse tout réseau de proxénétisme ainsi que toute exploitation de mineurs.": ["Reported profiles can be hidden, scammers are banned, and the site rejects any pimping network and any exploitation of minors.", "Los perfiles denunciados pueden ocultarse, los estafadores son expulsados y el sitio rechaza cualquier red de proxenetismo y toda explotación de menores.", "Os perfis denunciados podem ser ocultados, os burlões são banidos e o site recusa qualquer rede de proxenetismo e toda a exploração de menores."],
   "Puis-je mettre mon profil en pause ?": ["Can I pause my profile?", "¿Puedo pausar mi perfil?", "Posso pausar o meu perfil?"],
   "Oui, en un clic depuis ton espace. Tes photos restent à toi et tu peux les retirer quand tu veux.": ["Yes, in one click from your account. Your photos stay yours and you can remove them whenever you want.", "Sí, con un clic desde tu espacio. Tus fotos son tuyas y puedes retirarlas cuando quieras.", "Sim, num clique a partir do teu espaço. As tuas fotos são tuas e podes retirá-las quando quiseres."],
+  "📋 Tous les logements": ["📋 All listings", "📋 Todos los alojamientos", "📋 Todos os alojamentos"],
+  "✏️ Mon logement": ["✏️ My listing", "✏️ Mi alojamiento", "✏️ O meu alojamento"],
+  "Par ville": ["By city", "Por ciudad", "Por cidade"],
+  "Tu as un logement ?": ["Do you have a place to offer?", "¿Tienes un alojamiento?", "Tens um alojamento?"],
+  "Publie ton annonce : elle est validée avant d’apparaître.": ["Post your listing: it is reviewed before it appears.", "Publica tu anuncio: se valida antes de aparecer.", "Publica o teu anúncio: é validado antes de aparecer."],
 };

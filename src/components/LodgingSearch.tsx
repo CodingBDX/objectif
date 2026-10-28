@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useT } from "@/lib/i18n";
 import CityInput from "@/components/CityInput";
@@ -10,9 +10,10 @@ import { WARNING } from "@/lib/lodging";
 export type LItem = { id: string; title: string; city: string; area: string | null; lat: number | null; lon: number | null; photo: string; day: number | null; week: number | null; month: number | null; owner: string };
 const RADII = [0, 10, 25, 50, 100, 200, 100000];
 
-export default function LodgingSearch({ items, strip }: { items: LItem[]; strip?: boolean }) {
-  const { tr } = useT(); const [city, setCity] = useState(""); const [r, setR] = useState(25); const [c0, setC0] = useState<[number, number] | null>(null);
+export default function LodgingSearch({ items, strip, initialCity = "" }: { items: LItem[]; strip?: boolean; initialCity?: string }) {
+  const { tr } = useT(); const [city, setCity] = useState(initialCity); const [r, setR] = useState(25); const [c0, setC0] = useState<[number, number] | null>(null);
   const pick = async (v: string) => { setC0(v ? await cityCentre(v) : null); };
+  useEffect(() => { setCity(initialCity); if (initialCity) cityCentre(initialCity).then(setC0); else setC0(null); }, [initialCity]);
   const list = useMemo(() => {
     if (!city) return items;
     return items.filter((l) => {
@@ -23,7 +24,7 @@ export default function LodgingSearch({ items, strip }: { items: LItem[]; strip?
   }, [items, city, r, c0]);
   return (
     <>
-      <section className="panel regp" style={{ display: "grid", gap: 12 }}>
+      <section className="dcard" style={{ display: "grid", gap: 12 }}>
         <p className="note" role="note" style={{ margin: 0 }}>⚠️ {tr(WARNING)}</p>
         <div className="row2">
           <div className="f"><span style={{ fontSize: 14, fontWeight: 700, color: "var(--mut)" }}>{tr("Ville")}</span>
