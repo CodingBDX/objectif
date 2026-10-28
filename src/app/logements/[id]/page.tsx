@@ -16,8 +16,9 @@ export default async function Page({ params }: { params: { id: string } }) {
   const sb = supabaseServer();
   const { data: l } = await sb.from("lodgings").select("*").eq("profile_id", params.id).maybeSingle();
   if (!l) notFound();
-  const { data: o } = await sb.from("profiles").select("id,name,vip,verified").eq("id", params.id).maybeSingle();
+  const { data: o } = await sb.from("profiles").select("id,name,vip,verified,paused").eq("id", params.id).maybeSingle();
   const { data: { user } } = await sb.auth.getUser(); const mine = user?.id === params.id;
+  if (!mine && (l.status !== "approved" || !o || !o.vip || !o.verified || (o as any).paused)) notFound();
   return (
     <section id="lg" className="gut">
       <div className="pbar"><Link className="btn ghost" href="/logements"><Tr k="← Tous les logements" /></Link><h1 className="pbn">{l.title}</h1></div>
