@@ -30,26 +30,26 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
         </button>
         <div className="navmenu" onClick={(e) => { if ((e.target as HTMLElement).closest("a,button")) close(); }}>
           <div className="gs-mob"><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
-          <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />{tr("Annuaire")}</Link>
+          <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" /><span className="nlx">{tr("Annuaire")}</span></Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte" aria-label={tr("Carte")} title={tr("Carte")}><Ic n="pin" /><span className="nlt">{tr("Carte")}</span></Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1" aria-label={tr("Favoris")} title={tr("Favoris")}><Ic n="heart" /><span className="nlt">{tr("Favoris")}</span> <span className="cn">{favs.length}</span></Link>
-          {lodg && <Link className={`nl${path?.startsWith("/logements") ? " on" : ""}`} href="/logements">🏠 <span className="nlt">{tr("Logements")}</span></Link>}
-          {escort && <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title={tr("Associations et soutien par ville")}>🤝 <span className="nlt">{tr("Associations")}</span></Link>}
+          {lodg && <Link className={`nl${path?.startsWith("/logements") ? " on" : ""}`} href="/logements" title={tr("Logements")} aria-label={tr("Logements")}><span className="em" aria-hidden="true">🏠</span><span className="nlt">{tr("Logements")}</span></Link>}
+          {escort && <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title={tr("Associations et soutien par ville")}><span className="em" aria-hidden="true">🤝</span><span className="nlt">{tr("Associations")}</span></Link>}
           <Link className="nl" href="/contact" aria-label={tr("Nous contacter")} title={tr("Nous contacter")}>
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">{tr("Contact")}</span>
           </Link>
-          <Link className="nl" href="/?pm=1" title={tr("Profils près de moi")}>📍 <span className="nlt">{tr("Près de moi")}</span></Link>
+          <Link className="nl" href="/?pm=1" title={tr("Profils près de moi")} aria-label={tr("Près de moi")}><span className="em" aria-hidden="true">📍</span><span className="nlt">{tr("Près de moi")}</span></Link>
           {loggedIn && hasProfile && !vip && <Link className="nl vipn" href="/contact?s=vip"><span aria-hidden="true">👑</span><span>{tr("Devenir VIP")}</span></Link>}
           <div className="gs-desk"><LangSwitch /><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
-          {isAdmin && <Link className="nl" href="/admin">🛠 Admin</Link>}
+          {isAdmin && <Link className="nl" href="/admin" title="Admin" aria-label="Admin"><span className="em" aria-hidden="true">🛠</span><span className="nlt">Admin</span></Link>}
           {loggedIn ? (<>
             {hasProfile && vip && <PauseBtn id={userId} paused={!!paused} />}
-            {hasProfile && <Link className={`nl${path === "/verifier" ? " on" : ""}`} href="/verifier" title={tr("Vérifier un client")}>🛡️ <span className="nlt">{tr("Vérifier un client")}</span></Link>}
-            {hasProfile && <Link className={`nl own${path === "/mon-profil" ? " on" : ""}`} href="/mon-profil" title={tr("Modifier mon profil")}>✏️ <span className="nlt">{tr("Modifier mon profil")}</span></Link>}
-            {hasProfile && lodg && <Link className={`nl own${path === "/mon-logement" ? " on" : ""}`} href="/mon-logement" title={tr("Mon logement")}>🏠 <span className="nlt">{tr("Mon logement")}</span></Link>}
-            {hasProfile && <Link className="nl own" href="/mon-profil#stats" title={tr("Mes statistiques")}>📊 <span className="nlt">{tr("Mes statistiques")}</span></Link>}
-            <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>{tr("Mon profil")}</Link>
-            <button className="nl" onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}>👤 {name || tr("Moi")} · {tr("Quitter")}</button>
+            {hasProfile && <Link className={`nl${path === "/verifier" ? " on" : ""}`} href="/verifier" title={tr("Vérifier un client")}><span className="em" aria-hidden="true">🛡️</span><span className="nlt">{tr("Vérifier un client")}</span></Link>}
+            {hasProfile && <Link className={`nl own${path === "/mon-profil" ? " on" : ""}`} href="/mon-profil" title={tr("Modifier mon profil")}><span className="em" aria-hidden="true">✏️</span><span className="nlt">{tr("Modifier mon profil")}</span></Link>}
+            {hasProfile && lodg && <Link className={`nl own${path === "/mon-logement" ? " on" : ""}`} href="/mon-logement" title={tr("Mon logement")}><span className="em" aria-hidden="true">🏠</span><span className="nlt">{tr("Mon logement")}</span></Link>}
+            {hasProfile && <Link className="nl own" href="/mon-profil#stats" title={tr("Mes statistiques")}><span className="em" aria-hidden="true">📊</span><span className="nlt">{tr("Mes statistiques")}</span></Link>}
+            <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"} title={tr("Mon profil")} aria-label={tr("Mon profil")}><span className="em" aria-hidden="true">👤</span><span className="nlt">{tr("Mon profil")}</span></Link>
+            <button className="nl" title={tr("Quitter")} aria-label={tr("Quitter")} onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}><span className="em" aria-hidden="true">🚪</span><span className="nlt">{name || tr("Moi")} · {tr("Quitter")}</span></button>
           </>) : (<>
             <Link className="btn login" href="/connexion">{tr("Se connecter")}</Link>
             <Link className="btn" href="/connexion?inscription=1">{tr("Créer mon profil")}</Link>

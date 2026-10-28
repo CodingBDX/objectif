@@ -15,5 +15,5 @@ export default function PauseBtn({ id, paused, className = "nl own", full = fals
     setBusy(false); r.refresh();
   };
   const t = paused ? "Relancer mon annonce" : "Mettre mon annonce en pause";
-  return <button type="button" className={className} onClick={go} disabled={busy} title={t} aria-label={t}>{icon ? (paused ? "▶" : "⏸") : full ? (paused ? "▶ Relancer mon annonce" : "⏸ Mettre en pause") : <>{paused ? "▶" : "⏸"} <span className="nlt">{paused ? "Relancer" : "Pause"}</span></>}</button>;
+  return <button type="button" className={className} onClick={go} disabled={busy} title={t} aria-label={t}>{icon ? (paused ? "▶" : "⏸") : full ? (paused ? "▶ Relancer mon annonce" : "⏸ Mettre en pause") : <><span className="em" aria-hidden="true">{paused ? "▶" : "⏸"}</span><span className="nlt">{paused ? "Relancer" : "Pause"}</span></>}</button>;
 }

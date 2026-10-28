@@ -26,7 +26,7 @@ button{cursor:pointer}
 .nlt{display:none}
 .burger{display:none;margin-left:auto;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);place-items:center;cursor:pointer;padding:0}
 .nav.open .burger{background:var(--btn);color:var(--btnt)}
-@media (max-width:900px){
+@media (max-width:1180px){
  .nav .gut{flex-wrap:nowrap}
  .burger{display:grid}
  .navmenu{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;gap:6px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 14px 30px rgba(0,0,0,.18);padding:12px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow:auto}
@@ -679,7 +679,7 @@ input[type="file"]:disabled::file-selector-button{opacity:.6;cursor:progress}
 .vlbw video{display:block;max-width:96vw;max-height:88vh}
 .vlbw .wm{font-size:clamp(24px,4.5vw,44px)}
 .vlb .x{z-index:2}
-@media (min-width:1200px){.nl.own .nlt{display:inline}}
+
 
 /* Vidéo = première diapositive du slider */
 .slide.vslide video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;background:#000}
@@ -777,7 +777,7 @@ input[type="date"]:disabled,input[type="time"]:disabled{opacity:.5}
 
 /* Recherche en haut du menu burger (au-dessus de Annuaire) sur mobile */
 .gs-desk{display:contents}.gs-mob{display:none}
-@media (max-width:900px){
+@media (max-width:1180px){
  .gs-desk{display:none}
  .gs-mob{display:block;min-width:0}
  .gs-mob .sp{max-width:none;width:100%;margin:0}
@@ -852,7 +852,7 @@ h1.pbn{margin:0}
 
 /* Langues sur mobile : entre le logo et le menu burger, alignées */
 .lang-bar{display:none}
-@media (max-width:900px){
+@media (max-width:1180px){
  .lang-bar{display:flex;align-items:center;margin-left:auto}
  .lang-bar .langsw{margin:0;padding:2px}
  .lang-bar .langsw button{min-width:34px;min-height:34px;font-size:12px;padding:0 6px}
@@ -950,3 +950,19 @@ h1.pbn{margin:0}
 .slide>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block}
 .th{overflow:hidden}.th>img{width:100%;height:100%;object-fit:cover;display:block}
 .lcard img,.lslide i img{aspect-ratio:auto}
+
+/* Barre du haut (ordinateur) : une seule ligne, icônes de même taille, centrées et alignées */
+.em{display:inline-grid;place-items:center;width:22px;height:22px;font-size:18px;line-height:1;flex:none}
+.nl>.ic{width:22px;height:22px;flex:none}
+@media (min-width:1181px){
+ .nav .gut{flex-wrap:nowrap;gap:4px}
+ .logo{margin-right:6px;flex:none}
+ .nl{height:44px;box-sizing:border-box;padding:0 10px;line-height:1;white-space:nowrap;justify-content:center;flex:none}
+ .nl .nlt{display:none}
+ .nl .cn{line-height:20px}
+ .gs-desk{display:flex;align-items:center;gap:6px;margin-left:auto;min-width:0}
+ .gs-desk .langsw{height:44px;box-sizing:border-box;align-items:center;margin:0}
+ .gs-desk .sp{min-height:44px;height:44px;box-sizing:border-box;flex:1 1 120px;min-width:100px;max-width:240px;margin-left:0}
+ .gs-desk .langsw button{min-width:34px;font-size:12px;padding:0 6px}
+ .nav .btn{height:44px;padding:0 16px;white-space:nowrap;flex:none}
+}
