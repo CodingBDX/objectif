@@ -1021,3 +1021,6 @@ h1.pbn{margin:0}
 .panel.top.topx.all li{display:list-item!important}
 .topmore{margin-top:12px;justify-self:center}
 .panel.top.topx{display:grid}
+
+/* Accueil : liste dépliée de toutes les villes, défilante pour rester compacte */
+.panel.top.topx.all ol{max-height:min(70vh,560px);overflow-y:auto;padding-right:4px;overscroll-behavior:contain}
