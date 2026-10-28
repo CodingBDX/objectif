@@ -5,7 +5,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 
 type C = { id: number; author_id: string; author_name: string; body: string; created_at: string; parent_id?: number | null };
 const PAGE = 5;
-const Flag = ({ n }: { n?: number }) => n ? <span className="cmflag" title={`Numéro signalé par ${n} profil${n > 1 ? "s" : ""}`}>🚩 Signalé</span> : null;
+const Flag = ({ n }: { n?: number }) => n ? <span className="cmflag" title={`Numéro signalé par ${n} profil${n > 1 ? "s" : ""}`}>🚩 Signalé · {n} signalement{n > 1 ? "s" : ""}</span> : null;
 const fmtD = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 
 export default function Comments({ profileId, ownerId }: { profileId: string; ownerId: string }) {
