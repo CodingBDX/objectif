@@ -9,7 +9,7 @@ export const maxDuration = 30;
  *  Appelée chaque nuit par Vercel (voir vercel.json). Ne renvoie aucune donnée sensible. */
 export async function GET() {
   const profiles = await allProfiles();
-  const cc: Record<string, number> = {}; profiles.filter((p) => p.genre !== "livecam").forEach((p) => { cc[p.city] = (cc[p.city] || 0) + 1; });
+  const cc: Record<string, number> = {}; profiles.forEach((p) => { cc[p.city] = (cc[p.city] || 0) + 1; });
   const cities = Object.entries(cc).sort((a, b) => b[1] - a[1]).slice(0, 40).map(([c]) => c);
   await regionMap(profiles);
   await Promise.all(cities.map((c) => nearbyCommunes(c, 3)));
