@@ -18,9 +18,9 @@ begin
     now(), now(), now())
   on conflict do nothing;
 
-  insert into public.profiles (id, name, genre, city, specialties, bio, vip, verified)
+  insert into public.profiles (id, name, genre, city, specialties, bio, phone, vip, verified)
   values (uid, 'Test Profil', 'fille', 'Paris', array['Massage','Dîner'],
-    'Profil de test (compte fictif).', false, false)
+    'Profil de test (compte fictif).', '06 39 98 00 00', false, false)
   on conflict (id) do nothing;
 end $$;
 

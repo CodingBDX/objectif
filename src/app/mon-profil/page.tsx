@@ -123,6 +123,7 @@ export default function MyProfile() {
     if (!genre) { setMsg({ t: tr("Choisis ton profil (obligatoire).") }); return; }
     if (kind === "livecam" && !/^https?:\/\//.test(vlink)) { setMsg({ t: tr("Indique le lien de ton live (https://…).") }); return; }
     if (kind !== "livecam") { const bad = (await Promise.all(more.filter(Boolean).map(async (c) => ((await tooFar(f.city, c, maxKm)) ? c : "")))).find(Boolean); if (bad) { setFarMsg(bad); setMsg({ t: tr("{c} est trop loin de ta ville principale (plus de {n} km).", { c: bad, n: maxKm }) }); return; } }
+    if (f.phone.replace(/\D/g, "").length < 8) { setMsg({ t: tr("Indique ton numéro de téléphone (obligatoire).") }); return; }
     if (photos.length < 3) { setMsg({ t: tr("Ajoute au moins 3 photos.") }); return; }
     const nAge = Number(age); if (!nAge || nAge < 18 || nAge > 99) { setMsg({ t: tr("Indique ton âge (18 ans minimum) dans l’encart Description.") }); document.getElementById("descr")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     if (!h24 && !Object.values(hours).some((h) => h && h[0] && h[1])) { setMsg({ t: tr("Indique tes disponibilités (obligatoire) : coche « 24h/24, 7j/7 » ou au moins un jour avec ses horaires.") }); document.getElementById("dispo")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
@@ -230,7 +231,7 @@ export default function MyProfile() {
                 <input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" aria-label={tr("Prix")} value={r.p} disabled={!canRate} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, p: e.target.value } : x)))} />
                 <button type="button" className="rrm" disabled={!canRate} aria-label={tr("Retirer ce tarif")} title={tr("Retirer ce tarif")} onClick={() => setRates(rates.filter((_, j) => j !== i))}>✕</button></div>)}
                 {canRate && rates.length < 8 && <button type="button" className="btn ghost" onClick={() => setRates([...rates, { d: RATE_OPTS.find((o) => !rates.some((r) => r.d === o[0]))?.[0] || "1h", p: "" }])}>{tr("+ Ajouter un tarif")}</button>}</div>{canRate && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
-            <label className="f">{isLive ? tr("Numéro WhatsApp (optionnel)") : tr("Numéro de téléphone (optionnel)")}<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
+            <label className="f">{isLive ? tr("Numéro WhatsApp (obligatoire)") : tr("Numéro de téléphone (obligatoire)")}<input type="tel" required inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
             {isLive && <div className="f"><span style={L}>{tr("Paiement (optionnel)")}</span><div className="row2">
               <input maxLength={80} placeholder={tr("Wero : numéro ou e-mail")} aria-label={tr("Wero : numéro ou e-mail")} value={wero} onChange={(e) => setWero(e.target.value)} />
               <input maxLength={80} placeholder={tr("PayPal : lien paypal.me ou e-mail")} aria-label={tr("PayPal : lien paypal.me ou e-mail")} value={paypal} onChange={(e) => setPaypal(e.target.value)} /></div></div>}
