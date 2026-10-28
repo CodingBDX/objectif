@@ -15,6 +15,8 @@ export default function VerifRequest({ uid, verified }: { uid: string; verified:
     if (!f) return; setMsg("");
     if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { setMsg(tr("Choisis une photo (JPG, PNG ou WebP).")); return; }
     if (f.size > 8 * 1024 * 1024) { setMsg(tr("8 Mo maximum.")); return; }
+    if (f.lastModified && Date.now() - f.lastModified > 48 * 36e5) { setMsg(tr("Cette photo date de plus de 2 jours. Prends-en une nouvelle, aujourd’hui, avec le papier daté.")); return; }
+    try { const bmp = await createImageBitmap(f); const ok = Math.min(bmp.width, bmp.height) >= 600; bmp.close(); if (!ok) { setMsg(tr("Photo trop petite : prends-la en meilleure qualité (600 px minimum).")); return; } } catch { setMsg(tr("Image illisible, essaie une autre photo.")); return; }
     setBusy(true);
     const sb = await sbLazy(); const path = `${uid}/${Date.now()}.${f.type === "image/png" ? "png" : f.type === "image/webp" ? "webp" : "jpg"}`;
     const up = await sb.storage.from("verif").upload(path, f, { contentType: f.type });

@@ -19,7 +19,7 @@ export default function Admin() {
   const [state, setState] = useState<"load" | "no" | "ok">("load");
   const [tab, setTab] = useState<Tab>("dash");
   const [reports, setReports] = useState<any[]>([]); const [profiles, setProfiles] = useState<any[]>([]); const [messages, setMessages] = useState<any[]>([]);
-  const [verifs, setVerifs] = useState<any[]>([]);
+  const [verifs, setVerifs] = useState<any[]>([]); const [ai, setAi] = useState<Record<string, any>>({});
   const [lodgs, setLodgs] = useState<any[]>([]); const [lAddr, setLAddr] = useState<Record<string, string>>({});
   const [vipEnd, setVipEnd] = useState<Record<string, { until: string; paused_at: string | null }>>({});
   const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
@@ -134,6 +134,11 @@ export default function Admin() {
     ...messages.slice(0, 8).map((m) => ({ t: m.created_at, i: "✉️", title: "Message de contact", sub: m.subject })),
     ...profiles.slice(0, 8).map((p) => ({ t: p.created_at, i: "👤", title: "Nouveau profil", sub: `${p.name} · ${p.city}` })),
   ].sort((a, b) => +new Date(b.t) - +new Date(a.t)).slice(0, 8);
+  async function analyse(x: any) {
+    setAi((a) => ({ ...a, [x.profile_id]: { wait: true } }));
+    try { const r = await fetch("/api/verif-ai", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ path: x.path }) }); const j = await r.json(); setAi((a) => ({ ...a, [x.profile_id]: r.ok ? j : { error: j.error || "Erreur" } })); }
+    catch { setAi((a) => ({ ...a, [x.profile_id]: { error: "Erreur réseau" } })); }
+  }
   async function decideVerif(x: any, ok: boolean) {
     setErr(""); const { error } = await sb.rpc("admin_decide_verif", { p_id: x.profile_id, p_ok: ok, p_note: ok ? "" : (rej["v" + x.profile_id] || "") });
     if (error) { setErr(error.message); return; }
@@ -275,12 +280,19 @@ export default function Admin() {
         </div>)}
 
         {tab === "verifs" && (<div style={{ display: "grid", gap: 10 }}>
-          <p className="note" style={{ margin: 0 }}>Vérifie que la personne tient un papier avec « sex-escorte.com » et la date du jour, visage visible, et qu’elle ressemble aux photos du profil. La photo est supprimée dès ta décision.</p>
+          <p className="note" style={{ margin: 0 }}>Vérifie que la personne tient un papier avec « sex-escorte.com » et la date du jour, visage visible, et qu’elle ressemble aux photos du profil. La photo est supprimée dès ta décision. La pré-analyse est une aide : la décision reste la tienne (elle envoie la photo à l’IA, uniquement quand tu cliques).</p>
           {verifs.length === 0 && <p className="note">Aucune demande en attente.</p>}
           {verifs.map((x) => (
             <div className="dcard" key={x.profile_id} style={{ display: "grid", gap: 8 }}>
               <div><Link href={`/profil/${x.profile_id}`}><b>{x.profiles?.name || "?"}</b></Link> · {x.profiles?.city} · <span className="note">{ago(x.created_at)}</span></div>
               {x.url ? <a href={x.url} target="_blank" rel="noopener noreferrer"><img src={x.url} alt="" style={{ maxWidth: "100%", maxHeight: 420, borderRadius: 12, objectFit: "contain" }} /></a> : <p className="note">Photo introuvable.</p>}
+              {(Date.now() - new Date(x.created_at).getTime() > 48 * 36e5) && <div className="note" style={{ color: "var(--btn)", fontWeight: 700 }}>⏰ En attente depuis plus de 48 h : à traiter en priorité.</div>}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <button type="button" className="btn ghost" disabled={!!ai[x.profile_id]?.wait} onClick={() => analyse(x)}>{ai[x.profile_id]?.wait ? "Analyse…" : "🤖 Pré-analyse"}</button>
+                {ai[x.profile_id]?.error && <span className="note" style={{ color: "var(--btn)" }}>{ai[x.profile_id].error}</span>}
+                {ai[x.profile_id] && !ai[x.profile_id].wait && !ai[x.profile_id].error && (() => { const a = ai[x.profile_id]; const ok = a.papier && a.site && a.date && a.visage && !a.doute; return <span style={{ fontWeight: 700 }}>{ok ? "✅ Conforme" : "⚠️ À regarder de près"} · {a.papier ? "✔" : "✘"} papier · {a.site ? "✔" : "✘"} sex-escorte.com · {a.date ? "✔" : "✘"} date · {a.visage ? "✔" : "✘"} visage{a.doute ? " · ⚠ doute" : ""}</span>; })()}
+              </div>
+              {ai[x.profile_id]?.resume && <div className="note">Lu sur le papier : {ai[x.profile_id].resume}</div>}
               <input placeholder="Motif du refus (facultatif)" maxLength={300} value={rej["v" + x.profile_id] || ""} onChange={(e) => setRej((r) => ({ ...r, ["v" + x.profile_id]: e.target.value }))} />
               <div className="acts"><button className="btn" onClick={() => decideVerif(x, true)}>✓ Vérifier le profil</button><button className="btn ghost" onClick={() => decideVerif(x, false)}>✕ Refuser</button></div>
             </div>))}

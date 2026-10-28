@@ -51,3 +51,15 @@ end $$;
 
 revoke all on function public.submit_verif(text), public.admin_decide_verif(uuid, boolean, text) from public, anon;
 grant execute on function public.submit_verif(text), public.admin_decide_verif(uuid, boolean, text) to authenticated;
+
+-- Garde-fou : on ne peut pas renvoyer une photo en boucle (1 envoi toutes les 2 minutes max)
+create or replace function public.submit_verif(p_path text) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null or not exists (select 1 from public.profiles where id = auth.uid()) then raise exception 'Réservé aux profils'; end if;
+  if p_path is null or split_part(p_path, '/', 1) <> auth.uid()::text then raise exception 'Fichier invalide'; end if;
+  if exists (select 1 from public.verif_requests where profile_id = auth.uid() and created_at > now() - interval '2 minutes') then raise exception 'Patiente un instant avant de renvoyer une photo.'; end if;
+  insert into public.verif_requests (profile_id, path, status, note, created_at, decided_at)
+  values (auth.uid(), p_path, 'pending', '', now(), null)
+  on conflict (profile_id) do update set path = excluded.path, status = 'pending', note = '', created_at = now(), decided_at = null;
+end $$;
