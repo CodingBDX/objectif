@@ -2,6 +2,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import VipPrices from "@/components/VipPrices";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 function Form() {
@@ -19,6 +20,7 @@ function Form() {
         <div className="panel regp">
           <h1 style={{ font: "700 clamp(28px,5vw,38px)/1.1 var(--fd)", color: "var(--pink)", margin: "0 0 6px" }}>Nous contacter</h1>
           <p className="note" style={{ margin: "0 0 16px" }}>Une question, un profil à signaler, une demande de vérification ou de VIP ? Écris-nous.</p>
+          {vip && !done && <div style={{ margin: "0 0 16px" }}><b>👑 VIP</b><VipPrices pay /></div>}
           {done ? <p className="note" role="status"><b>Message envoyé, merci !</b> Nous te répondons dès que possible.</p> : (
             <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={send}>
               <div className="row2"><label className="f">Nom<input name="n" required maxLength={60} autoComplete="name" /></label>

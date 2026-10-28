@@ -872,3 +872,11 @@ h1.pbn{margin:0}
 .rrow select,.rrow input{min-width:0;width:100%}
 .rrm{border:0;border-radius:50%;width:44px;height:44px;background:var(--soft);color:var(--btn);font-weight:700;cursor:pointer}
 .panel.pi .rates{margin:0 0 12px}
+
+/* Prix VIP */
+.vipp ul{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.vipp li{display:inline-flex;gap:8px;align-items:center;background:var(--soft);border-radius:999px;padding:6px 14px;font-weight:600}
+.vipp li b{font:700 16px var(--fd);color:var(--btn)}
+.vipp .note{margin:8px 0 0}
+.vipadm{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center}
+.vipadm .btn{padding:4px 10px;min-height:0}

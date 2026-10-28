@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
-import { cap, CATS, isNew, Profile, showTarif } from "@/lib/types";
+import { cap, CATS, isNew, Profile, showTarif, rateList, RATE_OPTS } from "@/lib/types";
 import { publicSpecialties } from "@/lib/public";
 import { avail, DAYL, dShort, MS, nextOpen, nowP, todayP, tripsOf } from "@/lib/avail";
 import Ic from "@/components/Ic";
