@@ -46,6 +46,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
             {hasProfile && vip && <PauseBtn id={userId} paused={!!paused} />}
             {hasProfile && <Link className={`nl${path === "/verifier" ? " on" : ""}`} href="/verifier" title={tr("Vérifier un client")}>🛡️ <span className="nlt">{tr("Vérifier un client")}</span></Link>}
             {hasProfile && <Link className={`nl own${path === "/mon-profil" ? " on" : ""}`} href="/mon-profil" title={tr("Modifier mon profil")}>✏️ <span className="nlt">{tr("Modifier mon profil")}</span></Link>}
+            {hasProfile && <Link className={`nl own${path === "/mon-logement" ? " on" : ""}`} href="/mon-logement" title={tr("Mon logement")}>🏠 <span className="nlt">{tr("Mon logement")}</span></Link>}
             {hasProfile && <Link className="nl own" href="/mon-profil#stats" title={tr("Mes statistiques")}>📊 <span className="nlt">{tr("Mes statistiques")}</span></Link>}
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"}>{tr("Mon profil")}</Link>
             <button className="nl" onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}>👤 {name || tr("Moi")} · {tr("Quitter")}</button>
