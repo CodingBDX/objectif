@@ -26,7 +26,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       <div className="pbar"><Link className="btn ghost" href="/logements"><Tr k="← Tous les logements" /></Link><h1 className="pbn">{l.title}</h1></div>
       <div className="pfc"><div className="pgrid"><div className="pmain">
         {l.status !== "approved" && mine && <p className="note" role="status"><b><Tr k="⏳ Aperçu : ton logement n’est pas encore visible par les autres." /></b></p>}
-        <Slider imgs={l.photos || []} vip={true} />
+        <Slider imgs={l.photos || []} vip={true} alt={l.title} />
         <div className="panel pi">
           <div className="rates" aria-label="Prix">{l.price_day ? <span><Ic n="rose" s={18} /><Tr k="Jour" /> <b>{l.price_day}</b></span> : null}{l.price_week ? <span><Ic n="rose" s={18} /><Tr k="Semaine" /> <b>{l.price_week}</b></span> : null}{l.price_month ? <span><Ic n="rose" s={18} /><Tr k="Mois" /> <b>{l.price_month}</b></span> : null}</div>
           <p className="note" style={{ margin: "0 0 10px" }}>📍 {l.city}{l.area ? ` · ${l.area}` : ""}</p>

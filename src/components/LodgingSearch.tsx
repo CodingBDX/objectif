@@ -38,7 +38,7 @@ export default function LodgingSearch({ items, strip }: { items: LItem[]; strip?
       {strip && list.length > 0 ? null : list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ne correspond pour le moment.")}</p> :
         <div className="lgrid">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lcard">
-            {l.photo ? <img src={l.photo} alt="" loading="lazy" /> : <span className="lph" />}
+            {l.photo ? <img src={l.photo} alt={l.title} width={640} height={420} loading="lazy" decoding="async" /> : <span className="lph" />}
             <div className="lbody"><b>{l.title}</b><span className="note">📍 {l.city}{l.area ? ` · ${l.area}` : ""}</span>
               <span className="rates">{l.day ? <span>{tr("Jour")} <b>{l.day}</b></span> : null}{l.week ? <span>{tr("Semaine")} <b>{l.week}</b></span> : null}{l.month ? <span>{tr("Mois")} <b>{l.month}</b></span> : null}</span>
               <small className="note">{l.owner}</small></div></Link>))}</div>}

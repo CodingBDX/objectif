@@ -1,9 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { thumbUrl } from "@/lib/img";
+
+/** Si la miniature n'existe pas (anciennes photos), on retombe sur l'image d'origine. */
+const fb = (src: string) => (e: React.SyntheticEvent<HTMLImageElement>) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.removeAttribute("srcset"); el.src = src; } };
 
 type Item = { v: boolean; src: string };
 /** Photos du profil ; la vidéo (si elle existe) est la première diapositive. Un clic agrandit la photo ou lance la vidéo en grand. */
-export default function Slider({ imgs, vip, video }: { imgs: string[]; vip: boolean; video?: string | null }) {
+export default function Slider({ imgs, vip, video, alt }: { imgs: string[]; vip: boolean; video?: string | null; alt?: string }) {
   const [i, setI] = useState(0); const [stop, setStop] = useState(false); const [lb, setLb] = useState(false); const [vbad, setVbad] = useState(false);
   const hov = useRef(false); const tx = useRef<number | null>(null);
   const items: Item[] = [...(video ? [{ v: true, src: video }] : []), ...imgs.map((src) => ({ v: false, src }))]; const N = items.length;
@@ -22,13 +26,15 @@ export default function Slider({ imgs, vip, video }: { imgs: string[]; vip: bool
           {vip && <span className="vipb">👑 VIP</span>}
           {items.map((it, k) => it.v
             ? <button key={k} className={`slide vslide${k === i ? " on" : ""}`} aria-label="Agrandir et lire la vidéo" onClick={() => setLb(true)}><video muted playsInline preload="metadata" src={it.src + "#t=0.1"} /><span className="vplay" aria-hidden="true">▶</span></button>
-            : <button key={k} className={`slide${k === i ? " on" : ""}`} style={{ backgroundImage: `url('${it.src}')` }} aria-label={`Agrandir la photo ${video ? k : k + 1}`} onClick={() => setLb(true)} />)}
+            : <button key={k} className={`slide${k === i ? " on" : ""}`} aria-label={`Agrandir la photo ${video ? k : k + 1}`} onClick={() => setLb(true)}>
+              <img src={it.src} srcSet={thumbUrl(it.src) !== it.src ? `${thumbUrl(it.src)} 640w, ${it.src} 1600w` : undefined} sizes="(max-width: 700px) 100vw, 800px" alt={alt ? `${alt}${imgs.length > 1 ? ` (${video ? k : k + 1})` : ""}` : ""} width={1600} height={900}
+                loading={k === 0 ? "eager" : "lazy"} fetchPriority={k === 0 ? "high" : "auto"} decoding="async" onError={fb(it.src)} /></button>)}
           {N > 1 && <><button className="nv prev" aria-label="Précédent" onClick={() => go(-1, true)}>‹</button><button className="nv next" aria-label="Suivant" onClick={() => go(1, true)}>›</button></>}
           <div className="pc">{i + 1} / {N}</div>
         </div>
         <div className="thumbs">{items.map((it, k) => it.v
           ? <button key={k} className={`th vth${k === i ? " on" : ""}`} aria-label="Voir la vidéo" onClick={() => { setI(k); setStop(true); }}><video muted playsInline preload="metadata" src={it.src + "#t=0.1"} /><span aria-hidden="true">▶</span></button>
-          : <button key={k} className={`th${k === i ? " on" : ""}`} style={{ backgroundImage: `url('${it.src}')` }} aria-label={`Voir la photo ${video ? k : k + 1}`} onClick={() => { setI(k); setStop(true); }} />)}</div>
+          : <button key={k} className={`th${k === i ? " on" : ""}`} aria-label={`Voir la photo ${video ? k : k + 1}`} onClick={() => { setI(k); setStop(true); }}><img src={thumbUrl(it.src)} alt="" width={88} height={58} loading="lazy" decoding="async" onError={fb(it.src)} /></button>)}</div>
       </div>
       {lb && (
         <dialog id="lb" open style={{ position: "fixed", inset: 0, margin: "auto", zIndex: 60 }} onClick={() => setLb(false)}>

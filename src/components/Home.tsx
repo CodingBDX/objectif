@@ -25,8 +25,8 @@ const isoIn = (n: number) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europ
 const visitOf = (p: Profile, city: string, n: number) => { const t = todayP(), lim = isoIn(n); return tripsOf(p).find((x) => slug(x.city) === slug(city) && x.from <= lim && x.to >= t); };
 const ITEMS: [string, string, string][] = [["tous", "Tous les profils", "grid"], ["fille", "Filles", "fille"], ["homme", "Hommes", "homme"], ["trans", "Trans", "trans"], ["livecam", "Livecam", "live"]];
 
-function Tile({ u }: { u: string }) {
-  return <div>{u && <img src={thumbUrl(u)} alt="" loading="lazy" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = u; } }} />}</div>;
+function Tile({ u, alt = "" }: { u: string; alt?: string }) {
+  return <div>{u && <img src={thumbUrl(u)} alt={alt} width={640} height={550} loading="lazy" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = u; } }} />}</div>;
 }
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
   const { tr } = useT();
@@ -38,7 +38,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
       <div className="cover">
         <div className="tr"><span className="phb" title={tr("Nombre de photos")}><Ic n="camera" s={14} />{p.photos.length}</span>{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}</div>
         {isNew(p) && <span className="nwb" title={tr("Profil créé il y a moins d’un mois")}><Ic n="spark" s={14} />{tr("New")}</span>}
-        <div className="mos">{pics.map((u, i) => <Tile key={i} u={u} />)}</div>
+        <div className="mos">{pics.map((u, i) => <Tile key={i} u={u} alt={i === 0 ? `${p.name}${live ? "" : ", " + p.city}` : ""} />)}</div>
         {a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? tr("En direct") : tr("Dispo")}</span>}
         {lab(p) && <span className={`badge${live ? " live" : ""}`}>{lab(p)}</span>}
         {p.video && <span className="vid-ic"><Ic n="video" s={14} />{tr("vidéo")}</span>}
