@@ -30,7 +30,7 @@ export default function MyProfile() {
   const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [specList, setSpecList] = useState<string[]>(SPECIALTIES); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [verif, setVerif] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
-  const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
+  const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [mphone, setMphone] = useState(""); const [hasPhone, setHasPhone] = useState(true); const [vlink, setVlink] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [farMsg, setFarMsg] = useState(""); const [wero, setWero] = useState(""); const [paypal, setPaypal] = useState("");
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
@@ -42,8 +42,8 @@ export default function MyProfile() {
     const sl = await sb.from("specialties").select("name").order("position").order("name");
     const SL: string[] = !sl.error && sl.data?.length ? sl.data.map((r: { name: string }) => r.name) : SPECIALTIES; setSpecList(SL);
     const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
-    const { data: mem } = await sb.from("members").select("pseudo").eq("id", user.id).maybeSingle();
-    if (mem) { setIsMember(true); setPseudo(mem.pseudo); }
+    const { data: mem } = await sb.from("members").select("pseudo,phone_hash").eq("id", user.id).maybeSingle();
+    if (mem) { setIsMember(true); setPseudo(mem.pseudo); setHasPhone(!!mem.phone_hash); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
       setRecv(!!data.receives); setTrav(!!data.travels);
@@ -144,7 +144,8 @@ export default function MyProfile() {
   }
   async function saveMember(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null);
-    const { error } = await sb.from("members").insert({ id: uid, pseudo: pseudo.trim() });
+    if (mphone.replace(/\D/g, "").length < 8) { setBusy(false); setMsg({ t: tr("Indique ton numéro de téléphone (obligatoire).") }); return; }
+    const { error } = isMember ? await sb.rpc("set_member_phone", { p_phone: mphone }) : await sb.rpc("register_member", { p_pseudo: pseudo.trim(), p_phone: mphone });
     setBusy(false); if (error) setMsg({ t: error.message }); else location.href = "/";
   }
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });
@@ -176,6 +177,12 @@ export default function MyProfile() {
           {!isNewP && <div className="acts dacts">
             <button type="button" className="btn ghost" onClick={async () => { window.dispatchEvent(new CustomEvent("hp-pause", { detail: !paused })); await sb.from("profiles").update({ paused: !paused }).eq("id", uid); setPaused(!paused); await refreshListings(); }}>{paused ? tr("▶ Réactiver mon annonce") : tr("⏸ Mettre mon annonce en pause")}</button>
             <Link className="btn ghost" href={`/profil/${uid}`}>{tr("Voir mon profil")}</Link></div>}
+          {isMember && !hasPhone && (<form onSubmit={saveMember}><fieldset className="fs">
+            <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{tr("Pour continuer à commenter, ajoute ton numéro de téléphone.")}</p>
+            <label className="f">{tr("Numéro de téléphone (obligatoire)")}<input type="tel" inputMode="tel" required maxLength={20} placeholder="06 12 34 56 78" value={mphone} onChange={(e) => setMphone(e.target.value)} autoComplete="tel" /></label>
+            {msg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
+            <button className="btn" type="submit" disabled={busy}>{tr("Enregistrer mon numéro")}</button>
+          </fieldset></form>)}
           {isNewP && (<>
             <p className="note">{tr("Choisis le type de profil qui te correspond.")}</p>
             <div className="kinds" role="radiogroup" aria-label={tr("Type de profil")}>
@@ -189,6 +196,8 @@ export default function MyProfile() {
           {kind === "membre" && (
             <form onSubmit={saveMember}><fieldset className="fs">
               <label className="f">{tr("Pseudo")}<input value={pseudo} onChange={(e) => setPseudo(e.target.value)} required minLength={2} maxLength={30} autoComplete="nickname" /></label>
+              <label className="f">{tr("Numéro de téléphone (obligatoire)")}<input type="tel" inputMode="tel" required maxLength={20} placeholder="06 12 34 56 78" value={mphone} onChange={(e) => setMphone(e.target.value)} autoComplete="tel" /></label>
+              <p className="note">{tr("Ton numéro n’est jamais affiché ni enregistré en clair. Si un profil a signalé ce numéro, tes commentaires sont marqués en rouge.")}</p>
               <label className="chk"><input type="checkbox" required /> <span>{tr("Je suis majeur·e et je m’engage à rester respectueux·se (pas de propos haineux ni à caractère sexuel).")}</span></label>
               <p className="note">{tr("Un profil membre ne peut pas publier de photos ni de vidéos : seulement des commentaires.")}</p>
               {msg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}

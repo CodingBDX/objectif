@@ -990,3 +990,9 @@ h1.pbn{margin:0}
 .rjn{animation:rjpop .5s cubic-bezier(.3,1.6,.5,1) both}.rjst li:nth-child(2) .rjn{animation-delay:.15s}.rjst li:nth-child(3) .rjn{animation-delay:.3s}
 .rjf .btn{animation:rjfloat 3s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.rjh>*,.rjh::before,.rjh::after,.rjc,.rjst li,.rjn,.rjf .btn,.rja .btn::after{animation:none!important}.rjc:hover{transform:none}}
+
+/* Commentaire d'un membre dont le numéro a été signalé */
+.cmi.flagged,.cmi.flagged.own,.cmi.flagged.reply{background:#ffe3e3;border-color:#e5484d;border-left:4px solid #e5484d;color:#7a1218}
+.cmflag{background:#e5484d;color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+:root[data-theme="dark"] .cmi.flagged{background:#3a1519;border-color:#ff6b70;color:#ffd9db}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cmi.flagged{background:#3a1519;border-color:#ff6b70;color:#ffd9db}}
