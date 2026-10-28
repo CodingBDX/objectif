@@ -8,7 +8,7 @@ export const COORDS: Record<string, [number, number]> = {
   "clermont-ferrand": [45.7772, 3.087], "le-mans": [48.0061, 0.1996], "aix-en-provence": [43.5297, 5.4474], brest: [48.3904, -4.4861], tours: [47.3941, 0.6848],
   amiens: [49.8941, 2.2958], limoges: [45.8336, 1.2611], annecy: [45.8992, 6.1294], perpignan: [42.6887, 2.8948], metz: [49.1193, 6.1757],
   besancon: [47.2378, 6.0241], orleans: [47.9029, 1.9093], rouen: [49.4432, 1.0993], mulhouse: [47.7508, 7.3359], caen: [49.1829, -0.3707],
-  nancy: [48.6921, 6.1844], avignon: [43.9493, 4.8055], "la-rochelle": [46.1603, -1.1511], ajaccio: [41.9192, 8.7386]
+  nancy: [48.6921, 6.1844], avignon: [43.9493, 4.8055], "la-rochelle": [46.1603, -1.1511], ajaccio: [41.9192, 8.7386], monaco: [43.7384, 7.4246]
 };
 export const km = (a: [number, number], b: [number, number]) => {
   const R = 6371, rad = (x: number) => (x * Math.PI) / 180, dLat = rad(b[0] - a[0]), dLon = rad(b[1] - a[1]);

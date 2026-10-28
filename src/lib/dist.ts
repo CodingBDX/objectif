@@ -3,7 +3,9 @@ const cache = new Map<string, Promise<[number, number] | null>>();
 export const MAX_KM_VIP = 100;
 export const MAX_KM_STD = 20;
 
+import { extraCity } from "./extraCities";
 export function cityCentre(name: string): Promise<[number, number] | null> {
+  const ex = extraCity(name); if (ex) return Promise.resolve([ex.lon, ex.lat]);
   const k = name.trim().toLowerCase();
   if (!cache.has(k)) {
     cache.set(k, (async () => {

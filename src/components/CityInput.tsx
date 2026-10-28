@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { extraMatches } from "@/lib/extraCities";
 
 type Commune = { nom: string; departement?: { code: string; nom: string } };
 const cache = new Map<string, Commune[]>();
@@ -22,7 +23,7 @@ export default function CityInput({ value, onChange, required, placeholder, labe
     const t = setTimeout(async () => {
       try {
         const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(q)}&fields=nom,departement&boost=population&limit=8`);
-        if (!r.ok) return; const j = (await r.json()) as Commune[];
+        if (!r.ok) return; const j = [...extraMatches(q).map((c) => ({ nom: c.nom, departement: { code: "MC", nom: "Principauté" } })), ...((await r.json()) as Commune[])];
         cache.set(q.toLowerCase(), j); if (id === seq.current) setList(j);
       } catch {}
     }, 250);

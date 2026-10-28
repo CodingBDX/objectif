@@ -1,5 +1,6 @@
 import { cap, cityList, Profile } from "./types";
 import { km } from "./geo";
+import { extraCity } from "./extraCities";
 
 type Com = { nom: string; population?: number; centre?: { coordinates: [number, number] } };
 const GEO = "https://geo.api.gouv.fr";
@@ -7,7 +8,8 @@ const get = async (u: string) => { try { const r = await fetch(u, { next: { reva
 
 /** Les 3 communes les plus proches (même département, ≥ 2 000 habitants), avec ou sans profil. API officielle, mise en cache 24 h. */
 export async function nearbyCommunes(city: string, n = 3): Promise<string[]> {
-  const me: Com[] | null = await get(`${GEO}/communes?nom=${encodeURIComponent(city)}&fields=nom,centre,codeDepartement&boost=population&limit=1`);
+  const ex = extraCity(city);
+  const me: Com[] | null = ex ? [{ nom: ex.nom, centre: { coordinates: [ex.lon, ex.lat] }, codeDepartement: ex.near } as Com] : await get(`${GEO}/communes?nom=${encodeURIComponent(city)}&fields=nom,centre,codeDepartement&boost=population&limit=1`);
   const m = me?.[0] as (Com & { codeDepartement?: string }) | undefined; if (!m?.centre || !m.codeDepartement) return [];
   const all: Com[] | null = await get(`${GEO}/communes?codeDepartement=${m.codeDepartement}&fields=nom,centre,population`);
   if (!all) return [];
@@ -36,6 +38,7 @@ export async function regionMap(profiles: Profile[]): Promise<Record<string, str
   const out: Record<string, string> = {};
   profiles = profiles.filter((p) => p.genre !== "livecam");
   profiles.forEach((p) => { if (p.region) out[p.city] = p.region; });
+  Array.from(new Set(profiles.map((p) => p.city))).forEach((c) => { const ex = extraCity(c); if (ex && !out[c]) out[c] = ex.region; });
   const missing = Array.from(new Set(profiles.map((p) => p.city))).filter((c) => !out[c]).slice(0, 40);
   await Promise.all(missing.map(async (c) => {
     try {
