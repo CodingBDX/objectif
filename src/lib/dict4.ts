@@ -107,4 +107,6 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Prête à rejoindre Sex-Escorte ?": ["Ready to join Sex-Escorte?", "¿Lista para unirte a Sex-Escorte?", "Pronta para te juntares ao Sex-Escorte?"],
   "L’inscription prend deux minutes.": ["Signing up takes two minutes.", "Registrarte lleva dos minutos.", "A inscrição demora dois minutos."],
   "Rejoindre": ["Join", "Unirse", "Aderir"],
+  "Villes proches avec des profils :": ["Nearby cities with profiles:", "Ciudades cercanas con perfiles:", "Cidades próximas com perfis:"],
+  "Tu es escort dans cette ville ?": ["Are you an escort in this city?", "¿Eres escort en esta ciudad?", "És escort nesta cidade?"],
 };
