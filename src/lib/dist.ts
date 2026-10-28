@@ -1,6 +1,7 @@
 /** Distance entre deux communes (API officielle, 1 petite requête par ville, mise en cache). */
 const cache = new Map<string, Promise<[number, number] | null>>();
-export const MAX_KM = 100;
+export const MAX_KM_VIP = 100;
+export const MAX_KM_STD = 20;
 
 export function cityCentre(name: string): Promise<[number, number] | null> {
   const k = name.trim().toLowerCase();
@@ -24,9 +25,9 @@ export function km(a: [number, number], b: [number, number]) {
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-/** true si la ville est à plus de MAX_KM de la ville de base (false si on ne peut pas savoir). */
-export async function tooFar(base: string, other: string) {
+/** true si la ville est à plus de `max` km de la ville de base (false si on ne peut pas savoir). */
+export async function tooFar(base: string, other: string, max: number) {
   if (!base || !other) return false;
   const [a, b] = await Promise.all([cityCentre(base), cityCentre(other)]);
-  return !!a && !!b && km(a, b) > MAX_KM;
+  return !!a && !!b && km(a, b) > max;
 }
