@@ -81,7 +81,11 @@ export default function Admin() {
     setLodgs(l.map((x: any) => ({ ...x, owner: nm.get(x.profile_id) }))); setLAddr(Object.fromEntries((ad || []).map((a: any) => [a.profile_id, a.address])));
   }, []);
   useEffect(() => { if (state === "ok") loadLodgs(); }, [state, loadLodgs]);
-  async function setLodg(id: string, status: string) { setErr(""); const { error } = await sb.rpc("admin_set_lodging", { p_id: id, p_status: status }); if (error) setErr(error.message); else loadLodgs(); }
+  async function setLodg(id: string, status: string) {
+    setErr(""); const { error } = await sb.rpc("admin_set_lodging", { p_id: id, p_status: status }); if (error) { setErr(error.message); return; }
+    loadLodgs();
+    if (status === "approved") { try { const r = await fetch("/api/alerte-logement", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) }); const j = await r.json(); if (!r.ok) setErr("Alertes non envoyées : " + (j.error || r.status)); else if (j.sent) setErr(`✉️ ${j.sent} alerte(s) e-mail envoyée(s).`); } catch { setErr("Alertes non envoyées (erreur réseau)."); } }
+  }
   async function giveVip(id: string, days: number) {
     setErr(""); const { error } = await sb.rpc("admin_set_vip", { p_id: id, p_days: days });
     if (error) setErr(error.message); else { loadProfiles(); loadCounts(); loadExtra(); }
