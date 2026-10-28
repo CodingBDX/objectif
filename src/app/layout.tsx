@@ -38,6 +38,9 @@ export default async function Root({ children }: { children: React.ReactNode }) 
     <html lang="fr" data-theme="light">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {process.env.NEXT_PUBLIC_SUPABASE_URL && <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} crossOrigin="anonymous" />}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" />
       </head>
       <body>
