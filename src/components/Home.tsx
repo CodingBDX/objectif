@@ -44,7 +44,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
         {p.video && <span className="vid-ic"><Ic n="video" s={14} />{tr("vidéo")}</span>}
       </div>
       <div className="in">
-        <div className="ln"><h3>{p.name}</h3>
+        <div className="ln"><h2>{p.name}</h2>
           {p.verified && <span className="vf" role="img" aria-label={tr("Profil vérifié")} title={tr("Profil vérifié")}><Ic n="check" s={12} /></span>}
           <Heart id={p.id} /></div>
         <div className="meta"><Ic n="pin" s={15} />{live ? tr("En ligne") : p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>
