@@ -36,6 +36,7 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Cette photo date de plus de 2 jours. Prends-en une nouvelle, aujourd’hui, avec le papier daté.": ["This photo is more than 2 days old. Take a new one today with the dated paper.", "Esta foto tiene más de 2 días. Haz una nueva hoy con el papel fechado.", "Esta foto tem mais de 2 dias. Tira uma nova hoje com o papel datado."],
   "Photo trop petite : prends-la en meilleure qualité (600 px minimum).": ["Photo too small: take it in better quality (600 px minimum).", "Foto demasiado pequeña: hazla con mejor calidad (mínimo 600 px).", "Foto demasiado pequena: tira-a com melhor qualidade (mínimo 600 px)."],
   "Image illisible, essaie une autre photo.": ["Unreadable image, try another photo.", "Imagen ilegible, prueba con otra foto.", "Imagem ilegível, tenta outra foto."],
+  "Pseudonyme": ["Alias", "Seudónimo", "Pseudónimo"],
   "Numéro WhatsApp (obligatoire)": ["WhatsApp number (required)", "Número de WhatsApp (obligatorio)", "Número de WhatsApp (obrigatório)"],
   "Numéro de téléphone (obligatoire)": ["Phone number (required)", "Número de teléfono (obligatorio)", "Número de telefone (obrigatório)"],
   "Indique ton numéro de téléphone (obligatoire).": ["Enter your phone number (required).", "Indica tu número de teléfono (obligatorio).", "Indica o teu número de telefone (obrigatório)."],

@@ -198,7 +198,7 @@ export default function MyProfile() {
             {kind === "livecam" && <p className="note">{tr("Pas de ville pour un profil livecam : ton profil apparaît uniquement dans la section Livecam.")}</p>}
             {kind === "livecam" && <p className="note">{tr("Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).")}</p>}
 <section className="dcard"><h3>{tr("Qui es-tu ?")}</h3><div className="row2">
-              <label className="f">{tr("Nom ou nom de studio")}<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
+              <label className="f">{tr("Pseudonyme")}<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
             </div>
             <div className="f"><span style={L}>{tr("Spécialités (jusqu’à {n})", { n: maxS })}{!vip && tr(" · 30 en VIP")} <span style={{ fontWeight: 600 }}>{spec.length}/{maxS}</span></span>
               <div className="bub" role="group">{specList.map((s) => { const on = spec.includes(s);
