@@ -10,7 +10,6 @@ import RichEditor from "@/components/RichEditor";
 import { refreshListings } from "@/app/actions";
 import { useT } from "@/lib/i18n";
 import { tooFar, MAX_KM_VIP, MAX_KM_STD } from "@/lib/dist";
-import { LIVE_CITY } from "@/lib/types";
 import VipPrices from "@/components/VipPrices";
 import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 
@@ -29,7 +28,7 @@ export default function MyProfile() {
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
-  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [farMsg, setFarMsg] = useState(""); const [wero, setWero] = useState(""); const [paypal, setPaypal] = useState("");
+  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [farMsg, setFarMsg] = useState("");
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
@@ -48,7 +47,7 @@ export default function MyProfile() {
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
       setBio(data.bio); setVip(!!data.vip); setMore([...(data.more || []), "", "", "", "", "", ""].slice(0, data.vip ? 6 : 3)); setSpec((data.specialties || []).filter((x: string) => SL.includes(x))); setPhotos(data.photos); setVideo(data.video);
-      setWero(data.pay_wero || ""); setPaypal(data.pay_paypal || ""); setRates(rateList(data).map((r) => ({ d: r.d, p: String(r.p) }))); setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
+      setRates(rateList(data).map((r) => ({ d: r.d, p: String(r.p) }))); setTshow(data.tarif_visible !== false); setT30(data.tarif_30 ? String(data.tarif_30) : ""); setT60(data.tarif_60 ? String(data.tarif_60) : ""); setH24(data.h24); setHours(data.hours || {}); setPaused(data.paused);
       setTrips([...(data.trips || []), { city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }].slice(0, Math.max(3, (data.trips || []).length)));
       if (new URLSearchParams(location.search).get("reactiver")) { await sb.from("profiles").update({ paused: false }).eq("id", user.id); setPaused(false); window.dispatchEvent(new CustomEvent("hp-pause", { detail: false })); await refreshListings(); }
     }
@@ -113,7 +112,7 @@ export default function MyProfile() {
       await sb.auth.signOut(); location.href = "/";
     } catch (e: any) { setDelMsg(tr("Suppression impossible : {e}. Écris-nous via la page Contact.", { e: e?.message || tr("réessaie") })); setDelBusy(false); }
   }
-  const isLive = kind === "livecam"; const canRate = vip || isLive; const socOk = vip || isLive; const maxKm = vip ? MAX_KM_VIP : MAX_KM_STD; const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3; const maxS = vip ? 30 : 5;
+  const maxKm = vip ? MAX_KM_VIP : MAX_KM_STD; const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3; const maxS = vip ? 30 : 5;
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
 
   async function save(e: React.FormEvent) {
@@ -126,13 +125,13 @@ export default function MyProfile() {
     const nAge = Number(age); if (!nAge || nAge < 18 || nAge > 99) { setMsg({ t: tr("Indique ton âge (18 ans minimum) dans l’encart Description.") }); document.getElementById("descr")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     if (!h24 && !Object.values(hours).some((h) => h && h[0] && h[1])) { setMsg({ t: tr("Indique tes disponibilités (obligatoire) : coche « 24h/24, 7j/7 » ou au moins un jour avec ses horaires.") }); document.getElementById("dispo")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     setBusy(true);
-    let region: string | null | undefined = isLive ? null : undefined;
-    if (!isLive) try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
+    let region: string | null | undefined;
+    try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
     const num = (v: string, a: number, b: number) => { const n = Math.round(Number(v)); return v && n >= a && n <= b ? n : null; };
     const cleanRates = rates.map((r) => ({ d: r.d, p: Math.max(0, Math.min(10000, Math.round(Number(r.p)))) })).filter((r) => r.p > 0 && RATE_OPTS.some((o) => o[0] === r.d)).filter((r, i, a) => a.findIndex((x) => x.d === r.d) === i).slice(0, 8);
-    const row = { ...(region !== undefined ? { region } : {}), age: nAge, receives: isLive ? false : recv, travels: isLive ? false : trav, pay_wero: isLive ? wero.trim().slice(0, 80) || null : null, pay_paypal: isLive ? paypal.trim().slice(0, 80) || null : null, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: isLive ? LIVE_CITY : f.city, bio, more: isLive ? [] : more.map((x) => x.trim()).filter(Boolean),
+    const row = { ...(region !== undefined ? { region } : {}), age: nAge, receives: recv, travels: trav, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: f.city, bio, more: more.map((x) => x.trim()).filter(Boolean),
       phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
-      tarif_visible: tshow, rates: canRate ? cleanRates : [], tarif_30: canRate ? (cleanRates.find((r) => r.d === "30min")?.p ?? null) : t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: canRate ? (cleanRates.find((r) => r.d === "1h")?.p ?? null) : t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: isLive ? [] : trips.filter((t) => t.city && t.from), paused };
+      tarif_visible: tshow, rates: vip ? cleanRates : [], tarif_30: vip ? (cleanRates.find((r) => r.d === "30min")?.p ?? null) : t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: vip ? (cleanRates.find((r) => r.d === "1h")?.p ?? null) : t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: trips.filter((t) => t.city && t.from), paused };
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     if (!error) await refreshListings();
     setBusy(false);
@@ -189,7 +188,6 @@ export default function MyProfile() {
               <button className="btn" type="submit" disabled={busy}>{tr("Créer mon profil membre")}</button>
             </fieldset></form>)}
           {(kind === "createur" || kind === "livecam") && <form onSubmit={save}><fieldset className="fs dform">
-            {kind === "livecam" && <p className="note">{tr("Pas de ville pour un profil livecam : ton profil apparaît uniquement dans la section Livecam.")}</p>}
             {kind === "livecam" && <p className="note">{tr("Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).")}</p>}
 <section className="dcard"><h3>{tr("Qui es-tu ?")}</h3><div className="row2">
               <label className="f">{tr("Nom ou nom de studio")}<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
@@ -197,7 +195,7 @@ export default function MyProfile() {
             <div className="f"><span style={L}>{tr("Spécialités (jusqu’à {n})", { n: maxS })}{!vip && tr(" · 30 en VIP")} <span style={{ fontWeight: 600 }}>{spec.length}/{maxS}</span></span>
               <div className="bub" role="group">{specList.map((s) => { const on = spec.includes(s);
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < maxS ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
-</section>{!isLive && <section className="dcard"><h3>{tr("Où te trouver ?")}</h3><div className="f"><span style={L}>{tr("Ville (tape les premières lettres)")}</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div>
+</section><section className="dcard"><h3>{tr("Où te trouver ?")}</h3><div className="f"><span style={L}>{tr("Ville (tape les premières lettres)")}</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div>
             <div className="f"><span style={L}>{tr("Villes supplémentaires (jusqu’à {n}, optionnel)", { n: maxM })}{!vip && tr(" · 6 en VIP")}</span>
               <div className="row3">{more.slice(0, maxM).map((m, i) => <CityInput key={i} value={m} placeholder={tr("Ville {n}", { n: i + 2 })} label={tr("Ville supplémentaire {n}", { n: i + 1 })} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} onPick={async (v) => { if (kind !== "livecam" && (await tooFar(f.city, v, maxKm))) { setMore((cur) => cur.map((x, j) => (j === i ? "" : x))); setFarMsg(v); } else setFarMsg(""); }} />)}</div>{farMsg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: "6px 0 0" }}>{tr("{c} est à plus de {n} km de ta ville principale : ce n’est pas possible. Si tu te déplaces partout en France ou travailles à distance, tu es probablement un profil livecam : choisis la section « Profil livecam ».", { c: farMsg, n: maxKm })}</p>}</div>
             <div className="f"><span style={L}>{tr("Prochains déplacements (calendrier, optionnel)")}</span>
@@ -206,7 +204,7 @@ export default function MyProfile() {
                 <label className="tdate"><small>{tr("Du")}</small><input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={tr("Du (déplacement {n})", { n: i + 1 })} /></label>
                 <label className="tdate"><small>{tr("Au")}</small><input type="date" value={t.to} min={t.from || undefined} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={tr("Au (déplacement {n})", { n: i + 1 })} /></label></div>)}
               <span className="note">{tr("Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.")}</span></div>
-</section>}<section className="dcard" id="descr"><h3>{tr("Description")}</h3>
+</section><section className="dcard" id="descr"><h3>{tr("Description")}</h3>
             <div className="row2"><label className="f">{tr("Âge (obligatoire, 18 ans minimum)")}<input type="number" inputMode="numeric" min={18} max={99} required value={age} onChange={(e) => setAge(e.target.value)} /></label>
               <label className="f">{tr("Taille (cm)")}<input type="number" inputMode="numeric" min={120} max={230} placeholder={tr("ex. 170")} value={hcm} onChange={(e) => setHcm(e.target.value)} /></label></div>
             <div className="row2"><label className="f">{tr("Poids (kg)")}<input type="number" inputMode="numeric" min={30} max={200} placeholder={tr("ex. 58")} value={wkg} onChange={(e) => setWkg(e.target.value)} /></label>
@@ -214,28 +212,25 @@ export default function MyProfile() {
             <div className="row2"><label className="f">{tr("Couleur des cheveux")}<select value={hair} onChange={(e) => setHair(e.target.value)}><option value="">{tr("Non précisé")}</option>{HAIRS.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></label><label className="f">{tr("Couleur des yeux")}<select value={eyes} onChange={(e) => setEyes(e.target.value)}><option value="">{tr("Non précisé")}</option>{EYES.map((x) => <option key={x} value={x}>{tr(x)}</option>)}</select></label></div>
             <div className="row2"><label className="f">{tr("Taille de bonnet")}<select value={bra} onChange={(e) => setBra(e.target.value)}><option value="">{tr("Non précisé")}</option>{BRAS.map((x) => <option key={x} value={x}>{x}</option>)}</select></label>{kind === "createur" && <label className="f">{tr("Profil (obligatoire)")}<select value={f.genre} onChange={set("genre")} required><option value="" disabled>{tr("Choisir…")}</option><option value="fille">{tr("Fille")}</option><option value="homme">{tr("Homme")}</option><option value="trans">{tr("Trans")}</option></select></label>}</div>
             <div className="row2"><label className="f">{tr("Fumeuse / fumeur")}<select value={smoker} onChange={(e) => setSmoker(e.target.value)}>{HABIT.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select></label><label className="f">{tr("Buveuse / buveur")}<select value={drinker} onChange={(e) => setDrinker(e.target.value)}>{HABIT.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select></label></div>
-            {!isLive && <fieldset className="fs"><legend className="note">{tr("Rencontres")}</legend>
+            <fieldset className="fs"><legend className="note">{tr("Rencontres")}</legend>
               <label className="ck"><input type="checkbox" checked={recv} onChange={(e) => setRecv(e.target.checked)} /> {tr("Je reçois")}</label>
-              <label className="ck"><input type="checkbox" checked={trav} onChange={(e) => setTrav(e.target.checked)} /> {tr("Je me déplace")}</label></fieldset>}
+              <label className="ck"><input type="checkbox" checked={trav} onChange={(e) => setTrav(e.target.checked)} /> {tr("Je me déplace")}</label></fieldset>
             <fieldset className="fs"><legend className="note">{tr("Langues parlées (8 maximum)")}</legend>
               <div className="tags">{LANGS.map((l) => <button type="button" key={l} className="chip" aria-pressed={langs.includes(l)} onClick={() => setLangs(langs.includes(l) ? langs.filter((x) => x !== l) : langs.length < 8 ? [...langs, l] : langs)}>{tr(l)}</button>)}</div></fieldset>
             <p className="note" style={{ margin: 0 }}>{tr("Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.")}</p>
 </section><section className="dcard"><h3>{tr("Présentation et contact")}</h3><div className="f"><span style={L}>{tr("Présentation")}</span><RichEditor label={tr("Présentation")} value={bio} onChange={setBio} /></div>
             <div className="row2"><label className="f">{tr("Site ou réseau (optionnel)")}<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
-            <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!canRate && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="rlist">{rates.map((r, i) => <div className="rrow" key={i}>
-                <select aria-label={tr("Durée")} value={r.d} disabled={!canRate} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, d: e.target.value } : x)))}>{RATE_OPTS.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select>
-                <input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" aria-label={tr("Prix")} value={r.p} disabled={!canRate} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, p: e.target.value } : x)))} />
-                <button type="button" className="rrm" disabled={!canRate} aria-label={tr("Retirer ce tarif")} title={tr("Retirer ce tarif")} onClick={() => setRates(rates.filter((_, j) => j !== i))}>✕</button></div>)}
-                {canRate && rates.length < 8 && <button type="button" className="btn ghost" onClick={() => setRates([...rates, { d: RATE_OPTS.find((o) => !rates.some((r) => r.d === o[0]))?.[0] || "1h", p: "" }])}>{tr("+ Ajouter un tarif")}</button>}</div>{canRate && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
-            <label className="f">{isLive ? tr("Numéro WhatsApp (optionnel)") : tr("Numéro de téléphone (optionnel)")}<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
-            {isLive && <div className="f"><span style={L}>{tr("Paiement (optionnel)")}</span><div className="row2">
-              <input maxLength={80} placeholder={tr("Wero : numéro ou e-mail")} aria-label={tr("Wero : numéro ou e-mail")} value={wero} onChange={(e) => setWero(e.target.value)} />
-              <input maxLength={80} placeholder={tr("PayPal : lien paypal.me ou e-mail")} aria-label={tr("PayPal : lien paypal.me ou e-mail")} value={paypal} onChange={(e) => setPaypal(e.target.value)} /></div></div>}
+            <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="rlist">{rates.map((r, i) => <div className="rrow" key={i}>
+                <select aria-label={tr("Durée")} value={r.d} disabled={!vip} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, d: e.target.value } : x)))}>{RATE_OPTS.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select>
+                <input type="number" inputMode="numeric" min={0} max={10000} placeholder="ex. 80" aria-label={tr("Prix")} value={r.p} disabled={!vip} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, p: e.target.value } : x)))} />
+                <button type="button" className="rrm" disabled={!vip} aria-label={tr("Retirer ce tarif")} title={tr("Retirer ce tarif")} onClick={() => setRates(rates.filter((_, j) => j !== i))}>✕</button></div>)}
+                {vip && rates.length < 8 && <button type="button" className="btn ghost" onClick={() => setRates([...rates, { d: RATE_OPTS.find((o) => !rates.some((r) => r.d === o[0]))?.[0] || "1h", p: "" }])}>{tr("+ Ajouter un tarif")}</button>}</div>{vip && <label className="chk"><input type="checkbox" checked={tshow} onChange={(e) => setTshow(e.target.checked)} /> <span>{tr("Afficher mes tarifs sur mon profil et sur ma carte")}</span></label>}</div>
+            <label className="f">{tr("Numéro de téléphone (optionnel)")}<input type="tel" inputMode="tel" maxLength={20} placeholder="06 12 34 56 78" value={f.phone} onChange={set("phone")} /></label>
             <div className="f"><span style={L}>{tr("Réseaux sociaux (optionnel, ton pseudo sans @)")}</span>
-              {!socOk && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}
-              <div className="row3">{!isLive && <input maxLength={31} disabled={!socOk} placeholder="Instagram" aria-label={tr("Pseudo Instagram")} value={f.instagram} onChange={set("instagram")} />}
-                <input maxLength={31} disabled={!socOk} placeholder="Snapchat" aria-label={tr("Pseudo Snapchat")} value={f.snapchat} onChange={set("snapchat")} />
-                {!isLive && <input maxLength={31} disabled={!socOk} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} />}</div></div>
+              {!vip && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les réseaux sociaux sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}
+              <div className="row3"><input maxLength={31} disabled={!vip} placeholder="Instagram" aria-label={tr("Pseudo Instagram")} value={f.instagram} onChange={set("instagram")} />
+                <input maxLength={31} disabled={!vip} placeholder="Snapchat" aria-label={tr("Pseudo Snapchat")} value={f.snapchat} onChange={set("snapchat")} />
+                <input maxLength={31} disabled={!vip} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} /></div></div>
             <p className="note">{tr("Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.")}</p>
 
 </section><section className="dcard"><h3>{tr("Mes photos")}</h3><div>
