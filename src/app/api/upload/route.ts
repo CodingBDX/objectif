@@ -31,8 +31,8 @@ export async function POST(req: Request) {
   } else return NextResponse.json({ error: "Format non accepté" }, { status: 415 });
 
   const id = randomUUID(); const path = `${user.id}/${id}.${ext}`;
-  const { error } = await sb.storage.from("media").upload(path, body, { contentType: type });
+  const { error } = await sb.storage.from("media").upload(path, body, { contentType: type, cacheControl: "31536000" });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  if (thumb) await sb.storage.from("media").upload(`${user.id}/${id}-t.webp`, thumb, { contentType: "image/webp" });
+  if (thumb) await sb.storage.from("media").upload(`${user.id}/${id}-t.webp`, thumb, { contentType: "image/webp", cacheControl: "31536000" });
   return NextResponse.json({ url: sb.storage.from("media").getPublicUrl(path).data.publicUrl });
 }
