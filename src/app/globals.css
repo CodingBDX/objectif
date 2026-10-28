@@ -131,7 +131,7 @@ select{background:var(--card);border:1px solid var(--line);border-radius:999px;p
 .card.live .cover{background:var(--livebg)}
 .badge.live{background:var(--live);color:var(--livet)}
 .liveb{display:flex;align-items:center;gap:5px;background:var(--live);color:var(--livet);border-radius:999px;padding:2px 10px;font:700 12px var(--fb);box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.liveb i{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pl 1.8s infinite}
+.liveb i{position:relative;width:7px;height:7px;border-radius:50%;background:currentColor}
 .avb.live{background:var(--live);color:var(--livet);border-color:var(--live)}
 .avb.live i{background:var(--livet)}
 .vf{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px var(--pink),0 2px 8px rgba(214,51,132,.45);background:linear-gradient(135deg,var(--pink),var(--btn));color:var(--btnt);flex:none}
@@ -158,8 +158,11 @@ select{background:var(--card);border:1px solid var(--line);border-radius:999px;p
 .top li:nth-child(-n+3) .rk{background:linear-gradient(135deg,var(--pink),var(--btn));color:var(--btnt)}
 .top .n{margin-left:auto;font-size:12px;background:var(--soft);padding:1px 9px;border-radius:999px;color:var(--mut)}
 .avb{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:4px;background:var(--soft);color:var(--btn);border:1px solid var(--pink);border-radius:999px;padding:2px 10px 2px 8px;font:700 12px var(--fb)}
-.avb i{width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 0 var(--pink);animation:pl 1.8s infinite}
-@keyframes pl{70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.avb i{position:relative;width:7px;height:7px;border-radius:50%;background:var(--pink)}
+/* Pastille « dispo / en direct » : l'onde est animée avec transform + opacity (composité par le GPU), pas avec box-shadow */
+.avb i::after,.liveb i::after{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;opacity:0;animation:pl 1.8s infinite;will-change:transform,opacity}
+@keyframes pl{0%{transform:scale(1);opacity:.6}70%,100%{transform:scale(2.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.avb i::after,.liveb i::after{animation:none}}
 .card.off,.card.off.live,.card.off.isvip{background:var(--offbg);border-color:var(--offln);box-shadow:0 6px 18px rgba(120,80,110,.14);filter:grayscale(.45) brightness(.93)}
 .card.off .cover{background:var(--offbg)}
 .card.off .tag{background:rgba(120,80,110,.14);color:var(--mut)}
