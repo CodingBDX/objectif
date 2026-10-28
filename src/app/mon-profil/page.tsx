@@ -9,6 +9,7 @@ import CityInput from "@/components/CityInput";
 import RichEditor from "@/components/RichEditor";
 import { refreshListings } from "@/app/actions";
 import { useT } from "@/lib/i18n";
+import { tooFar, MAX_KM } from "@/lib/dist";
 import VipPrices from "@/components/VipPrices";
 import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 
@@ -27,7 +28,7 @@ export default function MyProfile() {
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [vlink, setVlink] = useState("");
-  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null);
+  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [farMsg, setFarMsg] = useState("");
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
@@ -119,6 +120,7 @@ export default function MyProfile() {
     const genre = kind === "livecam" ? "livecam" : f.genre;
     if (!genre) { setMsg({ t: tr("Choisis ton profil (obligatoire).") }); return; }
     if (kind === "livecam" && !/^https?:\/\//.test(vlink)) { setMsg({ t: tr("Indique le lien de ton live (https://…).") }); return; }
+    if (kind !== "livecam") { const bad = (await Promise.all(more.filter(Boolean).map(async (c) => ((await tooFar(f.city, c)) ? c : "")))).find(Boolean); if (bad) { setFarMsg(bad); setMsg({ t: tr("{c} est trop loin de ta ville principale (plus de {n} km).", { c: bad, n: MAX_KM }) }); return; } }
     if (photos.length < 3) { setMsg({ t: tr("Ajoute au moins 3 photos.") }); return; }
     const nAge = Number(age); if (!nAge || nAge < 18 || nAge > 99) { setMsg({ t: tr("Indique ton âge (18 ans minimum) dans l’encart Description.") }); document.getElementById("descr")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     if (!h24 && !Object.values(hours).some((h) => h && h[0] && h[1])) { setMsg({ t: tr("Indique tes disponibilités (obligatoire) : coche « 24h/24, 7j/7 » ou au moins un jour avec ses horaires.") }); document.getElementById("dispo")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
@@ -195,7 +197,7 @@ export default function MyProfile() {
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < maxS ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
 </section><section className="dcard"><h3>{tr("Où te trouver ?")}</h3><div className="f"><span style={L}>{tr("Ville (tape les premières lettres)")}</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} required label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div>
             <div className="f"><span style={L}>{tr("Villes supplémentaires (jusqu’à {n}, optionnel)", { n: maxM })}{!vip && tr(" · 6 en VIP")}</span>
-              <div className="row3">{more.slice(0, maxM).map((m, i) => <CityInput key={i} value={m} placeholder={tr("Ville {n}", { n: i + 2 })} label={tr("Ville supplémentaire {n}", { n: i + 1 })} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} />)}</div></div>
+              <div className="row3">{more.slice(0, maxM).map((m, i) => <CityInput key={i} value={m} placeholder={tr("Ville {n}", { n: i + 2 })} label={tr("Ville supplémentaire {n}", { n: i + 1 })} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} onPick={async (v) => { if (kind !== "livecam" && (await tooFar(f.city, v))) { setMore((cur) => cur.map((x, j) => (j === i ? "" : x))); setFarMsg(v); } else setFarMsg(""); }} />)}</div>{farMsg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: "6px 0 0" }}>{tr("{c} est à plus de {n} km de ta ville principale : ce n’est pas possible. Si tu te déplaces partout en France ou travailles à distance, tu es probablement un profil livecam : choisis la section « Profil livecam ».", { c: farMsg, n: MAX_KM })}</p>}</div>
             <div className="f"><span style={L}>{tr("Prochains déplacements (calendrier, optionnel)")}</span>
               {trips.map((t, i) => <div className="trow" key={i}>
                 <CityInput placeholder={tr("Ville visitée")} value={t.city} onChange={(v) => setTrip(i, "city", v)} label={tr("Ville du déplacement {n}", { n: i + 1 })} />
