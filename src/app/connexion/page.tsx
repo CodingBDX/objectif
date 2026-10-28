@@ -15,7 +15,8 @@ function Form() {
     e.preventDefault(); setBusy(true); setMsg(null);
     const sb = supabaseBrowser();
     if (signup) {
-      const { error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}${nx}`, data: { adult_confirmed_at: new Date().toISOString() } } });
+      const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}${nx}`, data: { adult_confirmed_at: new Date().toISOString() } } });
+      if (!error && data?.session) { location.href = nx; return; }
       setMsg(error ? { t: error.message } : { t: tr("Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi."), ok: true });
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw });
@@ -29,7 +30,7 @@ function Form() {
       <div className="pfc" style={{ maxWidth: 520 }}>
         <div className="panel regp">
           <h1 className="regh">{signup ? tr("Créer mon profil") : tr("Se connecter")}</h1>
-          <p className="note">{signup ? tr("Crée ton compte avec ton e-mail : un lien de confirmation te sera envoyé.") : tr("Retrouve ton profil avec ton e-mail et ton mot de passe.")}</p>
+          <p className="note">{signup ? tr("Crée ton compte avec ton e-mail et un mot de passe.") : tr("Retrouve ton profil avec ton e-mail et ton mot de passe.")}</p>
           <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={go}>
             <label className="f">{tr("Adresse e-mail")}<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
             <label className="f">{tr("Mot de passe (8 caractères minimum)")}<input type="password" required minLength={8} value={pw} onChange={(e) => setPw(e.target.value)} autoComplete={signup ? "new-password" : "current-password"} /></label>

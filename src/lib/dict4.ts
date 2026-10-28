@@ -83,4 +83,5 @@ export const DICT4: Record<string, [string, string, string]> = {
   "← Modifier mon profil": ["← Edit my profile", "← Editar mi perfil", "← Editar o meu perfil"],
   "🏠 Mon logement": ["🏠 My listing", "🏠 Mi alojamiento", "🏠 O meu alojamento"],
   "Voir tous les logements": ["See all listings", "Ver todos los alojamientos", "Ver todos os alojamentos"],
+  "Crée ton compte avec ton e-mail et un mot de passe.": ["Create your account with your email and a password.", "Crea tu cuenta con tu correo y una contraseña.", "Cria a tua conta com o teu e-mail e uma palavra-passe."],
 };
