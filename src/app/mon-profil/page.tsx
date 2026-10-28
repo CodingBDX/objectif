@@ -8,7 +8,7 @@ import { DAYL } from "@/lib/avail";
 import CityInput from "@/components/CityInput";
 import RichEditor from "@/components/RichEditor";
 import { refreshListings } from "@/app/actions";
-import { useT, LangSwitch } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 import VipPrices from "@/components/VipPrices";
 import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 
@@ -160,7 +160,7 @@ export default function MyProfile() {
         {!isNewP && !vip && <div className="dvip"><div className="crown">👑</div><b>{tr("Passe en VIP")}</b><span>{tr("Plus de visibilité dans l’annuaire.")}</span><VipPrices /><Link className="dbtn pink" href="/contact?s=vip">{tr("Devenir VIP")}</Link></div>}
       </aside>
       <main className="dmain dedit">
-        <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1><LangSwitch /></div>
+        <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
         {!isNewP && <StatsPanel />}
         {!isNewP && <h2 className="dsub" id="profil">{tr("✏️ Modifier mon profil")}</h2>}
         <div className="dform0">

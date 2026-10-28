@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { useT, LangSwitch } from "@/lib/i18n";
+import { useT } from "@/lib/i18n";
 
 const CATS: Record<string, string> = { harcelement: "Harcèlement", menaces: "Menaces", impaye: "Impayé / arnaque", faux_rdv: "Faux rendez-vous", non_respect: "Non-respect des règles", autre: "Autre" };
 type Res = { niveau: "aucun" | "attention" | "danger"; signalements: number; dernier: string | null; categories: string[] };
@@ -48,7 +48,7 @@ export default function Verifier() {
   const L = res ? LOOK[res.niveau] : null;
   return (
     <section className="gut" style={{ maxWidth: 640, margin: "0 auto", display: "grid", gap: 16 }}>
-      <div className="dtop"><h1>{tr("🛡️ Vérifier un client")}</h1><LangSwitch /><Link className="btn ghost" href="/mon-profil">{tr("← Mon espace")}</Link></div>
+      <div className="dtop"><h1>{tr("🛡️ Vérifier un client")}</h1><Link className="btn ghost" href="/mon-profil">{tr("← Mon espace")}</Link></div>
       <p className="note" style={{ margin: 0 }}>{tr("Outil de sécurité réservé aux profils. Entre le numéro d’un client avant de répondre ou de l’accepter : tu vois si d’autres profils l’ont signalé. Les signalements sont anonymes et les numéros ne sont jamais affichés ni conservés en clair.")}</p>
 
       <div className="dcard">
