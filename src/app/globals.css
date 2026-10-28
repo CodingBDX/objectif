@@ -996,3 +996,8 @@ h1.pbn{margin:0}
 .cmflag{background:#e5484d;color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;white-space:nowrap}
 :root[data-theme="dark"] .cmi.flagged{background:#3a1519;border-color:#ff6b70;color:#ffd9db}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cmi.flagged{background:#3a1519;border-color:#ff6b70;color:#ffd9db}}
+
+/* Contraste AA des pastilles de compteur (.n) : #94607f sur fond rose = 4,07 ; #7a4a66 = 5,76 */
+.si .n,.top .n{color:#7a4a66}
+:root[data-theme="dark"] .si .n,:root[data-theme="dark"] .top .n{color:var(--mut)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .si .n,:root:not([data-theme="light"]) .top .n{color:var(--mut)}}
