@@ -30,7 +30,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
   ]);
   const escort = isAdmin || (!!me && me.genre !== "livecam");
   const cc: Record<string, number> = {}, tc: Record<string, number> = {};
-  all.forEach((p) => { cc[p.city] = (cc[p.city] || 0) + 1; p.specialties.forEach((x) => { const k = x.toLowerCase(); tc[k] = (tc[k] || 0) + 1; }); });
+  all.forEach((p) => { if (p.genre !== "livecam") cc[p.city] = (cc[p.city] || 0) + 1; p.specialties.forEach((x) => { const k = x.toLowerCase(); tc[k] = (tc[k] || 0) + 1; }); });
   const index = { c: Object.entries(cc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")) as [string, number][], t: Object.entries(tc).sort((a, b) => b[1] - a[1]) as [string, number][], p: all.map((p) => ({ id: p.id, name: p.name, sub: [lab(p), p.city].filter(Boolean).join(" · ") })) };
   return (
     <html lang="fr" data-theme="light">

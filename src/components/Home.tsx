@@ -47,7 +47,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
         <div className="ln"><h3>{p.name}</h3>
           {p.verified && <span className="vf" role="img" aria-label={tr("Profil vérifié")} title={tr("Profil vérifié")}><Ic n="check" s={12} /></span>}
           <Heart id={p.id} /></div>
-        <div className="meta"><Ic n="pin" s={15} />{p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>
+        <div className="meta"><Ic n="pin" s={15} />{live ? tr("En ligne") : p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>
         {a && (a.on
           ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? tr("Disponible 24h/24, 7j/7") : tr("Disponible jusqu’à {u}", { u: a.until || "" })}</div>
           : <div className="meta"><Ic n="clock" s={15} />{tr("Indisponible")}{a.next ? tr(" · reprend {n}", { n: a.next }) : ""}</div>)}
@@ -104,7 +104,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
   const list = useMemo(() => {
-    const l = profiles.filter((p) => (type === "tous" || p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : cityList(p).includes(city))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
+    const l = profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" || fav : p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : cityList(p).includes(city))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
       && (!fav || favs.includes(p.id)) && inRange(p.age, df.amin, df.amax) && inRange(p.height_cm, df.hmin, df.hmax) && inRange(p.weight_kg, df.wmin, df.wmax)
       && (!df.eth || p.ethnicity === df.eth) && (!df.lang || (p.languages || []).includes(df.lang)) && (!df.hair || p.hair === df.hair) && (!df.eyes || p.eyes === df.eyes) && (!df.bra || p.bra === df.bra)
       && (!df.smk || p.smoker === df.smk) && (!df.drk || p.drinker === df.drk) && (!df.recv || p.receives) && (!df.trav || p.travels)
@@ -115,13 +115,13 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, favs, df]);
 
-  const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
+  const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.filter((p) => p.genre !== "livecam").forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
   const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
-  const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.filter((p) => type === "tous" || p.genre === type).forEach((p) => cityList(p).forEach((c) => { if (!region || regions[c] === region) cc[c] = (cc[c] || 0) + 1; })); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 9); }, [profiles, type, region, regions]);
-  const hl = useMemo(() => profiles.filter((p) => (type === "tous" || p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || (b.views || 0) + 5 * (b.favs || 0) - (a.views || 0) - 5 * (a.favs || 0) || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 10), [profiles, type, tag, city]);
+  const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type)).forEach((p) => cityList(p).forEach((c) => { if (!region || regions[c] === region) cc[c] = (cc[c] || 0) + 1; })); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, 9); }, [profiles, type, region, regions]);
+  const hl = useMemo(() => profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || (b.views || 0) + 5 * (b.favs || 0) - (a.views || 0) - 5 * (a.favs || 0) || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 10), [profiles, type, tag, city]);
 
   const sentinel = useRef<HTMLDivElement>(null);
   useEffect(() => {

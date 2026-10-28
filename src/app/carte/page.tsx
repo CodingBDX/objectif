@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Carte des profils", description: "Ca
 
 export default async function Page() {
   const ps = await allProfiles(); const by: Record<string, MapCity> = {};
-  ps.forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); });
+  ps.filter((p) => p.genre !== "livecam").forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); });
   const cities = Object.values(by).sort((a, b) => b.n - a.n);
   const { allowed, list } = await assosForViewer();
   const assos: MapAsso[] = allowed ? list.filter((a) => a.address).map((a) => ({ slug: a.slug, name: a.name, address: a.address as string, city: a.city, phone: a.phone })) : [];

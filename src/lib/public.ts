@@ -29,8 +29,8 @@ export const publicProfiles = unstable_cache(async (): Promise<Profile[]> => {
 }, ["public-profiles"], { revalidate: 30, tags: ["profiles"] });
 
 export const publicCities = unstable_cache(async (): Promise<string[]> => {
-  const { data } = await anon().from("profiles").select("city").eq("paused", false);
-  return Array.from(new Set((data || []).map((c: { city: string }) => c.city).filter(Boolean))).sort((x, y) => x.localeCompare(y, "fr"));
+  const { data } = await anon().from("profiles").select("city,genre").eq("paused", false);
+  return Array.from(new Set((data || []).filter((c: { genre: string }) => c.genre !== "livecam").map((c: { city: string }) => c.city).filter(Boolean))).sort((x, y) => x.localeCompare(y, "fr"));
 }, ["public-cities"], { revalidate: 30, tags: ["profiles"] });
 
 export type Asso = { id: string; slug: string; name: string; city: string; more: string[]; region: string | null; description: string; services: string[]; phone: string | null; email: string | null; site: string | null; address: string | null; hours: string | null; created_at: string; featured?: boolean; national?: boolean };

@@ -880,3 +880,4 @@ h1.pbn{margin:0}
 .vipp .note{margin:8px 0 0}
 .vipadm{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center}
 .vipadm .btn{padding:4px 10px;min-height:0}
+.rates.pay .nb{color:var(--btn);font-weight:700}

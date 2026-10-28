@@ -34,6 +34,7 @@ export async function cityIntro(city: string, profiles: Profile[]): Promise<stri
 /** Région de chaque ville : lue d'abord dans les profils (colonne `region`, instantané). L'API officielle (cache 7 jours, 1,2 s max) ne sert que pour les villes sans région enregistrée. */
 export async function regionMap(profiles: Profile[]): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
+  profiles = profiles.filter((p) => p.genre !== "livecam");
   profiles.forEach((p) => { if (p.region) out[p.city] = p.region; });
   const missing = Array.from(new Set(profiles.map((p) => p.city))).filter((c) => !out[c]).slice(0, 40);
   await Promise.all(missing.map(async (c) => {

@@ -5,7 +5,7 @@ export const SPECIALTIES = ["Girlfriend experience","Accompagnement","Dîner","S
 export type Trip = { city: string; from: string; to: string };
 export type Hours = Record<string, [string, string] | null>;
 export type Profile = {
-  id: string; name: string; genre: Genre; city: string; more: string[]; specialties: string[]; region?: string | null; age?: number | null; height_cm?: number | null; weight_kg?: number | null; ethnicity?: string | null; hair?: string | null; eyes?: string | null; bra?: string | null; smoker?: string | null; receives?: boolean; rates?: Rate[] | null; travels?: boolean; drinker?: string | null; languages?: string[]; bio: string;
+  id: string; name: string; genre: Genre; city: string; more: string[]; specialties: string[]; region?: string | null; age?: number | null; height_cm?: number | null; weight_kg?: number | null; ethnicity?: string | null; hair?: string | null; eyes?: string | null; bra?: string | null; smoker?: string | null; receives?: boolean; rates?: Rate[] | null; pay_wero?: string | null; pay_paypal?: string | null; travels?: boolean; drinker?: string | null; languages?: string[]; bio: string;
   phone: string | null; instagram: string | null; snapchat: string | null; tiktok: string | null; site: string | null;
   h24: boolean; hours: Hours; trips: Trip[];
   photos: string[]; video: string | null; vlink: string | null; vip: boolean; verified: boolean; paused: boolean; created_at: string; views?: number; favs?: number; tarif?: number | null; tarif_visible?: boolean; tarif_30?: number | null; tarif_60?: number | null;
@@ -13,7 +13,8 @@ export type Profile = {
 export const lab = (p: Profile) => CATS[p.genre] || "";
 export const isNew = (p: Profile) => { const d = Date.now() - new Date(p.created_at).getTime(); return d >= 0 && d < 30 * 864e5; };
 /** Ville de base uniquement : les compteurs, filtres et pages ville ne comptent que les profils basés dans la ville. */
-export const cityList = (p: Profile) => [p.city];
+export const LIVE_CITY = "En ligne";
+export const cityList = (p: Profile) => (p.genre === "livecam" ? [] : [p.city]);
 export const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 /** Les tarifs ne sont affichés que pour les profils VIP qui ont choisi de les montrer. */
@@ -25,7 +26,7 @@ export const rateList = (p: Profile): Rate[] => {
   if (r.length) return r.slice(0, 8);
   return [p.tarif_30 ? { d: "30min", p: p.tarif_30 } : null, p.tarif_60 ? { d: "1h", p: p.tarif_60 } : null].filter(Boolean) as Rate[];
 };
-export const showTarif = (p: Profile) => !!p.vip && p.tarif_visible !== false && rateList(p).length > 0;
+export const showTarif = (p: Profile) => (!!p.vip || p.genre === "livecam") && p.tarif_visible !== false && rateList(p).length > 0;
 
 export const LANGS = ["Français", "Anglais", "Espagnol", "Portugais", "Italien", "Allemand", "Arabe", "Russe", "Roumain", "Chinois", "Néerlandais", "Polonais"];
 export const ETHNIES = ["Africaine", "Antillaise", "Asiatique", "Caucasienne", "Latine", "Métisse", "Maghrébine", "Moyen-orientale", "Indienne", "Autre"];

@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data } = await sb.from("profiles").select("id,city,more,genre,created_at").eq("paused", false).limit(5000);
   const ps = (data || []) as { id: string; city: string; more: string[]; genre: string; created_at: string }[];
   const cities = new Set<string>(); const gc = new Set<string>();
-  ps.forEach((p) => [p.city, ...(p.more || [])].filter(Boolean).forEach((c) => { cities.add(slug(c)); gc.add(`${GPATH[p.genre]}/${slug(c)}`); }));
+  ps.filter((p) => p.genre !== "livecam").forEach((p) => [p.city, ...(p.more || [])].filter(Boolean).forEach((c) => { cities.add(slug(c)); gc.add(`${GPATH[p.genre]}/${slug(c)}`); }));
   const now = new Date();
   return [
     { url: base, lastModified: now, changeFrequency: "daily", priority: 1 },

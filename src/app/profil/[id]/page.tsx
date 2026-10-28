@@ -22,11 +22,11 @@ const get = async (id: string) => { const [{ data }, spec] = await Promise.all([
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const p = await get(params.id);
   if (!p) return {};
-  const desc = (p.bio ? plain(p.bio).slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"} à ${p.city}. Photos, disponibilités et contact.`);
+  const desc = (p.bio ? plain(p.bio).slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"}${p.genre === "livecam" ? " en ligne" : ` à ${p.city}`}. Photos, disponibilités et contact.`);
   return {
-    title: `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`, description: desc, alternates: { canonical: `/profil/${p.id}` },
-    openGraph: { type: "profile", title: `${p.name} · ${p.city}`, description: desc, images: p.photos[0] ? [{ url: p.photos[0] }] : undefined },
-    twitter: { card: "summary_large_image", title: `${p.name} · ${p.city}`, description: desc, images: p.photos[0] ? [p.photos[0]] : undefined }
+    title: `${p.name}, ${CATS[p.genre] || "profil"}${p.genre === "livecam" ? "" : ` à ${p.city}`}`, description: desc, alternates: { canonical: `/profil/${p.id}` },
+    openGraph: { type: "profile", title: (p.genre === "livecam" ? p.name : `${p.name} · ${p.city}`), description: desc, images: p.photos[0] ? [{ url: p.photos[0] }] : undefined },
+    twitter: { card: "summary_large_image", title: (p.genre === "livecam" ? p.name : `${p.name} · ${p.city}`), description: desc, images: p.photos[0] ? [p.photos[0]] : undefined }
   };
 }
 const SOC: Record<string, [string, string, (h: string) => string]> = {
@@ -37,6 +37,7 @@ const SOC: Record<string, [string, string, (h: string) => string]> = {
 const handle = (h: string | null) => String(h || "").trim().replace(/^@/, "");
 const okHandle = (h: string) => /^[A-Za-z0-9._]{1,30}$/.test(h);
 const telHref = (s: string) => { const d = s.replace(/[^\d+]/g, ""); return /^0\d{9}$/.test(d) ? "+33" + d.slice(1) : d.replace(/^00/, "+"); };
+const waHref = (s: string) => { let d = s.replace(/\D/g, ""); if (/^0\d{9}$/.test(d)) d = "33" + d.slice(1); else d = d.replace(/^00/, ""); return `https://wa.me/${d}`; };
 const fmtPh = (s: string) => { const d = s.replace(/\D/g, ""); return /^0\d{9}$/.test(d) ? d.replace(/(\d{2})(?=\d)/g, "$1 ") : s; };
 
 const HL: Record<string, string> = { non: "Non", parfois: "Parfois", oui: "Oui" };
@@ -62,7 +63,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}/profil/${p.id}`, dateCreated: p.created_at,
         mainEntity: { "@type": "Person", name: p.name, description: plain(p.bio).slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
-          homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } }, knowsAbout: p.specialties,
+          ...(p.genre === "livecam" ? {} : { homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } } }), knowsAbout: p.specialties,
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return p.vip && h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
       <div className="pbar"><Link className="btn ghost" href="/"><Tr k="← Tous les profils" /></Link><h1 className="pbn">{p.name}</h1>
@@ -72,15 +73,15 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="pcontact">
           {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
           {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
-          {p.phone && !asleep && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={`tel:${telHref(p.phone)}`} aria-label={`Appeler ${p.name}`}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
-          {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if (!p.vip || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
+          {p.phone && !asleep && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={live ? waHref(p.phone) : `tel:${telHref(p.phone)}`} aria-label={live ? `WhatsApp ${p.name}` : `Appeler ${p.name}`} {...(live ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
+          {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">
-            <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} /><Tr k="Villes" /></h2><div className="mvs"><Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
-                {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>
+            {!live && <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} /><Tr k="Villes" /></h2><div className="mvs"><Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
+                {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}
             <Slider imgs={p.photos} vip={p.vip} video={p.video} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer"><Tr k="▶ Rejoindre le live" /></a></p>}
             <div className="panel pi">
@@ -91,6 +92,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 {st && <div role="listitem"><i aria-hidden="true">🔥</i><b>{fmtN(st.views_today)}</b><span><Tr k="Vues aujourd’hui" /></span></div>}
               </div>
               {showTarif(p) && <div className="rates" aria-label="Tarifs">{rateList(p).map((r) => <span key={r.d}><Ic n="rose" s={18} /><Tr k={RATE_OPTS.find((o) => o[0] === r.d)![1]} /> <b>{r.p}</b></span>)}</div>}
+              {live && (p.pay_wero || p.pay_paypal) && <div className="rates pay" aria-label="Paiement">
+                {p.pay_wero && <span><Ic n="rose" s={18} />Wero <b>{p.pay_wero}</b><CopyBtn text={p.pay_wero} label="Copier" className="" /></span>}
+                {p.pay_paypal && (/^https:\/\/(www\.)?paypal\.me\/[\w./-]+$/i.test(p.pay_paypal) ? <span><Ic n="rose" s={18} />PayPal <a className="nb" href={p.pay_paypal} target="_blank" rel="noopener noreferrer">{p.pay_paypal.replace(/^https:\/\/(www\.)?/i, "")}</a></span> : <span><Ic n="rose" s={18} />PayPal <b>{p.pay_paypal}</b><CopyBtn text={p.pay_paypal} label="Copier" className="" /></span>)}</div>}
               {(p.genre || p.receives || p.travels || p.age || p.hair || p.eyes || p.bra || p.smoker || p.drinker || p.height_cm || p.weight_kg || p.ethnicity || (p.languages || []).length > 0) && <><h2 className="pres"><Tr k="Description" /></h2>
                 <ul className="dscr">{p.genre ? <li><span><Tr k="👤 Genre" /></span><b><Tr k={CATS[p.genre]} /></b></li> : null}{p.receives ? <li><span><Tr k="🏠 Rencontre" /></span><b><Tr k="Reçoit" /></b></li> : null}{p.travels ? <li><span><Tr k="🚗 Rencontre" /></span><b><Tr k="Se déplace" /></b></li> : null}{p.age ? <li><span><Tr k="🎂 Âge" /></span><b>{p.age} <Tr k="ans" /></b></li> : null}{p.height_cm ? <li><span><Tr k="📏 Taille" /></span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span><Tr k="⚖️ Poids" /></span><b>{p.weight_kg} kg</b></li> : null}{p.hair ? <li><span><Tr k="💇 Cheveux" /></span><b><Tr k={p.hair!} /></b></li> : null}{p.eyes ? <li><span><Tr k="👁 Yeux" /></span><b><Tr k={p.eyes!} /></b></li> : null}{p.bra ? <li><span><Tr k="👙 Bonnet" /></span><b>{p.bra}</b></li> : null}{p.smoker ? <li><span><Tr k="🚬 Fume" /></span><b><Tr k={HL[p.smoker]} /></b></li> : null}{p.drinker ? <li><span><Tr k="🍷 Boit" /></span><b><Tr k={HL[p.drinker]} /></b></li> : null}{p.ethnicity ? <li><span><Tr k="🌍 Ethnie" /></span><b><Tr k={p.ethnicity!} /></b></li> : null}{(p.languages || []).length > 0 ? <li><span><Tr k="🗣 Langues" /></span><b>{p.languages!.map((l, i) => <span key={l}>{i > 0 ? ", " : ""}<Tr k={l} /></span>)}</b></li> : null}</ul></>}
               {p.specialties.length > 0 && <div className="mspec"><h2 className="pres"><Tr k="Spécialités" /></h2><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></div>}
@@ -102,9 +106,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             </div>
           </div>
           <aside className="pside" aria-label="Villes, déplacements et disponibilités">
-            <section className="bsec dsk"><h3 className="ph"><Ic n="pin" s={18} /><Tr k="Villes" /></h3><div className="bub">
+            {!live && <section className="bsec dsk"><h3 className="ph"><Ic n="pin" s={18} /><Tr k="Villes" /></h3><div className="bub">
               <Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
-              {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>
+              {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}
             <section className="bsec dsk"><h3 className="ph"><Ic n="tag" s={18} /><Tr k="Spécialités" /></h3><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></section>
             {trips.length > 0 && <div className="panel"><h3 className="ph"><Ic n="pin" s={18} /><Tr k="Prochains passages" /></h3>
               {trips.map((x, i) => { const now = x.from <= td; const [, m, d] = x.from.split("-");
