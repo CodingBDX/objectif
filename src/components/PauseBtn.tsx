@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabaseBrowser } from "@/lib/supabase/client";
+import { sbLazy } from "@/lib/supabase/lazy";
 import { refreshListings } from "@/app/actions";
 
 /** Met l'annonce en pause ou la relance, depuis n'importe quelle page (profils standard et VIP). */
@@ -9,7 +9,7 @@ export default function PauseBtn({ id, paused, className = "nl own", full = fals
   const r = useRouter(); const [busy, setBusy] = useState(false);
   const go = async () => {
     setBusy(true); window.dispatchEvent(new CustomEvent("hp-pause", { detail: !paused }));
-    const { error } = await supabaseBrowser().from("profiles").update({ paused: !paused }).eq("id", id);
+    const { error } = await (await sbLazy()).from("profiles").update({ paused: !paused }).eq("id", id);
     if (error) window.dispatchEvent(new CustomEvent("hp-pause", { detail: paused }));
     else await refreshListings();
     setBusy(false); r.refresh();

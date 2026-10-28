@@ -8,7 +8,7 @@ import GlobalSearch, { SIndex } from "./GlobalSearch";
 import { useT, LangSwitch } from "@/lib/i18n";
 import { useFavs } from "@/lib/favs";
 import { slug } from "@/lib/site";
-import { supabaseBrowser } from "@/lib/supabase/client";
+import { sbLazy } from "@/lib/supabase/lazy";
 
 type P = { loggedIn: boolean; hasProfile: boolean; vip: boolean; name: string; userId: string; index: SIndex; isAdmin?: boolean; escort?: boolean; paused?: boolean; lodg?: boolean };
 
@@ -16,7 +16,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
     const [open, setOpen] = useState(false);
   const { tr } = useT(); const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
-  useEffect(() => { if (!hasProfile) return; try { if (sessionStorage.getItem("hp_seen")) return; sessionStorage.setItem("hp_seen", "1"); } catch {} supabaseBrowser().rpc("touch_last_seen").then(() => {}, () => {}); }, [hasProfile]);
+  useEffect(() => { if (!hasProfile) return; try { if (sessionStorage.getItem("hp_seen")) return; sessionStorage.setItem("hp_seen", "1"); } catch {} sbLazy().then((sb) => sb.rpc("touch_last_seen")).then(() => {}, () => {}); }, [hasProfile]);
   const path = usePathname();
   return (
     <>
@@ -49,7 +49,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
             {hasProfile && lodg && <Link className={`nl own${path === "/mon-logement" ? " on" : ""}`} href="/mon-logement" title={tr("Mon logement")}><span className="em" aria-hidden="true">🏠</span><span className="nlt">{tr("Mon logement")}</span></Link>}
             {hasProfile && <Link className="nl own" href="/mon-profil#stats" title={tr("Mes statistiques")}><span className="em" aria-hidden="true">📊</span><span className="nlt">{tr("Mes statistiques")}</span></Link>}
             <Link className="nl" href={hasProfile ? `/profil/${userId}` : "/mon-profil"} title={tr("Mon profil")} aria-label={tr("Mon profil")}><span className="em" aria-hidden="true">👤</span><span className="nlt">{tr("Mon profil")}</span></Link>
-            <button className="nl" title={tr("Quitter")} aria-label={tr("Quitter")} onClick={async () => { await supabaseBrowser().auth.signOut(); location.href = "/"; }}><span className="em" aria-hidden="true">🚪</span><span className="nlt">{name || tr("Moi")} · {tr("Quitter")}</span></button>
+            <button className="nl" title={tr("Quitter")} aria-label={tr("Quitter")} onClick={async () => { await (await sbLazy()).auth.signOut(); location.href = "/"; }}><span className="em" aria-hidden="true">🚪</span><span className="nlt">{name || tr("Moi")} · {tr("Quitter")}</span></button>
           </>) : (<>
             <Link className="btn login" href="/connexion">{tr("Se connecter")}</Link>
             <Link className="btn" href="/connexion?inscription=1">{tr("Créer mon profil")}</Link>

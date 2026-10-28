@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase/client";
+import { sbLazy } from "@/lib/supabase/lazy";
 
 const REASONS = ["Photos ou vidéos publiées sans mon accord", "Personne mineure", "Usurpation d’identité", "Contenu sexuel ou inapproprié", "Arnaque ou faux profil", "Harcèlement", "Autre"];
 
@@ -9,7 +9,7 @@ export default function ReportBtn({ profileId }: { profileId: string }) {
   async function send(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setBusy(true); setErr("");
     const f = new FormData(e.currentTarget);
-    const { error } = await supabaseBrowser().from("reports").insert({ profile_id: profileId, reason: f.get("reason"), details: f.get("details") || "", contact: f.get("contact") || "" });
+    const { error } = await (await sbLazy()).from("reports").insert({ profile_id: profileId, reason: f.get("reason"), details: f.get("details") || "", contact: f.get("contact") || "" });
     setBusy(false); if (error) setErr("Envoi impossible, réessaie dans un instant."); else setDone(true);
   }
   if (done) return <p className="note" role="status" style={{ margin: 0 }}><b>Merci, ton signalement est bien reçu.</b> Nous l’examinons rapidement.</p>;

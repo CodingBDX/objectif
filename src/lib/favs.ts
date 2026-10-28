@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabaseBrowser } from "./supabase/client";
+import { sbLazy, hasAuthCookie } from "./supabase/lazy";
 const K = "objectif_favoris";
 const read = (): string[] => { try { return JSON.parse(localStorage.getItem(K) || "[]"); } catch { return []; } };
 export function useFavs() {
@@ -11,8 +11,8 @@ export function useFavs() {
     // connecté : fusionne les cœurs de l'appareil avec ceux du compte (une fois par visite)
     (async () => {
       try {
-        if (sessionStorage.getItem("favs_synced")) return;
-        const sb = supabaseBrowser(); const { data: { user } } = await sb.auth.getUser(); if (!user) return;
+        if (sessionStorage.getItem("favs_synced") || !hasAuthCookie()) return;
+        const sb = await sbLazy(); const { data: { user } } = await sb.auth.getUser(); if (!user) return;
         const { data, error } = await sb.from("favorites").select("profile_id"); if (error) return;
         const remote = (data || []).map((r: { profile_id: string }) => r.profile_id); const local = read();
         const all = Array.from(new Set([...local, ...remote]));
@@ -29,7 +29,7 @@ export function useFavs() {
     try { localStorage.setItem(K, JSON.stringify(n)); } catch {}
     window.dispatchEvent(new Event("favs"));
     (async () => { // connecté : enregistre aussi le cœur dans le compte
-      try { const sb = supabaseBrowser(); const { data: { user } } = await sb.auth.getUser(); if (!user) return;
+      try { if (!hasAuthCookie()) return; const sb = await sbLazy(); const { data: { user } } = await sb.auth.getUser(); if (!user) return;
         if (n.includes(id)) await sb.from("favorites").upsert({ user_id: user.id, profile_id: id }, { onConflict: "user_id,profile_id", ignoreDuplicates: true });
         else await sb.from("favorites").delete().eq("user_id", user.id).eq("profile_id", id); } catch {}
     })();
