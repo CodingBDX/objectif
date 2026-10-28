@@ -1,0 +1,6 @@
+Supabase > Authentication > Emails > Templates. Pour chaque modele : colle le contenu du fichier HTML et mets le sujet.
+confirmation.html -> Confirm signup      | Sujet : Confirme ton inscription sur Sex-Escorte
+recovery.html     -> Reset password      | Sujet : Réinitialise ton mot de passe
+magic_link.html   -> Magic link          | Sujet : Ton lien de connexion Sex-Escorte
+email_change.html -> Change email address| Sujet : Confirme ta nouvelle adresse e-mail
+invite.html       -> Invite user         | Sujet : Tu es invité(e) sur Sex-Escorte
