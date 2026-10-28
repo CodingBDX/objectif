@@ -24,11 +24,12 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
         <Link className="logo" href="/" aria-label="HeyPapi, retour à l’annuaire" onClick={() => { close(); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} window.dispatchEvent(new Event("hp-home")); }}>
           <svg className="ic" viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path d="M14 7c3.5 0 6 3 5 7.5-1.2 5-6 7.5-13.5 5.5 4-1 6.300-3 7.300-6 .8-2.300.4-4.500 1.200-7z" /><path d="M14 7c-.2-2 1-3.600 3.200-4" /></svg>heypapi
         </Link>
+        <div className="lang-bar"><LangSwitch /></div>
         <button className="burger" aria-label={open ? tr("Fermer le menu") : tr("Ouvrir le menu")} aria-expanded={open} onClick={() => setOpen(!open)}>
           <svg className="ic" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
         <div className="navmenu" onClick={(e) => { if ((e.target as HTMLElement).closest("a,button")) close(); }}>
-          <div className="gs-mob"><LangSwitch /><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
+          <div className="gs-mob"><GlobalSearch index={index} onGo={(u) => { close(); r.push(u); }} /></div>
           <Link className={`nl${!sp.get("fav") && path !== "/carte" ? " on" : ""}`} href="/"><Ic n="grid" />{tr("Annuaire")}</Link>
           <Link className={`nl${path === "/carte" ? " on" : ""}`} href="/carte"><Ic n="pin" />{tr("Carte")}</Link>
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1"><Ic n="heart" />{tr("Favoris")} <span className="cn">{favs.length}</span></Link>

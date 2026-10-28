@@ -848,3 +848,13 @@ h1.pbn{margin:0}
 .langsw button{border:0;background:none;color:var(--btn);font:700 13px var(--fb);min-height:32px;min-width:40px;border-radius:999px;cursor:pointer}
 .langsw button.on{background:var(--btn);color:var(--btnt)}
 .navmenu .langsw{margin-left:0;align-self:flex-start}.dtop .langsw{margin-left:auto}
+
+/* Langues sur mobile : entre le logo et le menu burger, alignées */
+.lang-bar{display:none}
+@media (max-width:900px){
+ .lang-bar{display:flex;align-items:center;margin-left:auto}
+ .lang-bar .langsw{margin:0;padding:2px}
+ .lang-bar .langsw button{min-width:34px;min-height:34px;font-size:12px;padding:0 6px}
+ .nav .burger{margin-left:0}
+ .nav .logo{margin-right:0}
+}
