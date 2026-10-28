@@ -857,12 +857,19 @@ h1.pbn{margin:0}
  .lang-bar .langsw{margin:0;padding:2px}
  .lang-bar .langsw button{min-width:34px;min-height:34px;font-size:12px;padding:0 6px}
  .nav .burger{margin-left:0;flex:none}
- .nav .gut{gap:8px;align-items:center}
+ .nav .gut{gap:8px;align-items:center;flex-wrap:nowrap}
  .nav .logo{flex:1 1 auto;min-width:0}
  .lang-bar{flex:none;margin-left:auto}
  .lang-bar .langsw{height:46px;align-items:center;box-sizing:border-box;gap:2px}
  .lang-bar .langsw button{min-height:38px;line-height:1;display:grid;place-items:center}
  .nav .logo{margin-right:0;min-width:0;flex:0 1 auto}
+}
+@media (max-width:430px){
+ .nav .logo small{display:none}
+ .nav .logo .ic{width:22px;height:22px}
+ .lang-bar .langsw{height:42px}
+ .lang-bar .langsw button{min-width:28px;min-height:34px;padding:0 4px;font-size:11px}
+ .nav .burger{width:42px;height:42px}
 }
 
 /* Tarifs en simple ligne (roses) et message "elle dort" */
