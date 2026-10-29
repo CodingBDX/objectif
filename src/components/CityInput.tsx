@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { extraMatches } from "@/lib/extraCities";
+import { primeCity } from "@/lib/dist";
 
-type Commune = { nom: string; departement?: { code: string; nom: string } };
+type Commune = { nom: string; departement?: { code: string; nom: string }; centre?: { coordinates: [number, number] } };
 const cache = new Map<string, Commune[]>();
 
 /** Champ ville avec suggestions de toutes les communes de France (API officielle geo.api.gouv.fr).
@@ -22,7 +23,7 @@ export default function CityInput({ value, onChange, required, placeholder, labe
     const id = ++seq.current;
     const t = setTimeout(async () => {
       try {
-        const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(q)}&fields=nom,departement&boost=population&limit=8`);
+        const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(q)}&fields=nom,departement,centre&boost=population&limit=8`);
         if (!r.ok) return; const j = [...extraMatches(q).map((c) => ({ nom: c.nom, departement: { code: "MC", nom: "Principauté" } })), ...((await r.json()) as Commune[])];
         cache.set(q.toLowerCase(), j); if (id === seq.current) setList(j);
       } catch {}
@@ -33,7 +34,7 @@ export default function CityInput({ value, onChange, required, placeholder, labe
     const h = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) revert(); };
     document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h);
   }, [value]);
-  const pick = (c: Commune) => { setText(c.nom); onChange(c.nom); onPick?.(c.nom); setOpen(false); setHi(-1); };
+  const pick = (c: Commune) => { if (c.centre) primeCity(c.nom, c.centre.coordinates); setText(c.nom); onChange(c.nom); onPick?.(c.nom); setOpen(false); setHi(-1); };
   return (
     <div className="cityin" ref={box} onBlur={(e) => { if (!box.current?.contains(e.relatedTarget as Node)) revert(); }}>
       <input ref={inp} value={text} required={required} maxLength={40} placeholder={placeholder} aria-label={label} autoComplete="off" role="combobox" aria-expanded={open && list.length > 0}

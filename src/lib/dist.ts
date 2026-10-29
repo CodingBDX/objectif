@@ -20,6 +20,9 @@ export function cityCentre(name: string): Promise<[number, number] | null> {
   return cache.get(k)!;
 }
 
+/** Mémorise le centre exact d'une commune choisie dans une liste (évite de confondre deux communes de même nom, ex. Saint-Denis 93 et La Réunion). */
+export function primeCity(name: string, centre: [number, number]) { cache.set(name.trim().toLowerCase(), Promise.resolve(centre)); }
+
 export function km(a: [number, number], b: [number, number]) {
   const R = 6371, rad = (x: number) => (x * Math.PI) / 180;
   const dLat = rad(b[1] - a[1]), dLon = rad(b[0] - a[0]);
