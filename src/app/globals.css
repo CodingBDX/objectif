@@ -1095,7 +1095,7 @@ h1.pbn{margin:0}
  .panel.top .msbtn{margin-top:10px}
  .sheetbg{display:block;position:fixed;inset:0;z-index:68;background:rgba(40,10,30,.5);animation:sbIn .25s both}
  .sheetbg.out{animation:sbOut .26s both}
- .panel.msearch.sheet{display:flex!important;flex-direction:column;position:fixed;left:0;right:0;bottom:0;top:7vh;z-index:70;margin:0!important;padding:0!important;border-radius:26px 26px 0 0;background:var(--bg1);overflow:hidden;box-shadow:0 -12px 40px rgba(0,0,0,.28);animation:sheetUp .32s cubic-bezier(.2,.8,.2,1) both}
+ .panel.msearch.sheet{display:flex!important;flex-direction:column;position:fixed;left:0;right:0;top:calc(var(--vvt,0px) + 28px);height:calc(var(--vvh,100dvh) - 28px);max-height:calc(100dvh - 28px);z-index:70;margin:0!important;padding:0!important;border-radius:26px 26px 0 0;background:var(--bg1);overflow:hidden;box-shadow:0 -12px 40px rgba(0,0,0,.28);animation:sheetUp .32s cubic-bezier(.2,.8,.2,1) both}
  .panel.msearch.sheet.closing{animation:sheetDown .26s ease-in both}
  .sheethd{display:flex;flex:none;align-items:center;justify-content:space-between;position:relative;background:var(--bg1);padding:18px 16px 10px;margin:0}
  .sheethd i{position:absolute;left:50%;top:8px;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:var(--line)}
