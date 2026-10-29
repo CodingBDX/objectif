@@ -204,11 +204,13 @@ export default function MyProfile() {
       <main className="dmain dedit">
         <div className="pbar"><Crumbs inline items={[[tr("Accueil"), "/"], [isNewP ? tr("Créer mon profil") : tr("Mon espace"), "#"]]} /></div>
         <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
-        {!isNewP && <StatsPanel />}
-        {!isNewP && <BumpCard />}
-        {!isNewP && <SafetyCard />}
-        {!isNewP && <LoyaltyCard />}
-        {!isNewP && <ReferralCard />}
+        {!isNewP && <details className="dcard actbox"><summary>{tr("📊 Mon activité")}<small>{tr("Stats · Remonter · Points · Parrainage · Sécurité")}</small></summary>
+          <StatsPanel />
+          <BumpCard />
+          <LoyaltyCard />
+          <ReferralCard />
+          <SafetyCard />
+        </details>}
         {!isNewP && <LodgingFinder />}
         {!isNewP && <h2 className="dsub" id="profil">{tr("✏️ Modifier mon profil")}</h2>}
         <div className="dform0">
@@ -245,7 +247,7 @@ export default function MyProfile() {
           {(kind === "createur" || kind === "livecam") && <form onSubmit={save} onInvalidCapture={(e) => (e.target as HTMLElement).closest(".dcard")?.classList.add("open")}><fieldset className="fs dform acc" onClick={toggleCard} onKeyDown={keyCard}>
             {kind === "livecam" && <p className="note">{tr("Pas de ville pour un profil livecam : ton profil apparaît uniquement dans la section Livecam.")}</p>}
             {kind === "livecam" && <p className="note">{tr("Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).")}</p>}
-<section className="dcard open"><h3>{tr("Qui es-tu ?")}</h3><div className="row2">
+<section className="dcard open"><h3>{tr("Moi")}</h3><h4 className="subh first">{tr("Qui es-tu ?")}</h4><div className="row2">
               <label className="f">{tr("Pseudonyme")}<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
             </div>
             <div className="f vipopt"><span style={L}>{tr("Adresse personnalisée et slogan")} <span className="gchip" style={{ marginLeft: 6 }}>VIP</span></span>
@@ -257,7 +259,7 @@ export default function MyProfile() {
             <div className="f"><span style={L}>{tr("Spécialités (jusqu’à {n})", { n: maxS })}{!vip && tr(" · 30 en VIP")} <span style={{ fontWeight: 600 }}>{spec.length}/{maxS}</span></span>
               <div className="bub" role="group">{specList.map((s) => { const on = spec.includes(s);
                 return <button type="button" key={s} className="bubble" aria-pressed={on} onClick={() => setSpec(on ? spec.filter((x) => x !== s) : spec.length < maxS ? [...spec, s] : spec)}>{s}</button>; })}</div></div>
-</section>{!isLive && <section className="dcard"><h3>{tr("Où te trouver ?")}</h3><div className="f"><span style={L}>{tr("Ville (tape les premières lettres)")}</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} onPick={(v) => { if (v === f.city) return; const k = (x: string) => x.trim().toLowerCase(); if (f.city.trim()) memo.current[k(f.city)] = { more, dist }; const back = memo.current[k(v)]; setMore(back ? back.more : more.map(() => "")); setDist(back ? back.dist : ""); setFarMsg(""); }} required label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div><div className="f"><span style={L}>{tr("Arrondissement ou quartier (facultatif)")}</span>{ARR[f.city.trim().toLowerCase()] ? <select value={dist} onChange={(e) => setDist(e.target.value)}><option value="">{tr("Non précisé")}</option>{ARR[f.city.trim().toLowerCase()].map((x) => <option key={x} value={x}>{x}</option>)}</select> : <input maxLength={40} value={dist} onChange={(e) => setDist(e.target.value)} placeholder={tr("Ex. Chartrons")} />}</div>
+{!isLive && <><h4 className="subh">{tr("Où te trouver ?")}</h4><div className="f"><span style={L}>{tr("Ville (tape les premières lettres)")}</span><CityInput value={f.city} onChange={(v) => setF({ ...f, city: v })} onPick={(v) => { if (v === f.city) return; const k = (x: string) => x.trim().toLowerCase(); if (f.city.trim()) memo.current[k(f.city)] = { more, dist }; const back = memo.current[k(v)]; setMore(back ? back.more : more.map(() => "")); setDist(back ? back.dist : ""); setFarMsg(""); }} required label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div><div className="f"><span style={L}>{tr("Arrondissement ou quartier (facultatif)")}</span>{ARR[f.city.trim().toLowerCase()] ? <select value={dist} onChange={(e) => setDist(e.target.value)}><option value="">{tr("Non précisé")}</option>{ARR[f.city.trim().toLowerCase()].map((x) => <option key={x} value={x}>{x}</option>)}</select> : <input maxLength={40} value={dist} onChange={(e) => setDist(e.target.value)} placeholder={tr("Ex. Chartrons")} />}</div>
             <div className="f"><span style={L}>{tr("Villes supplémentaires (jusqu’à {n}, optionnel)", { n: maxM })}{!vip && tr(" · 6 en VIP")}</span>
               <div className="row3">{more.slice(0, maxM).map((m, i) => <CityInput key={i} value={m} placeholder={tr("Ville {n}", { n: i + 2 })} label={tr("Ville supplémentaire {n}", { n: i + 1 })} onChange={(v) => setMore(more.map((x, j) => (j === i ? v : x)))} onPick={async (v) => { if (await tooFar(f.city, v, maxKm)) { setMore((cur) => cur.map((x, j) => (j === i ? "" : x))); setFarMsg(v); } else setFarMsg(""); }} />)}</div><NearbySuggest city={f.city} maxKm={maxKm} picked={more} full={more.slice(0, maxM).every((x) => x.trim())} onAdd={(c) => setMore((cur) => { const i = cur.slice(0, maxM).findIndex((x) => !x.trim()); return i < 0 ? cur : cur.map((x, j) => (j === i ? c : x)); })} />{farMsg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: "6px 0 0" }}>{tr("{c} est à plus de {n} km de ta ville principale : ce n’est pas possible. Si tu te déplaces partout en France ou travailles à distance, tu es probablement un profil livecam : choisis la section « Profil livecam ».", { c: farMsg, n: maxKm })}</p>}</div>
             <div className="f"><span style={L}>{tr("Prochains déplacements (calendrier, optionnel)")}</span>
@@ -266,7 +268,7 @@ export default function MyProfile() {
                 <label className="tdate"><small>{tr("Du")}</small><input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={tr("Du (déplacement {n})", { n: i + 1 })} /></label>
                 <label className="tdate"><small>{tr("Au")}</small><input type="date" value={t.to} min={t.from || undefined} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={tr("Au (déplacement {n})", { n: i + 1 })} /></label></div>)}
               <span className="note">{tr("Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.")}</span></div>
-</section>}<section className="dcard" id="descr"><h3>{tr("Description")}</h3>
+</>}<h4 className="subh" id="descr">{tr("Description")}</h4>
             <div className="row2"><label className="f">{tr("Âge (obligatoire, 18 ans minimum)")}<input type="number" inputMode="numeric" min={18} max={99} required value={age} onChange={(e) => setAge(e.target.value)} /></label>
               <label className="f">{tr("Taille (cm)")}<input type="number" inputMode="numeric" min={120} max={230} placeholder={tr("ex. 170")} value={hcm} onChange={(e) => setHcm(e.target.value)} /></label></div>
             <div className="row2"><label className="f">{tr("Poids (kg)")}<input type="number" inputMode="numeric" min={30} max={200} placeholder={tr("ex. 58")} value={wkg} onChange={(e) => setWkg(e.target.value)} /></label>
@@ -289,7 +291,7 @@ export default function MyProfile() {
             <fieldset className="fs"><legend className="note">{tr("Langues parlées (8 maximum)")}</legend>
               <div className="tags">{LANGS.map((l) => <button type="button" key={l} className="chip" aria-pressed={langs.includes(l)} onClick={() => setLangs(langs.includes(l) ? langs.filter((x) => x !== l) : langs.length < 8 ? [...langs, l] : langs)}>{tr(l)}</button>)}</div></fieldset>
             <p className="note" style={{ margin: 0 }}>{tr("Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.")}</p>
-</section><section className="dcard"><h3>{tr("Présentation et contact")}</h3><div className="f"><span style={L}>{tr("Présentation")}</span><RichEditor label={tr("Présentation")} value={bio} onChange={setBio} /><small className="note" style={{ color: plain(bio).trim().length < 150 ? "var(--btn)" : undefined }}>{plain(bio).trim().length}/150 {tr("caractères minimum")}</small></div>
+</section><section className="dcard"><h3>{tr("Ma présentation")}</h3><div className="f"><span style={L}>{tr("Présentation")}</span><RichEditor label={tr("Présentation")} value={bio} onChange={setBio} /><small className="note" style={{ color: plain(bio).trim().length < 150 ? "var(--btn)" : undefined }}>{plain(bio).trim().length}/150 {tr("caractères minimum")}</small></div>
             <div className="row2"><label className="f">{tr("Site ou réseau (optionnel)")}<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
             <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!canRate && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="rlist">{rates.map((r, i) => <div className="rrow" key={i}>
                 <select aria-label={tr("Durée")} value={r.d} disabled={!canRate} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, d: e.target.value } : x)))}>{RATE_OPTS.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select>
@@ -338,7 +340,7 @@ export default function MyProfile() {
             </label>}
             {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
 
-{!isNewP && <VerifRequest uid={uid} verified={verif} embedded />}</section><section className="dcard"><h3 id="dispo">{tr("Disponibilités")}</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>{tr("Mes heures de disponibilité (obligatoire)")}</strong>
+{!isNewP && <VerifRequest uid={uid} verified={verif} embedded />}</section><section className="dcard"><h3 id="dispo">{tr("Disponibilités et déplacements")}</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>{tr("Mes heures de disponibilité (obligatoire)")}</strong>
               <p className="note">{tr("Coche les jours où tu es joignable. Ton profil affichera « Dispo » pendant ces heures et sera grisé en dehors.")}</p>
               <label className="h24"><input type="checkbox" checked={h24} onChange={(e) => setH24(e.target.checked)} /> <b>{tr("Disponible 24h/24, 7j/7")}</b></label>
               {DAYL.map((d, i) => { const h = hours[String(i)];
@@ -350,7 +352,7 @@ export default function MyProfile() {
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
             <button className="dbtn" type="submit" disabled={busy}>{busy ? tr("Patiente…") : isNewP ? tr("Publier mon profil") : tr("Enregistrer")}</button></section>
           </fieldset></form>}
-          {!isNewP && <section className="dcard dzone" id="supprimer"><h3>{tr("🗑 Supprimer mon profil et mes données")}</h3>
+          {!isNewP && <details className="dcard actbox dzone" id="supprimer"><summary>{tr("🗑 Supprimer mon profil et mes données")}</summary><div style={{ padding: "16px 18px" }}>
             <p className="note" style={{ margin: "0 0 10px" }}>{tr("Efface définitivement ton profil, tes photos et ta vidéo, tes commentaires, tes signalements de numéros et ton compte de connexion. C’est irréversible.")}</p>
             {!delAsk ? <button type="button" className="btn ghost" onClick={() => setDelAsk(true)}>{tr("Supprimer mon compte…")}</button> : <div style={{ display: "grid", gap: 8 }}>
               <label className="f">{tr("Pour confirmer, écris")} <b>SUPPRIMER</b><input value={delTxt} onChange={(e) => setDelTxt(e.target.value)} autoComplete="off" /></label>
@@ -358,7 +360,7 @@ export default function MyProfile() {
                 <button type="button" className="btn" disabled={delBusy || delTxt.trim().toUpperCase() !== "SUPPRIMER"} onClick={deleteAll}>{delBusy ? tr("Suppression…") : tr("Oui, tout supprimer")}</button>
                 <button type="button" className="btn ghost" disabled={delBusy} onClick={() => { setDelAsk(false); setDelTxt(""); }}>{tr("Annuler")}</button></div>
               {delMsg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: 0 }}>{delMsg}</p>}</div>}
-          </section>}
+          </div></details>}
         </div>
       </main>
     </div>
