@@ -113,7 +113,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
             <div className="panel pi">
               <div className="pst" role="list" aria-label="Informations du profil">
                 <div role="listitem"><i aria-hidden="true">📅</i><b><TDate iso={p.created_at} /></b><span><Tr k="Inscription" /></span></div>
-                {seen && <div role="listitem"><i aria-hidden="true">🕒</i><b><Tr k={seen.k} vars={seen.v} /></b><span><Tr k="Dernière connexion" /></span></div>}
+                {<div role="listitem"><i aria-hidden="true">🕒</i><b>{seen ? <Tr k={seen.k} vars={seen.v} /> : <Tr k="Pas encore connectée" />}</b><span><Tr k="Dernière connexion" /></span></div>}
                 {st && <div role="listitem"><i aria-hidden="true">👁</i><b>{fmtN(st.views_total)}</b><span><Tr k="Vues au total" /></span></div>}
                 {st && <div role="listitem"><i aria-hidden="true">🔥</i><b>{fmtN(st.views_today)}</b><span><Tr k="Vues aujourd’hui" /></span></div>}
               </div>
