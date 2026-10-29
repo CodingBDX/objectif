@@ -1378,3 +1378,6 @@ h1.pbn{margin:0}
 .leaflet-container .leaflet-marker-pane .mprof i img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;object-position:center top;border-radius:50%}
 .mprof b{max-width:calc(92px*var(--s,1));font:700 calc(8px + 4px*var(--s,1)) var(--fb);padding:1px calc(9px*var(--s,1))}
 .mprof em{width:calc(24px*var(--s,1));height:calc(24px*var(--s,1));font-size:calc(14px*var(--s,1))}
+/* Pied de page : badges de confiance alignés (même hauteur, texte centré) */
+.sf-trust li{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 14px;line-height:1;white-space:nowrap}
+@media(max-width:520px){.sf-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sf-trust li{padding:0 6px;font-size:11.5px;gap:4px}}
