@@ -287,7 +287,7 @@ export default function MyProfile() {
                 {!isLive && <input maxLength={31} disabled={!socOk} placeholder="TikTok" aria-label={tr("Pseudo TikTok")} value={f.tiktok} onChange={set("tiktok")} />}</div></div>
             <p className="note">{tr("Le numéro et les pseudos seront visibles par tous sur ton profil. Ne mets que ce que tu veux partager publiquement.")}</p>
 
-</section><section className="dcard"><h3>{tr("Mes photos")}</h3><div>
+</section><section className="dcard"><h3>{tr("Photos, vidéo et vérification")}</h3><div>
               <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Mes photos")} ({photos.length}/{maxP})</b>{tr(" · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.")}{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}>{tr(" Il en faut au moins 3.")}</span>}</p>
               <div className="edph">{photos.map((src, i) => (
                 <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} referrerPolicy="no-referrer" alt={tr("Photo {n}", { n: i + 1 })} />
@@ -304,7 +304,7 @@ export default function MyProfile() {
             </label>}
             {photos.length < maxP && <div className="f"><span style={L}>{tr("Ou ajoute une photo par lien (image hébergée ailleurs)")}</span><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input type="url" inputMode="url" placeholder="https://…/photo.jpg" aria-label={tr("Lien de la photo")} value={plink} onChange={(e) => setPlink(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addLink(); } }} style={{ flex: "1 1 220px", minWidth: 0 }} /><button type="button" className="btn ghost" onClick={addLink}>{tr("Ajouter le lien")}</button></div><small className="note">{tr("Le filigrane n’est pas ajouté sur les photos par lien, et la photo disparaît si l’autre site la retire.")}</small></div>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
-</section>{!isNewP && <VerifRequest uid={uid} verified={verif} />}<section className="dcard"><h3>{tr("Vidéo")}</h3>{kind === "livecam" && <label className="f">{tr("Lien de ton live (obligatoire pour un profil livecam)")}<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
+<h4 className="subh">{tr("Vidéo")}</h4>{kind === "livecam" && <label className="f">{tr("Lien de ton live (obligatoire pour un profil livecam)")}<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Ma vidéo")} ({video ? 1 : 0}/1)</b>{tr(" · une seule vidéo de présentation, 20 Mo maximum. ✕ pour la supprimer.")}</p>
             {video && <div className="edph"><div className="eph vid"><video src={video + "#t=0.1"} muted playsInline preload="metadata" aria-label={tr("Aperçu de ma vidéo")} />
               <span className="fst">{tr("Vidéo")}</span>
@@ -316,7 +316,7 @@ export default function MyProfile() {
             </label>}
             {vMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: vMsg.ok ? "inherit" : "var(--btn)" }}>{vMsg.t}</p>}
 
-</section><section className="dcard"><h3 id="dispo">{tr("Disponibilités")}</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>{tr("Mes heures de disponibilité (obligatoire)")}</strong>
+{!isNewP && <VerifRequest uid={uid} verified={verif} embedded />}</section><section className="dcard"><h3 id="dispo">{tr("Disponibilités")}</h3><div className={`hf${h24 ? " is24" : ""}`}><strong>{tr("Mes heures de disponibilité (obligatoire)")}</strong>
               <p className="note">{tr("Coche les jours où tu es joignable. Ton profil affichera « Dispo » pendant ces heures et sera grisé en dehors.")}</p>
               <label className="h24"><input type="checkbox" checked={h24} onChange={(e) => setH24(e.target.checked)} /> <b>{tr("Disponible 24h/24, 7j/7")}</b></label>
               {DAYL.map((d, i) => { const h = hours[String(i)];

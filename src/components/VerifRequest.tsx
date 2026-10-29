@@ -7,7 +7,7 @@ type Req = { status: "pending" | "approved" | "rejected"; note: string } | null;
 const today = () => new Date().toLocaleDateString("fr-FR");
 
 /** Demande de vérification : photo de soi avec un papier "sex-escorte.com" + la date du jour. Visible seulement par l'admin, supprimée après décision. */
-export default function VerifRequest({ uid, verified }: { uid: string; verified: boolean }) {
+export default function VerifRequest({ uid, verified, embedded }: { uid: string; verified: boolean; embedded?: boolean }) {
   const { tr } = useT();
   const [req, setReq] = useState<Req>(null); const [busy, setBusy] = useState(false); const [msg, setMsg] = useState("");
   useEffect(() => { (async () => { const sb = await sbLazy(); const { data } = await sb.from("verif_requests").select("status,note").eq("profile_id", uid).maybeSingle(); setReq((data as Req) || null); })(); }, [uid]);
@@ -25,9 +25,9 @@ export default function VerifRequest({ uid, verified }: { uid: string; verified:
     setBusy(false); if (error) { setMsg(error.message); return; }
     setReq({ status: "pending", note: "" });
   }
-  if (verified) return <section className="dcard"><h3>{tr("✔ Profil vérifié")}</h3><p className="note" style={{ margin: 0 }}>{tr("Ton profil est vérifié : le badge est visible sur ta fiche.")}</p></section>;
+  if (verified) return <div className="subcard"><h4 className="subh">{tr("✔ Profil vérifié")}</h4><p className="note" style={{ margin: 0 }}>{tr("Ton profil est vérifié : le badge est visible sur ta fiche.")}</p></div>;
   return (
-    <section className="dcard" id="verif"><h3>{tr("Faire vérifier mon profil")}</h3>
+    <div className="subcard" id="verif"><h4 className="subh">{tr("Faire vérifier mon profil")}</h4>
       {req?.status === "pending" ? <p className="note" style={{ margin: 0 }}>{tr("⏳ Ta photo est en cours de vérification. Tu seras vérifiée dès qu’elle est validée.")}</p> : <>
         <p className="note" style={{ margin: "0 0 8px" }}>{tr("Le badge vérifié rassure les visiteurs. Prends une photo de toi en tenant un papier avec écrit à la main :")}</p>
         <p style={{ margin: "0 0 8px", font: "700 17px var(--fd)" }}>sex-escorte.com · {today()}</p>
@@ -36,6 +36,6 @@ export default function VerifRequest({ uid, verified }: { uid: string; verified:
         <label className="btn ghost" style={{ cursor: "pointer", justifySelf: "start" }}>{busy ? tr("Envoi en cours…") : tr("📷 Envoyer ma photo")}<input type="file" accept="image/jpeg,image/png,image/webp" hidden disabled={busy} onChange={(e) => { send(e.target.files?.[0]); e.target.value = ""; }} /></label>
         {msg && <p role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: "8px 0 0" }}>{msg}</p>}
       </>}
-    </section>
+    </div>
   );
 }
