@@ -1065,3 +1065,21 @@ h1.pbn{margin:0}
 .nsug .nbub:hover:not(:disabled){background:var(--btn);color:var(--btnt);border-color:var(--btn)}
 .nsug .nbub:disabled{opacity:.45;cursor:not-allowed}
 .nsugf{font:500 12px var(--fb);opacity:.8;flex-basis:100%}
+
+/* Ville sans profil : encart d'invitation */
+.ejoin{position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 16px;padding:18px 20px;border-radius:24px;border:1px solid var(--line);
+ background:linear-gradient(120deg,var(--soft),var(--card) 55%,var(--livebg));box-shadow:var(--sh);animation:pop .6s both}
+.ejoin::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--pink),var(--live),var(--pink));background-size:300% 100%;animation:mv 6s linear infinite}
+.ejoin::after{content:"✦";position:absolute;left:62px;top:12px;font-size:22px;color:var(--pink);opacity:.35;animation:ejtw 3.2s ease-in-out infinite}
+.ejico{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--btn);color:var(--btnt);flex:none;animation:ejfl 3.4s ease-in-out infinite;box-shadow:0 8px 20px rgba(238,79,151,.35)}
+.ejtx{flex:1 1 240px;min-width:0}
+.ejtx h2{font:600 22px/1.2 var(--fd);margin:0 0 4px;color:var(--ink);text-wrap:balance}
+.ejtx p{margin:0;color:var(--mut)}
+.ejbtn{position:relative;white-space:nowrap}
+.ejbtn::after{content:"";position:absolute;inset:-3px;border-radius:999px;border:2px solid var(--pink);opacity:0;animation:ejring 2.4s ease-out infinite;pointer-events:none}
+.ejbtn span{display:inline-block;transition:transform .2s}.ejbtn:hover span{transform:translateX(4px)}
+@keyframes ejfl{50%{transform:translateY(-5px) rotate(-5deg)}}
+@keyframes ejtw{50%{transform:scale(1.5) rotate(20deg);opacity:.7}}
+@keyframes ejring{0%{opacity:.7;transform:scale(1)}80%,100%{opacity:0;transform:scale(1.18)}}
+@media (prefers-reduced-motion:reduce){.ejoin,.ejoin::before,.ejoin::after,.ejico,.ejbtn::after{animation:none}}
+@media (max-width:560px){.ejoin{padding:16px;gap:12px}.ejbtn{width:100%}.ejbtn::after{display:none}}

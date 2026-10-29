@@ -79,9 +79,13 @@ function EmptyCityNearby({ profiles, city, onOpen }: { profiles: Profile[]; city
   }, [profiles, city]);
   return (
     <section className="emptynear" aria-label={tr("Profils à moins de 20 km")}>
-      <div className="panel" style={{ margin: "0 0 12px", padding: "12px 16px", display: "grid", gap: 6 }}>
-        <p style={{ margin: 0 }}><b>{tr("Tu es escort à {c} ?", { c: city })}</b> {tr("Inscris-toi gratuitement : ton profil sera le premier de la ville.")}</p>
-        <p style={{ margin: 0 }}><Link className="btn" href="/rejoindre">{tr("Créer mon profil gratuit")}</Link></p>
+      <div className="ejoin">
+        <span className="ejico" aria-hidden="true"><Ic n="pin" s={30} /></span>
+        <div className="ejtx">
+          <h2>{tr("Tu es escort à {c} ?", { c: city })}</h2>
+          <p>{tr("Inscris-toi gratuitement : ton profil sera le premier de la ville.")}</p>
+        </div>
+        <Link className="btn ejbtn" href="/rejoindre">{tr("Créer mon profil gratuit")} <span aria-hidden="true">→</span></Link>
       </div>
       {out && out.length > 0 && <>
         <h2 style={{ font: "600 20px var(--fd)", margin: "0 0 10px" }}>{tr("Profils à moins de 20 km de {c}", { c: city })}</h2>
