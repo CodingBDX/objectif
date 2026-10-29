@@ -1432,3 +1432,8 @@ h1.pbn{margin:0}
 .dch{padding:12px 20px 12px 12px;min-height:60px;gap:10px}
 .dch i{width:38px;height:38px}
 @media (max-width:700px){.dchips{padding:10px 2px 18px;margin-block:0}}
+
+/* Encart logement : les deux boutons alignés, même largeur et même hauteur */
+#logements .acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+#logements .acts .btn{display:flex;align-items:center;justify-content:center;text-align:center;min-height:48px;margin:0;width:100%;padding-inline:10px;line-height:1.2}
+@media (max-width:420px){#logements .acts{grid-template-columns:1fr}}
