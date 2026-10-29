@@ -7,6 +7,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import Nav from "@/components/Nav";
 import PauseBanner from "@/components/PauseBanner";
 import VipBanner from "@/components/VipBanner";
+import InstallBanner, { InstallLink } from "@/components/InstallBanner";
 import AgeGate from "@/components/AgeGate";
 import Splash from "@/components/Splash";
 import NavProgress from "@/components/NavProgress";
@@ -42,6 +43,9 @@ export default async function Root({ children }: { children: React.ReactNode }) 
     <html lang="fr" data-theme="light" className={`${fredoka.variable} ${quicksand.variable}`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#d63384" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="Sex-Escorte" />
         {process.env.NEXT_PUBLIC_SUPABASE_URL && <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} />}
       </head>
       <body>
@@ -52,7 +56,8 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         {me && <PauseBanner id={user!.id} name={me.name} vip={me.vip} paused={me.paused} />}
         {me && !me.vip && <VipBanner paused={me.paused} />}
         {children}
-        <footer className="gut" id="foot"><Tr k="Sex-Escorte.com soutient les escortes et les protège des arnaqueurs et des réseaux de proxénétisme, d’adultes comme de mineurs. Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos." /><br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · {escort && <><Link href="/associations">Associations</Link> · </>}<Link href="/contact">Contact</Link> · <Link href="/rejoindre"><Tr k="Rejoindre" /></Link></footer>
+        <InstallBanner />
+        <footer className="gut" id="foot"><Tr k="Sex-Escorte.com soutient les escortes et les protège des arnaqueurs et des réseaux de proxénétisme, d’adultes comme de mineurs. Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos." /><br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · {escort && <><Link href="/associations">Associations</Link> · </>}<Link href="/contact">Contact</Link> · <Link href="/rejoindre"><Tr k="Rejoindre" /></Link><InstallLink /></footer>
       </body>
     </html>
   );
