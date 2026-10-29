@@ -26,9 +26,16 @@ where u.email is not null
 update auth.users set email_confirmed_at = coalesce(email_confirmed_at, now()), banned_until = null
 where email like '%@objectif.invalid';
 
--- 4) Controle : pour chaque faux compte -> mot de passe present, confirme, identite presente (tout doit etre vrai)
+-- 4) Controle avec le PSEUDO : faux comptes + comptes crees aujourd'hui (mot de passe, confirme, identite : tout doit etre vrai)
 select u.email,
+       coalesce(p.name, m.pseudo) as pseudo,
+       p.city as ville,
        (coalesce(u.encrypted_password, '') <> '') as mot_de_passe,
        (u.email_confirmed_at is not null) as confirme,
        exists (select 1 from auth.identities i where i.user_id = u.id and i.provider = 'email') as identite
-from auth.users u where u.email like '%@objectif.invalid' order by u.email limit 50;
+from auth.users u
+left join public.profiles p on p.id = u.id
+left join public.members  m on m.id = u.id
+where u.email like '%@objectif.invalid'
+   or (u.created_at at time zone 'Europe/Paris')::date = (now() at time zone 'Europe/Paris')::date
+order by u.email;
