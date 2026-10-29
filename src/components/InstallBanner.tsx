@@ -46,8 +46,8 @@ export default function InstallBanner() {
 }
 
 /** Lien permanent « Installer l'appli » (pied de page) : visible seulement si l'installation est possible. */
-export function InstallLink() {
+export function InstallLink({ bare = false }: { bare?: boolean }) {
   const { tr } = useT(); const { can, ios, done, install } = useInstall(); const [help, setHelp] = useState(false);
   if (done || !(can || ios)) return null;
-  return <span className="pwal"> · <button type="button" onClick={() => (can ? install() : setHelp(!help))}>📲 {tr("Installer l’appli")}</button>{help && <small> {tr("Touche « Partager » puis « Sur l’écran d’accueil ».")}</small>}</span>;
+  return <span className="pwal">{bare ? null : " · "}<button type="button" onClick={() => (can ? install() : setHelp(!help))}>📲 {tr("Installer l’appli")}</button>{help && <small> {tr("Touche « Partager » puis « Sur l’écran d’accueil ».")}</small>}</span>;
 }
