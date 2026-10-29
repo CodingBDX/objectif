@@ -1388,3 +1388,15 @@ h1.pbn{margin:0}
 .sf-specs a{padding:4px 11px;font-size:12.5px}
 .sf-specs a:nth-child(n+9){display:none}
 }
+
+/* Fidélité : couronnes de niveau et carte « Mes points » */
+.crownl{display:inline-flex;align-items:center;flex:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.crownl .ic{fill:currentColor;stroke-width:1.2}
+.lyl{display:flex;align-items:center;gap:12px}
+.lyl b{display:block;font:700 18px var(--fd)}
+.lyl small{color:var(--mut)}
+.lybar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;border:1px solid var(--line)}
+.lybar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--btn))}
+.lyw{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:14px}
+.lyw b{display:inline-block;min-width:44px;color:var(--btn)}
+.lyb{display:flex;flex-wrap:wrap;gap:8px}

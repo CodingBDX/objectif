@@ -16,7 +16,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
     const [open, setOpen] = useState(false);
   const { tr } = useT(); const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const close = () => setOpen(false);
-  useEffect(() => { if (!hasProfile) return; try { if (sessionStorage.getItem("hp_seen")) return; sessionStorage.setItem("hp_seen", "1"); } catch {} sbLazy().then((sb) => sb.rpc("touch_last_seen")).then(() => {}, () => {}); }, [hasProfile]);
+  useEffect(() => { if (!hasProfile) return; try { if (sessionStorage.getItem("hp_seen")) return; sessionStorage.setItem("hp_seen", "1"); } catch {} sbLazy().then((sb) => Promise.all([sb.rpc("touch_last_seen"), sb.rpc("loyalty_sync")])).then(() => {}, () => {}); }, [hasProfile]);
   const path = usePathname();
   return (
     <>

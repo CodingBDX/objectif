@@ -1,4 +1,5 @@
 "use client";
+import LoyaltyCard from "@/components/LoyaltyCard";
 import { useEffect, useRef, useState } from "react";
 import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
@@ -206,6 +207,7 @@ export default function MyProfile() {
         {!isNewP && <StatsPanel />}
         {!isNewP && <BumpCard />}
         {!isNewP && <SafetyCard />}
+        {!isNewP && <LoyaltyCard />}
         {!isNewP && <ReferralCard />}
         {!isNewP && <LodgingFinder />}
         {!isNewP && <h2 className="dsub" id="profil">{tr("✏️ Modifier mon profil")}</h2>}

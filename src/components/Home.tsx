@@ -10,6 +10,7 @@ import { nearestCity, coordsOf, km } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
 import { buildZones } from "@/lib/quartiers";
 import Ic from "./Ic";
+import CrownBadge from "./CrownBadge";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
 import SearchBox from "./SearchBox";
@@ -52,6 +53,8 @@ function UneBanner({ p, onOpen }: { p: Profile; onOpen: () => void }) {
     </button>
   );
 }
+/** Remontée de moins de 24 h : passe devant ; ensuite les profils sont classés par points (fidélité), puis par date. */
+const bumpedNow = (p: Profile) => (p.bumped_at && Date.now() - new Date(p.bumped_at).getTime() < 864e5 ? 1 : 0);
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
   const { tr } = useT();
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
@@ -69,7 +72,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
       </div>
       <div className="in">
         <div className="bdgs">{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}{isNew(p) && <span className="nwb"><Ic n="spark" s={14} />{tr("New")}</span>}{lab(p) && <span className={`badge${live ? " live" : ""}`}>{lab(p)}</span>}{a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? tr("En direct") : tr("Dispo")}</span>}{p.video && <span className="vid-ic"><Ic n="video" s={14} />{tr("vidéo")}</span>}</div>
-        <div className="ln"><h2>{p.name}</h2>
+        <div className="ln"><h2>{p.name}</h2><CrownBadge level={p.crown} />
           {p.verified && <span className="vf" role="img" aria-label={tr("Profil vérifié")} title={tr("Profil vérifié")}><Ic n="check" s={12} /></span>}
           <Heart id={p.id} /></div>
         <div className="meta"><Ic n="pin" s={15} />{live ? tr("En ligne") : p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>
@@ -192,7 +195,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       && (!df.smk || p.smoker === df.smk) && (!df.drk || p.drinker === df.drk) && (!df.recv || p.receives) && (!df.trav || p.travels)
       && (!vid || p.video) && (!ver || p.verified) && (!rue || p.street) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio.replace(/[*#]/g, "") + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
-    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.bumped_at || b.created_at) - +new Date(a.bumped_at || a.created_at));
+    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : bumpedNow(b) - bumpedNow(a) || (b.points || 0) - (a.points || 0) || +new Date(b.bumped_at || b.created_at) - +new Date(a.bumped_at || a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, rue, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
