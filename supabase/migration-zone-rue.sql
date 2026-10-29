@@ -4,6 +4,8 @@ alter table public.profiles add column if not exists street boolean not null def
 alter table public.profiles add column if not exists zone text;
 alter table public.profiles add column if not exists zone_map boolean not null default false;
 alter table public.profiles add column if not exists street_hours text;
+-- Le site n'autorise la modification que de certaines colonnes (droits par colonne) : on ajoute celles-ci.
+grant update (street, zone, zone_map, street_hours) on public.profiles to authenticated;
 
 -- Garde-fous : longueur limitee, et la carte n'est jamais active sans zone.
 create or replace function public.zone_guard() returns trigger
