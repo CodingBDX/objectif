@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GPATH, slug } from "@/lib/site";
 import { profilePath } from "@/lib/profilUrl";
+import GlobalSearch from "@/components/GlobalSearch";
 import { CATS } from "@/lib/types";
 import { nearestCity, coordsOf, km } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
@@ -12,7 +13,6 @@ import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
 import SearchBox from "./SearchBox";
 import { useT, Tr } from "@/lib/i18n";
-const SearchLink = ({ cls = "" }: { cls?: string }) => { const { tr } = useT(); return <Link href="/recherche" className={`sp sbox slink ${cls}`} aria-label={tr("Ouvrir la recherche")}><Ic n="search" /><span>{tr("Ville, profil, spécialité…")}</span></Link>; };
 import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note"><Tr k="Chargement de la carte…" /></p> });
 import { useFavs } from "@/lib/favs";
@@ -178,6 +178,11 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
+  const sidx = useMemo(() => { // index de la recherche du panneau de droite (mêmes suggestions que le menu du haut)
+    const cc: Record<string, number> = {}, tc: Record<string, number> = {};
+    profiles.forEach((p) => { if (p.genre !== "livecam") cc[p.city] = (cc[p.city] || 0) + 1; (p.specialties || []).forEach((x) => { const k = x.toLowerCase(); tc[k] = (tc[k] || 0) + 1; }); });
+    return { c: Object.entries(cc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")) as [string, number][], t: Object.entries(tc).sort((a, b) => b[1] - a[1]) as [string, number][], p: profiles.map((p) => ({ id: p.id, name: p.name, sub: [lab(p), p.city].filter(Boolean).join(" · ") })) };
+  }, [profiles]);
   const isHome = usePathname() === "/"; const [topAll, setTopAll] = useState(false); const [sheet, setSheet] = useState<"" | "open" | "closing">("");
   const [pend, setPend] = useState<string[]>([]); // ville choisie dans la fenêtre de recherche, appliquée au clic sur « Voir les résultats »
   const closeSheet = () => { setPend([]); setSheet("closing"); setTimeout(() => setSheet(""), 260); };
@@ -294,7 +299,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       <aside className="aside" aria-label="Filtres">
         {!searchMode && <div className="panel hlp"><h2><Ic n="star" s={20} />Mis en avant{type !== "tous" ? " · " + tr(ITEMS.find((i) => i[0] === type)?.[1] || "") : ""}{tag ? " · " + cap(tag) : ""}{city ? " · " + city : ""}</h2>
           <div>{hl.slice(0, 3).map((p) => <button key={p.id} className="hl" onClick={() => open(p.id)}><i style={p.photos[0] ? { backgroundImage: `url('${p.photos[0]}')` } : undefined} /><span><b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></span></button>)}</div></div>}
-        <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><SearchLink /></div>
+        <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><GlobalSearch index={sidx} onGo={(u) => r.push(u)} /></div>
           <h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
           <div className="row"><span>{tr("Profil")}</span><select aria-label={tr("Profil")} value={type} onChange={(e) => setType(e.target.value)}><option value="tous">{tr("Tous les profils")}</option><option value="fille">{tr("Filles")}</option><option value="homme">{tr("Hommes")}</option><option value="trans">{tr("Trans")}</option><option value="livecam">{tr("Livecam")}</option></select></div>
           <div className="row"><span>{tr("Trier par")}</span><select aria-label={tr("Tri")} value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">{tr("Plus récents")}</option><option value="az">{tr("Nom (A à Z)")}</option><option value="tarif">{tr("Tarif croissant (selon la durée)")}</option><option value="vus">{tr("Plus vus (30 jours)")}</option><option value="media">{tr("Plus de contenus")}</option></select></div>

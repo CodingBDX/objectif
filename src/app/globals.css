@@ -1174,3 +1174,7 @@ h1.pbn{margin:0}
 .crumbs.inline li{flex:none}
 .crumbs.inline li[aria-current]{flex:0 1 auto;min-width:0;max-width:40vw;color:var(--ink)}
 .crumbs.inline a{color:var(--btn)}
+
+/* Recherche du panneau de droite (ordinateur) : vrai champ de saisie */
+.dsearch .sp{max-width:none;width:100%;margin:0}
+.dsearch .citylist{left:0;right:0;z-index:30}
