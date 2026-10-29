@@ -1119,3 +1119,6 @@ h1.pbn{margin:0}
 .pendl{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
 .pendl .pendc{margin:0}
 .multic{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}
+
+/* Fenêtre de recherche : pas de zoom automatique du téléphone au clic dans un champ (il décalait la fenêtre) */
+@media (max-width:700px){.panel.msearch.sheet input,.panel.msearch.sheet select,.panel.msearch.sheet textarea{font-size:16px}.panel.msearch.sheet{touch-action:pan-y}}
