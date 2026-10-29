@@ -1083,3 +1083,28 @@ h1.pbn{margin:0}
 @keyframes ejring{0%{opacity:.7;transform:scale(1)}80%,100%{opacity:0;transform:scale(1.18)}}
 @media (prefers-reduced-motion:reduce){.ejoin,.ejoin::before,.ejoin::after,.ejico,.ejbtn::after{animation:none}}
 @media (max-width:560px){.ejoin{padding:16px;gap:12px}.ejbtn{width:100%}.ejbtn::after{display:none}}
+
+/* Mobile : boutons du Top ville alignés + gros bouton Rechercher (fenêtre qui monte du bas) */
+.msbtn,.sheetbg,.sheethd,.sheetft{display:none}
+.topbtns{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.panel.top.topx .topbtns .btn{margin:0;flex:0 1 auto}
+@media (max-width:700px){
+ .panel.top.topx .topbtns .btn{flex:1 1 0;min-width:0;padding:10px 8px;font-size:14px;text-align:center;white-space:normal;line-height:1.2}
+ .panel.top .msbtn{display:flex;width:100%;margin-top:10px;min-height:56px;font-size:18px;border-radius:18px;box-shadow:0 8px 20px rgba(238,79,151,.3)}
+ .sheetbg{display:block;position:fixed;inset:0;z-index:68;background:rgba(40,10,30,.5);animation:sbIn .25s both}
+ .sheetbg.out{animation:sbOut .26s both}
+ .panel.msearch.sheet{display:flex!important;flex-direction:column;position:fixed;left:0;right:0;bottom:0;top:7vh;z-index:70;margin:0!important;border-radius:26px 26px 0 0;background:var(--bg1);padding:0 16px calc(84px + env(safe-area-inset-bottom,0px));overflow-y:auto;overscroll-behavior:contain;box-shadow:0 -12px 40px rgba(0,0,0,.28);animation:sheetUp .32s cubic-bezier(.2,.8,.2,1) both}
+ .panel.msearch.sheet.closing{animation:sheetDown .26s ease-in both}
+ .sheethd{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;background:var(--bg1);padding:18px 0 10px;margin:0}
+ .sheethd i{position:absolute;left:50%;top:8px;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:var(--line)}
+ .sheethd b{font:600 20px var(--fd)}
+ .sheethd .x{border:0;background:var(--soft);color:var(--ink);width:38px;height:38px;border-radius:50%;font-size:16px}
+ .sheetft{display:block;position:fixed;left:0;right:0;bottom:0;z-index:3;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,var(--bg1) 35%)}
+ .sheetft .btn{width:100%;min-height:50px;font-size:17px}
+ .panel.msearch.sheet .fh{margin-top:14px}
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sheetDown{from{transform:none}to{transform:translateY(100%)}}
+@keyframes sbIn{from{opacity:0}to{opacity:1}}
+@keyframes sbOut{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.panel.msearch.sheet,.sheetbg{animation:none!important}}
