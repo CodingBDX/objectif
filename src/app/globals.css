@@ -1292,3 +1292,14 @@ h1.pbn{margin:0}
 .dscr li{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:none;border-radius:0;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px;min-width:0}
 .dscr li span{font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--mut)}
 .dscr li b{font-weight:600;overflow-wrap:anywhere}
+
+/* Menus déroulants du profil (Description, Spécialités) */
+details.fold{margin:6px 0 4px}
+details.fold>summary{cursor:pointer;list-style:none;user-select:none}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::before{content:"";order:2;width:9px;height:9px;border-right:2.5px solid var(--pink);border-bottom:2.5px solid var(--pink);transform:rotate(45deg);margin:-4px 4px 0 0;transition:transform .2s}
+details.fold[open]>summary::before{transform:rotate(-135deg);margin-top:4px}
+details.fold>summary::after{order:1}
+details.fold>summary.pres{justify-content:flex-start}
+details.fold>summary:focus-visible{outline:2px solid var(--btn);outline-offset:4px;border-radius:8px}
+details.fold>:not(summary){margin-top:12px}
