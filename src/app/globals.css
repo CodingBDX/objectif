@@ -1417,16 +1417,6 @@ h1.pbn{margin:0}
 .dcard.actbox>.dcard{display:grid}
 .trow{align-items:end}.trow>.tdate input,.trow input{margin:0}
 
-/* Barre de contact flottante : plus d'air en hauteur (bulles moins écrasées) */
-.pcontact{padding:12px 14px;row-gap:12px}
-.pcontact .pph{min-height:52px;padding-top:6px;padding-bottom:6px}
-.pcontact .pph.zz{padding:10px 18px;line-height:1.35}
-@media (max-width:640px){
- .pcontact{padding:12px 12px;row-gap:12px;column-gap:10px;bottom:calc(16px + env(safe-area-inset-bottom,0px))}
- .pcontact .pph{min-height:52px}
- .pcontact .soc{height:52px;border-radius:26px}
-}
-
 /* Statistiques (Mon espace) : bulles plus aérées en hauteur */
 .dchips{gap:12px;row-gap:14px;padding-block:6px}
 .dch{padding:12px 20px 12px 12px;min-height:60px;gap:10px}
