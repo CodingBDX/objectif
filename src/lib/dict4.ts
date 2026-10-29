@@ -88,6 +88,7 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Voir les résultats": ["See results", "Ver resultados", "Ver resultados"],
   "Aucun profil ne correspond à ta recherche": ["No profile matches your search", "Ningún perfil coincide con tu búsqueda", "Nenhum perfil corresponde à tua pesquisa"],
   "Essaie d’autres mots, une autre ville, ou retire quelques filtres. Tu es escort ? Ton profil peut être le premier.": ["Try other words, another city, or remove a few filters. Are you an escort? Your profile could be the first.", "Prueba otras palabras, otra ciudad o quita algunos filtros. ¿Eres escort? Tu perfil puede ser el primero.", "Tenta outras palavras, outra cidade ou remove alguns filtros. És escort? O teu perfil pode ser o primeiro."],
+  "Bonjour {n}, je vous contacte depuis Sex-Escorte.com. Êtes-vous disponible ?": ["Hello {n}, I am contacting you from Sex-Escorte.com. Are you available?", "Hola {n}, te escribo desde Sex-Escorte.com. ¿Estás disponible?", "Olá {n}, estou a contactar-te através do Sex-Escorte.com. Estás disponível?"],
   "Numéro WhatsApp (obligatoire)": ["WhatsApp number (required)", "Número de WhatsApp (obligatorio)", "Número de WhatsApp (obrigatório)"],
   "Numéro de téléphone (obligatoire)": ["Phone number (required)", "Número de teléfono (obligatorio)", "Número de telefone (obrigatório)"],
   "Indique ton numéro de téléphone (obligatoire).": ["Enter your phone number (required).", "Indica tu número de teléfono (obligatorio).", "Indica o teu número de telefone (obrigatório)."],
