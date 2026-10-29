@@ -5,6 +5,7 @@ import Link from "next/link";
 import AssoForm from "@/components/AssoForm";
 import StatsPanel from "@/components/StatsPanel";
 import BumpCard from "@/components/BumpCard";
+import ReferralCard from "@/components/ReferralCard";
 import VerifRequest from "@/components/VerifRequest";
 import LodgingFinder from "@/components/LodgingFinder";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -166,7 +167,7 @@ export default function MyProfile() {
     const { error: pe } = await sb.rpc("set_my_phone", { p_phone: f.phone.trim() });
     if (pe) { setBusy(false); setMsg({ t: pe.message }); return; }
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
-    if (!error) await refreshListings();
+    if (!error) { await refreshListings(); if (isNewP) { try { const rc = localStorage.getItem("hp_ref"); if (rc) { await sb.rpc("claim_referral", { p_code: rc }); localStorage.removeItem("hp_ref"); } } catch {} } }
     setBusy(false);
     if (error) setMsg({ t: error.message }); else { location.href = `/profil/${uid}`; }
   }
@@ -201,6 +202,7 @@ export default function MyProfile() {
         <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
         {!isNewP && <StatsPanel />}
         {!isNewP && <BumpCard />}
+        {!isNewP && <ReferralCard />}
         {!isNewP && <LodgingFinder />}
         {!isNewP && <h2 className="dsub" id="profil">{tr("✏️ Modifier mon profil")}</h2>}
         <div className="dform0">
