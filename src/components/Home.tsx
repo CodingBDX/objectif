@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GPATH, slug } from "@/lib/site";
-import { nearestCity } from "@/lib/geo";
+import { nearestCity, coordsOf, km } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
 import Ic from "./Ic";
 import Heart from "./Heart";
@@ -57,6 +57,37 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
         <div className="tags">{p.specialties.slice(0, 2).map((t) => <span className="tag" key={t}>{cap(t)}</span>)}</div>
       </div>
     </article>
+  );
+}
+
+/** Ville sans aucun profil : profils basés à moins de 20 km, et invitation à s'inscrire. */
+function EmptyCityNearby({ profiles, city, onOpen }: { profiles: Profile[]; city: string; onOpen: (id: string) => void }) {
+  const { tr } = useT(); const [out, setOut] = useState<Profile[] | null>(null);
+  useEffect(() => {
+    let dead = false; setOut(null);
+    (async () => {
+      const me = await coordsOf(city); if (!me) { if (!dead) setOut([]); return; }
+      const cnt: Record<string, number> = {};
+      profiles.forEach((p) => { if (p.genre !== "livecam") cnt[p.city] = (cnt[p.city] || 0) + 1; });
+      const cand = Object.entries(cnt).sort((a, b) => b[1] - a[1]).slice(0, 120).map(([c]) => c);
+      const dist: Record<string, number> = {};
+      await Promise.all(cand.map(async (c) => { const k = await coordsOf(c); if (k) { const d = km(me, k); if (d <= 20) dist[c] = d; } }));
+      const res = profiles.filter((p) => p.genre !== "livecam" && dist[p.city] !== undefined).sort((a, b) => dist[a.city] - dist[b.city] || Number(b.vip) - Number(a.vip)).slice(0, 12);
+      if (!dead) setOut(res);
+    })();
+    return () => { dead = true; };
+  }, [profiles, city]);
+  return (
+    <section className="emptynear" aria-label={tr("Profils à moins de 20 km")}>
+      <div className="panel" style={{ margin: "0 0 12px", padding: "12px 16px", display: "grid", gap: 6 }}>
+        <p style={{ margin: 0 }}><b>{tr("Tu es escort à {c} ?", { c: city })}</b> {tr("Inscris-toi gratuitement : ton profil sera le premier de la ville.")}</p>
+        <p style={{ margin: 0 }}><Link className="btn" href="/rejoindre">{tr("Créer mon profil gratuit")}</Link></p>
+      </div>
+      {out && out.length > 0 && <>
+        <h2 style={{ font: "600 20px var(--fd)", margin: "0 0 10px" }}>{tr("Profils à moins de 20 km de {c}", { c: city })}</h2>
+        <div className="grid">{out.map((p, i) => <Card key={p.id} p={p} onOpen={() => onOpen(p.id)} delay={(i % 12) * 45} />)}</div>
+      </>}
+    </section>
   );
 }
 
@@ -216,6 +247,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : tr("Aucun profil ne correspond à votre recherche.")) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
         </div>
+        {view !== "map" && !!city && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}
         {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{tr("{n} profils à venir", { n: list.length - shown })}</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>{tr("Voir plus")}</button></div>}
       </main>
 
