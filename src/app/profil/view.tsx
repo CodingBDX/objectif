@@ -36,7 +36,7 @@ export const get = async (r: Ref) => {
   }
   let [{ data }, spec] = await Promise.all([q, publicSpecialties()]);
   if (r.slug && !(data || []).length) { // ancienne adresse conservée après un changement de pseudo : on retrouve le profil (puis redirection vers la nouvelle)
-    const { data: o } = await sb.from("profile_old_slugs").select("profile_id").eq("slug", r.slug.toLowerCase()).maybeSingle();
+    const { data: o } = await sb.from("profile_old_slugs").select("profile_id").eq("slug", r.slug.toLowerCase()).gt("created_at", new Date(Date.now() - 183 * 864e5).toISOString()).maybeSingle();
     if (o?.profile_id) data = (await sb.from("profiles").select("*").eq("id", o.profile_id).limit(1)).data;
   }
   const rows = (data || []) as Profile[];
