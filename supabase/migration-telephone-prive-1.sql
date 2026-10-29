@@ -39,20 +39,20 @@ end $$;
 -- Afficher le numero d un profil : limite par visiteur (12/heure sans compte, 30/heure connecte) et par adresse IP (40/heure)
 create or replace function public.reveal_phone(p_id uuid) returns text
 language plpgsql security definer set search_path = public as $$
-declare ip text; me uuid := auth.uid(); key text; lim int; n int; ph text;
+declare v_ip text; me uuid := auth.uid(); key text; lim int; n int; ph text;
 begin
   if me is not null and me = p_id then
     select phone into ph from public.profile_phones where profile_id = p_id; return ph;
   end if;
   if not exists (select 1 from public.profiles where id = p_id and paused = false) then return null; end if;
-  begin ip := split_part(coalesce((current_setting('request.headers', true)::json)->>'x-forwarded-for', 'inconnue'), ',', 1); exception when others then ip := 'inconnue'; end;
-  ip := trim(ip);
-  key := coalesce(me::text, ip); lim := case when me is null then 12 else 30 end;
+  begin v_ip := split_part(coalesce((current_setting('request.headers', true)::json)->>'x-forwarded-for', 'inconnue'), ',', 1); exception when others then v_ip := 'inconnue'; end;
+  v_ip := trim(v_ip);
+  key := coalesce(me::text, v_ip); lim := case when me is null then 12 else 30 end;
   select count(*) into n from public.phone_reveals r where r.k = key and r.at > now() - interval '1 hour';
   if n >= lim then raise exception 'Trop de demandes. Réessaie dans un moment.'; end if;
-  select count(*) into n from public.phone_reveals r where r.ip = reveal_phone.ip and r.at > now() - interval '1 hour';
+  select count(*) into n from public.phone_reveals r where r.ip = v_ip and r.at > now() - interval '1 hour';
   if n >= 40 then raise exception 'Trop de demandes. Réessaie dans un moment.'; end if;
-  insert into public.phone_reveals (k, ip) values (key, ip);
+  insert into public.phone_reveals (k, ip) values (key, v_ip);
   if random() < 0.02 then delete from public.phone_reveals where at < now() - interval '2 days'; end if;
   select phone into ph from public.profile_phones where profile_id = p_id;
   return ph;
