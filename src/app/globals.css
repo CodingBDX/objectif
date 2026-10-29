@@ -1282,3 +1282,8 @@ h1.pbn{margin:0}
 .sh .cnt0{order:1;margin-right:auto}
 .sh .vsw{order:3;margin-left:auto}
 }
+@media(max-width:700px){
+.mchips{flex-wrap:nowrap;overflow-x:auto;gap:6px;margin:12px 0 0;padding:2px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.mchips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:34px;padding:4px 12px;font-size:13px;white-space:nowrap;border-width:1.5px}
+}
