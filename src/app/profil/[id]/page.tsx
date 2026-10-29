@@ -1,4 +1,5 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { parseProfileParam, prefixRange, profileSeg, safeDecode } from "@/lib/profilUrl";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -19,13 +20,23 @@ import { TrackLink, TrackView } from "@/components/Track";
 import { GPATH, siteUrl, slug } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-const get = async (id: string) => { const [{ data }, spec] = await Promise.all([supabaseServer().from("profiles").select("*").eq("id", id).maybeSingle(), publicSpecialties()]); const p = data as Profile | null; if (p) p.specialties = (p.specialties || []).filter((x) => spec.includes(x)); return p; };
+const get = async (param: string) => {
+  const ref = parseProfileParam(param); if (!ref.id && !ref.prefix) return null;
+  const sb = supabaseServer(); let q = sb.from("profiles").select("*");
+  if (ref.id) q = q.eq("id", ref.id); else { const [lo, hi] = prefixRange(ref.prefix!); q = q.gte("id", lo).lte("id", hi).limit(60); }
+  const [{ data }, spec] = await Promise.all([q, publicSpecialties()]);
+  const rows = (data || []) as Profile[];
+  // adresse « jolie » : plusieurs identifiants peuvent partager le début (profils de démo) ; on garde celui dont l'adresse correspond
+  const p = ref.id ? rows[0] || null : rows.find((x) => profileSeg(x) === safeDecode(param).toLowerCase()) || rows.find((x) => x.id.startsWith(ref.prefix!)) || null;
+  if (p) p.specialties = (p.specialties || []).filter((x) => spec.includes(x));
+  return p;
+};
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const p = await get(params.id);
   if (!p) return {};
   const desc = (p.bio ? plain(p.bio).slice(0, 150) : `${p.name}, ${CATS[p.genre] || "créateur"}${p.genre === "livecam" ? " en ligne" : ` à ${p.city}`}. Photos, disponibilités et contact.`);
   return {
-    title: `${p.name}, ${CATS[p.genre] || "profil"}${p.genre === "livecam" ? "" : ` à ${p.city}`}`, description: desc, alternates: { canonical: `/profil/${p.id}` },
+    title: `${p.name}, ${CATS[p.genre] || "profil"}${p.genre === "livecam" ? "" : ` à ${p.city}`}`, description: desc, alternates: { canonical: `/profil/${profileSeg(p)}` },
     openGraph: { type: "profile", title: (p.genre === "livecam" ? p.name : `${p.name} · ${p.city}`), description: desc, images: p.photos[0] ? [{ url: p.photos[0] }] : undefined },
     twitter: { card: "summary_large_image", title: (p.genre === "livecam" ? p.name : `${p.name} · ${p.city}`), description: desc, images: p.photos[0] ? [p.photos[0]] : undefined }
   };
@@ -43,6 +54,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   const sb = supabaseServer();
   const p = await get(params.id);
   if (!p) notFound();
+  if (safeDecode(params.id).toLowerCase() !== profileSeg(p)) redirect(`/profil/${profileSeg(p)}`); // adresse unique : jolie pour les VIP, identifiant sinon
   const { data: { user } } = await sb.auth.getUser();
   const mine = user?.id === p.id;
   const a = avail(p); const trips = tripsOf(p); const td = todayP(); const nd = nowP().d;

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GPATH, slug } from "@/lib/site";
+import { profilePath } from "@/lib/profilUrl";
 import { nearestCity, coordsOf, km } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
 import Ic from "./Ic";
@@ -203,7 +204,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     return () => clearInterval(t);
   }, [hl]);
   useEffect(() => { setQ(sp.get("q") || ""); setTag(sp.get("tag") || ""); }, [sp]); // recherche venant du menu du haut
-  const open = (id: string) => r.push(`/profil/${id}`);
+  const open = (id: string) => { const pp = profiles.find((x) => x.id === id); r.push(pp ? profilePath(pp) : `/profil/${id}`); };
   const setCities = (l: string[]) => r.push(l.length ? `/${searchMode ? "recherche" : ""}?${l.map((c) => "ville=" + encodeURIComponent(c)).join("&")}` : searchMode ? "/recherche" : "/");
   const setCity = (c: string) => r.push(c ? `/${searchMode ? "recherche" : ""}?ville=${encodeURIComponent(c)}` : searchMode ? "/recherche" : "/");
   const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); setDf(DF0); r.push(searchMode ? "/recherche" : "/"); };
