@@ -41,6 +41,16 @@ function VipAd() {
     </aside>
   );
 }
+function UneBanner({ p, onOpen }: { p: Profile; onOpen: () => void }) {
+  const { tr } = useT();
+  return (
+    <button type="button" className="une" onClick={onOpen} aria-label={tr("Voir le profil de {n}", { n: p.name })}>
+      <i>{p.photos[0] && <img src={thumbUrl(p.photos[0])} referrerPolicy="no-referrer" alt="" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}</i>
+      <span><small><Ic n="crown" s={14} /> {tr("À la une aujourd’hui")}</small><b>{p.name}</b><em>{p.city}</em></span>
+      <u aria-hidden="true">→</u>
+    </button>
+  );
+}
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
   const { tr } = useT();
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
@@ -183,6 +193,13 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [une, setUne] = useState<Profile | null>(null); // « À la une » : un VIP du contexte (ville / genre / spécialité), change chaque jour
+  useEffect(() => {
+    const pool = profiles.filter((x) => x.vip && (type === "tous" ? x.genre !== "livecam" : x.genre === type) && (!tag || x.specialties.some((t) => t.toLowerCase() === tag)) && (!city || inCities(x))).sort((a, b) => a.id < b.id ? -1 : 1);
+    if (!pool.length || searchMode || fav) { setUne(null); return; }
+    const day = Math.floor((Date.now() + 3600000) / 86400000); let h = 0; for (const c of `${type}|${tag}|${cities.join(",")}`) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    setUne(pool[(day + h) % pool.length]);
+  }, [profiles, type, tag, cities, searchMode, fav]); // eslint-disable-line react-hooks/exhaustive-deps
   const [adAt, setAdAt] = useState(-1); // pub VIP : place aleatoire parmi les profils standard (choisie apres le rendu serveur)
   useEffect(() => {
     const ids = list.slice(0, 12).map((x, i) => (x.vip ? -1 : i)).filter((i) => i >= 0);
@@ -306,6 +323,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         {(nNow > 0 || now) && view !== "map" && <div className="nowbar"><button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button></div>}
+        {une && view !== "map" && <UneBanner p={une} onOpen={() => open(une.id)} />}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).flatMap((p, i) => { const c = <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
