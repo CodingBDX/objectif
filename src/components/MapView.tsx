@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { coordsOf, coordsOfAddress } from "@/lib/geo";
 import { slug } from "@/lib/site";
 import { thumbUrl } from "@/lib/img";
+import { ZONE_RADIUS, type MapZone } from "@/lib/quartiers";
 
 export type MapProfile = { id: string; name: string; sub: string; g: string; img: string };
 export type MapAsso = { slug: string; name: string; address: string; city: string; phone: string | null };
@@ -27,7 +28,7 @@ function ring(k: number, f = 1): [number, number][] {
 }
 
 /** Carte Leaflet / OpenStreetMap. Dézoomée : une bulle par ville. Zoomée : les profils (photo, pseudo, icône du genre). */
-export default function MapView({ cities, assos = [], lodgings = [] }: { cities: MapCity[]; assos?: MapAsso[]; lodgings?: MapLodging[] }) {
+export default function MapView({ cities, assos = [], lodgings = [], zones = [] }: { cities: MapCity[]; assos?: MapAsso[]; lodgings?: MapLodging[]; zones?: MapZone[] }) {
   const el = useRef<HTMLDivElement>(null); const [msg, setMsg] = useState("Chargement de la carte…");
   useEffect(() => {
     let map: any, dead = false;
@@ -58,6 +59,14 @@ export default function MapView({ cities, assos = [], lodgings = [] }: { cities:
           L.marker(k, { icon: L.divIcon({ className: "masso", iconSize: [38, 38], iconAnchor: [19, 19], html: "<span>🏠</span>" }), title: l.title, zIndexOffset: 800 })
             .addTo(map).bindPopup(`<b>${esc(l.title)}</b><br>📍 ${esc(l.city)}${l.area ? " · " + esc(l.area) : ""}${pr ? `<br>${esc(pr)}` : ""}<br><a class="mgo" href="/logements/${esc(l.id)}">Voir le logement →</a>`);
         });
+        // zones de rue (quartiers) : grands cercles roses, visibles à partir d'un zoom « ville » ; jamais de point exact
+        const zoneLayer = L.layerGroup();
+        zones.forEach((z) => {
+          L.circle([z.lat, z.lon], { radius: ZONE_RADIUS, color: "#d63384", weight: 2, dashArray: "6 6", fillColor: "#ee4f97", fillOpacity: 0.18 }).addTo(zoneLayer)
+            .bindPopup(`<b>${esc(z.q)}</b> · ${esc(z.city)}<br>Zone approximative<br>${z.p.map((p) => `<a class="mgo" href="/profil/${esc(p.id)}">${esc(p.name)}</a>`).join(" · ")}`);
+          L.marker([z.lat, z.lon], { icon: L.divIcon({ className: "mpin", iconSize: [34, 34], html: `<span style="width:34px;height:34px">${z.n}</span>` }), title: `${z.q} : ${z.n} profil${z.n > 1 ? "s" : ""}` }).addTo(zoneLayer)
+            .bindPopup(`<b>${esc(z.q)}</b> · ${esc(z.city)}<br>Zone approximative<br>${z.p.map((p) => `<a class="mgo" href="/profil/${esc(p.id)}">${esc(p.name)}</a>`).join(" · ")}`);
+        });
         // les profils s'écartent quand on zoome : le rayon des cercles grandit avec le zoom
         const draw = () => {
           profLayer.clearLayers(); const f = Math.min(3.6, Math.max(0.9, 1 + (map.getZoom() - ZOOM_PROFILES) * 0.45));
@@ -72,7 +81,7 @@ export default function MapView({ cities, assos = [], lodgings = [] }: { cities:
             if (c.n > shown.length) L.marker(k, { icon: L.divIcon({ className: "mprof", iconSize: [92, 26], iconAnchor: [46, -40], html: `<a class="more" href="/ville/${slug(c.city)}"><b>+${c.n - shown.length} autres</b></a>` }), zIndexOffset: 400 }).addTo(profLayer);
           });
         };
-        const sync = () => { const z = map.getZoom(); if (z >= ZOOM_PROFILES) { draw(); map.removeLayer(cityLayer); map.addLayer(profLayer); } else { map.removeLayer(profLayer); map.addLayer(cityLayer); } };
+        const sync = () => { const z = map.getZoom(); if (z >= 11) map.addLayer(zoneLayer); else map.removeLayer(zoneLayer); if (z >= ZOOM_PROFILES) { draw(); map.removeLayer(cityLayer); map.addLayer(profLayer); } else { map.removeLayer(profLayer); map.addLayer(cityLayer); } };
         map.on("zoomend", sync);
         if (pts.length > 1) map.fitBounds(pts, { padding: [40, 40], maxZoom: 9 }); else if (pts.length === 1) map.setView(pts[0], 8);
         sync(); map.once("focus", () => map.scrollWheelZoom.enable());
@@ -80,6 +89,6 @@ export default function MapView({ cities, assos = [], lodgings = [] }: { cities:
       } catch { setMsg("La carte n’a pas pu se charger. Vérifie ta connexion et recharge la page."); }
     })();
     return () => { dead = true; map?.remove(); };
-  }, [cities, assos, lodgings]);
+  }, [cities, assos, lodgings, zones]);
   return (<div className="mapbox"><div ref={el} className="mapel" role="application" aria-label="Carte des profils par ville" />{msg && <p className="note mapmsg">{msg}</p>}</div>);
 }

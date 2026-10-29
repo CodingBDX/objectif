@@ -8,6 +8,7 @@ import GlobalSearch from "@/components/GlobalSearch";
 import { CATS } from "@/lib/types";
 import { nearestCity, coordsOf, km } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
+import { buildZones } from "@/lib/quartiers";
 import Ic from "./Ic";
 import Heart from "./Heart";
 import NearbyCities from "./NearbyCities";
@@ -208,6 +209,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     setAdAt(ids.length > 1 ? ids[1 + Math.floor(Math.random() * (ids.length - 1))] : -1);
   }, [list.length, view]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const mapZones = useMemo(() => buildZones(list.filter((p) => p.genre !== "livecam")), [list]);
   const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.filter((p) => p.genre !== "livecam").forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
   const inCity = useMemo(() => (city ? profiles.filter((p) => inCities(p)) : profiles), [profiles, cities]); // eslint-disable-line react-hooks/exhaustive-deps
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
@@ -329,7 +331,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <span>{tr("📍 Profils près de toi : ")}<b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>{tr("Voir tous les profils")}</button></div>}
         {city && <NearbyCities profiles={profiles} city={city} type={type} />}
         {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{tr(intro)}</p> : null) : intro}
-        {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
+        {view === "map" && (mapCities.length ? <MapView cities={mapCities} zones={mapZones} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         {view !== "map" && <div className="nowbar">{(nNow > 0 || now) && <button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button>}<button type="button" className={`nowchip qf${vid ? " on" : ""}`} aria-pressed={vid} onClick={() => setVid(!vid)}><Ic n="video" s={16} />{tr("Avec vidéo de présentation")}</button>{(rue || profiles.some((x) => x.street)) && <button type="button" className={`nowchip qf${rue ? " on" : ""}`} aria-pressed={rue} onClick={() => setRue(!rue)}><Ic n="pin" s={16} />{tr("Escorte de rue")}</button>}<button type="button" className={`nowchip qf${ver ? " on" : ""}`} aria-pressed={ver} onClick={() => setVer(!ver)}><Ic n="check" s={16} />{tr("Profils vérifiés uniquement")}</button></div>}
         {une && view !== "map" && <UneBanner p={une} onOpen={() => open(une.id)} />}

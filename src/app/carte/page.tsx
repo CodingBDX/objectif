@@ -3,6 +3,7 @@ import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { allProfiles } from "@/lib/data";
 import { lab } from "@/lib/types";
+import { buildZones } from "@/lib/quartiers";
 import { assosForViewer } from "@/lib/assosServer";
 import MapView, { MapCity, MapAsso, MapLodging } from "@/components/MapView";
 import { publicLodgings, canSeeLodgings } from "@/lib/lodgingServer";
@@ -40,7 +41,7 @@ export default async function Page() {
         <div className="dtop"><h1>Carte des profils</h1></div>
         <section className="dcard">
           <p className="note" style={{ margin: "0 0 10px" }}>{ps.length} profil{ps.length > 1 ? "s" : ""} dans {cities.length} ville{cities.length > 1 ? "s" : ""}. Pour les profils, seule la ville est affichée, jamais une adresse.{allowed ? " Les 🤝 sont des associations de soutien." : ""}</p>
-          <MapView cities={cities} assos={assos} lodgings={lodgings} />
+          <MapView cities={cities} assos={assos} lodgings={lodgings} zones={buildZones(ps)} />
         </section>
       </main>
     </div>

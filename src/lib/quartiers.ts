@@ -28,3 +28,14 @@ export const QUARTIERS: Record<string, Quartier[]> = {
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 export const quartiersOf = (city: string): Quartier[] => { const k = Object.keys(QUARTIERS).find((c) => norm(c) === norm(city)); return k ? QUARTIERS[k] : []; };
 export const quartierOf = (city: string, name: string | null | undefined): Quartier | null => (name ? quartiersOf(city).find((q) => q.n === name) || null : null);
+
+export type MapZone = { q: string; city: string; lat: number; lon: number; n: number; p: { id: string; name: string }[] };
+/** Zones à afficher sur la grande carte : profils de rue vérifiés qui ont activé la carte, regroupés par quartier (jamais de point exact). */
+export function buildZones(ps: { id: string; name: string; city: string; street?: boolean; zone?: string | null; zone_map?: boolean; verified?: boolean }[]): MapZone[] {
+  const by: Record<string, MapZone> = {};
+  ps.forEach((p) => {
+    if (!p.street || !p.zone_map || !p.verified) return; const q = quartierOf(p.city, p.zone); if (!q) return;
+    const z = (by[p.city + "|" + q.n] ||= { q: q.n, city: p.city, lat: q.lat, lon: q.lon, n: 0, p: [] }); z.n++; if (z.p.length < 12) z.p.push({ id: p.id, name: p.name });
+  });
+  return Object.values(by);
+}
