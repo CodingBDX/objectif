@@ -72,7 +72,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
       </div>
       <div className="in">
         <div className="bdgs">{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}{isNew(p) && <span className="nwb"><Ic n="spark" s={14} />{tr("New")}</span>}{lab(p) && <span className={`badge${live ? " live" : ""}`}>{lab(p)}</span>}{a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? tr("En direct") : tr("Dispo")}</span>}{p.video && <span className="vid-ic"><Ic n="video" s={14} />{tr("vidéo")}</span>}</div>
-        <div className="ln"><h2>{p.name}</h2><CrownBadge level={p.crown} />
+        <div className="ln"><h2>{p.name}</h2><CrownBadge level={p.crown} size={24} />
           {p.verified && <span className="vf" role="img" aria-label={tr("Profil vérifié")} title={tr("Profil vérifié")}><Ic n="check" s={12} /></span>}
           <Heart id={p.id} /></div>
         <div className="meta"><Ic n="pin" s={15} />{live ? tr("En ligne") : p.city}{p.more?.length ? " " + tr("+ {n} ville(s)", { n: p.more.length }) : ""}</div>

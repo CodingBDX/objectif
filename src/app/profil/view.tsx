@@ -91,7 +91,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
           ...(p.genre === "livecam" ? {} : { homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } } }), knowsAbout: p.specialties,
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return p.vip && h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
-      <div className="pbar"><Crumbs items={cr} inline /><h1 className="pbn">{p.name} <CrownBadge level={p.crown} size={20} /></h1>
+      <div className="pbar"><Crumbs items={cr} inline /><h1 className="pbn">{p.name} <CrownBadge level={p.crown} size={28} /></h1>
         <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}<Heart id={p.id} />{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
           {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> <Tr k="Nouveau" /></span>}
           {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
