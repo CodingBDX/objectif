@@ -65,7 +65,7 @@ export default function MapView({ cities, assos = [], lodgings = [] }: { cities:
             const shown = c.p.slice(0, MAXP); const pos = ring(shown.length, f);
             shown.forEach((p, i) => {
               const [dx, dy] = pos[i]; const [gl, gc] = GI[p.g] || ["•", "#999"]; const W = 92, H = 78;
-              const img = p.img ? `<img src="${esc(thumbUrl(p.img))}" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(p.img)}'}">` : "";
+              const img = p.img ? `<img src="${esc(thumbUrl(p.img))}" referrerpolicy="no-referrer" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(p.img)}'}">` : "";
               L.marker(k, { icon: L.divIcon({ className: "mprof", iconSize: [W, H], iconAnchor: [W / 2 - dx, 28 - dy],
                 html: `<a href="/profil/${p.id}" title="${esc(p.name)}"><i>${img}<em style="background:${gc}">${gl}</em></i><b>${esc(p.name)}</b></a>` }), zIndexOffset: 500 }).addTo(profLayer);
             });

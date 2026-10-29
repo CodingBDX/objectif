@@ -28,7 +28,7 @@ export default function Slider({ imgs, vip, video, alt }: { imgs: string[]; vip:
           {items.map((it, k) => it.v
             ? <button key={k} className={`slide vslide${k === i ? " on" : ""}`} aria-label="Agrandir et lire la vidéo" onClick={() => setLb(true)}><video muted playsInline preload="metadata" src={it.src + "#t=0.1"} /><span className="vplay" aria-hidden="true">▶</span></button>
             : <button key={k} className={`slide${k === i ? " on" : ""}`} aria-label={`Agrandir la photo ${video ? k : k + 1}`} onClick={() => setLb(true)}>
-              <img src={it.src} srcSet={thumbUrl(it.src) !== it.src ? `${thumbUrl(it.src)} 640w, ${it.src} 1600w` : undefined} sizes="(max-width: 700px) 100vw, 800px" alt={alt ? `${alt}${imgs.length > 1 ? ` (${video ? k : k + 1})` : ""}` : ""} width={1600} height={900}
+              <img src={it.src} referrerPolicy="no-referrer" srcSet={thumbUrl(it.src) !== it.src ? `${thumbUrl(it.src)} 640w, ${it.src} 1600w` : undefined} sizes="(max-width: 700px) 100vw, 800px" alt={alt ? `${alt}${imgs.length > 1 ? ` (${video ? k : k + 1})` : ""}` : ""} width={1600} height={900}
                 loading={k === 0 ? "eager" : "lazy"} fetchPriority={k === 0 ? "high" : "auto"} decoding="async" onError={fb(it.src)} /></button>)}
           {N > 1 && <><button className="nv prev" aria-label="Précédent" onClick={() => go(-1, true)}>‹</button><button className="nv next" aria-label="Suivant" onClick={() => go(1, true)}>›</button></>}
           <ViewerMark />
@@ -36,7 +36,7 @@ export default function Slider({ imgs, vip, video, alt }: { imgs: string[]; vip:
         </div>
         <div className="thumbs">{items.map((it, k) => it.v
           ? <button key={k} className={`th vth${k === i ? " on" : ""}`} aria-label="Voir la vidéo" onClick={() => { setI(k); setStop(true); }}><video muted playsInline preload="metadata" src={it.src + "#t=0.1"} /><span aria-hidden="true">▶</span></button>
-          : <button key={k} className={`th${k === i ? " on" : ""}`} aria-label={`Voir la photo ${video ? k : k + 1}`} onClick={() => { setI(k); setStop(true); }}><img src={thumbUrl(it.src)} alt="" width={88} height={58} loading="lazy" decoding="async" onError={fb(it.src)} /></button>)}</div>
+          : <button key={k} className={`th${k === i ? " on" : ""}`} aria-label={`Voir la photo ${video ? k : k + 1}`} onClick={() => { setI(k); setStop(true); }}><img referrerPolicy="no-referrer" src={thumbUrl(it.src)} alt="" width={88} height={58} loading="lazy" decoding="async" onError={fb(it.src)} /></button>)}</div>
       </div>
       {lb && (
         <dialog id="lb" open style={{ position: "fixed", inset: 0, margin: "auto", zIndex: 60 }} onClick={() => setLb(false)}>

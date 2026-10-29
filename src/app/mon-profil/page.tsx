@@ -286,7 +286,7 @@ export default function MyProfile() {
 </section><section className="dcard"><h3>{tr("Mes photos")}</h3><div>
               <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Mes photos")} ({photos.length}/{maxP})</b>{tr(" · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.")}{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}>{tr(" Il en faut au moins 3.")}</span>}</p>
               <div className="edph">{photos.map((src, i) => (
-                <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} alt={tr("Photo {n}", { n: i + 1 })} />
+                <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} referrerPolicy="no-referrer" alt={tr("Photo {n}", { n: i + 1 })} />
                   {i === 0 && <span className="fst">{tr("En avant")}</span>}
                   <button type="button" className="rm" aria-label={tr("Supprimer la photo {n}", { n: i + 1 })} title={tr("Supprimer")} onClick={() => setPhotos(photos.filter((_, j) => j !== i))}>✕</button>
                   <span className="mv">{i > 0 ? <button type="button" aria-label={tr("Déplacer vers la gauche")} onClick={() => move(i, -1)}>◀</button> : <i />}{i < photos.length - 1 ? <button type="button" aria-label={tr("Déplacer vers la droite")} onClick={() => move(i, 1)}>▶</button> : <i />}</span>
