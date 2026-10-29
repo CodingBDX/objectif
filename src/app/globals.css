@@ -1134,3 +1134,8 @@ h1.pbn{margin:0}
  .pcontact .pph{flex:1 1 100%;justify-content:center;max-width:100%}
  .pcontact .soc{flex:0 0 44px}
 }
+
+/* Bouton WhatsApp à côté du numéro */
+.pph a.wab{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:#25d366;color:#fff;text-decoration:none}
+.pph a.wab .ic{stroke:#fff}
+.pph a.wab:hover{filter:brightness(1.08)}

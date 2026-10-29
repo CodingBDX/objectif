@@ -71,7 +71,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="pcontact">
           {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
           {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
-          {!asleep && <PhoneReveal id={p.id} live={live} mine={mine} name={p.name} />}
+          {!asleep && <PhoneReveal id={p.id} live={live} mine={mine} name={p.name} wa={!!p.whatsapp} />}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
