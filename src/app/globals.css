@@ -1369,3 +1369,8 @@ h1.pbn{margin:0}
 .sf-specs a:hover,.sf-specs a:focus-visible{background:var(--btn);color:var(--btnt);border-color:var(--btn)}
 @media(max-width:1000px){.sf-in{grid-template-columns:1fr 1fr 1fr}.sf-brand,.sf-specs{grid-column:1/-1}}
 @media(max-width:800px){.sf-in{grid-template-columns:1fr 1fr}.sf-col.sf-specs{grid-column:1/-1}}
+/* Carte : bulles photo toujours rondes, quel que soit le zoom ou la forme de la photo */
+.mprof a{width:100%;align-content:start}
+.mprof i{box-sizing:border-box;flex:none;width:56px;height:56px;min-width:56px;min-height:56px;max-width:56px;max-height:56px;aspect-ratio:1/1;overflow:visible;transform:none}
+.mprof i img{position:absolute;inset:0;width:100%;height:100%;max-width:none!important;max-height:none!important;object-fit:cover;object-position:center top;border-radius:50%;display:block;transform:none}
+.mprof i::before{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);pointer-events:none}
