@@ -59,7 +59,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         {me && !me.vip && <VipBanner paused={me.paused} />}
         {children}
         <InstallBanner /><RefCapture />
-        <SiteFooter escort={escort} />
+        <SiteFooter escort={escort} cities={index.c.slice(0, 10).map(([c]) => c)} />
       </body>
     </html>
   );
