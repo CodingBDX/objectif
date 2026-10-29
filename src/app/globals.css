@@ -1127,3 +1127,10 @@ h1.pbn{margin:0}
 .ejbtns{display:flex;gap:10px;flex-wrap:wrap}
 @media (max-width:560px){.ejbtns{width:100%;flex-direction:column}.ejbtns .btn{width:100%}}
 .empty:has(.nores){padding:0;color:var(--ink)}.nores{text-align:left}
+
+/* Barre de contact mobile : « Elle dort » / numéro sur toute la largeur, boutons réseaux alignés sur une seule ligne dessous */
+@media (max-width:640px){
+ .pcontact{width:min(calc(100vw - 24px),420px);border-radius:28px;justify-content:center;align-items:center;row-gap:8px;column-gap:10px}
+ .pcontact .pph{flex:1 1 100%;justify-content:center;max-width:100%}
+ .pcontact .soc{flex:0 0 44px}
+}
