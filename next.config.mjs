@@ -5,5 +5,9 @@ export default {
   async headers() {
     return [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noai, noimageai" }, { key: "Rating", value: "RTA-5042-1996-1400-1577-RTA" }] }];
   },
+  /* IndexNow : le fichier de preuve /<clé>.txt est servi par une route (la clé est dans la variable INDEXNOW_KEY). */
+  async rewrites() {
+    return [{ source: "/:k([a-f0-9]{16,64})\\.txt", destination: "/api/indexnow-key?k=:k" }];
+  },
   experimental: { serverActions: { bodySizeLimit: "10mb" } }
 };
