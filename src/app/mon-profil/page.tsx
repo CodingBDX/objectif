@@ -44,6 +44,7 @@ export default function MyProfile() {
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
+  useEffect(() => { document.querySelectorAll<HTMLElement>(".acc .dcard > h3").forEach((h) => { h.tabIndex = 0; h.setAttribute("role", "button"); h.setAttribute("aria-expanded", String(h.parentElement!.classList.contains("open"))); }); }); // titres des menus déroulants : accessibles au clavier
   useEffect(() => { (async () => {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) { location.href = "/connexion"; return; }
@@ -135,6 +136,9 @@ export default function MyProfile() {
     } catch (e: any) { setDelMsg(tr("Suppression impossible : {e}. Écris-nous via la page Contact.", { e: e?.message || tr("réessaie") })); setDelBusy(false); }
   }
   const isLive = kind === "livecam"; const canRate = vip || isLive; const socOk = vip || isLive; const maxKm = vip ? MAX_KM_VIP : MAX_KM_STD; const maxP = vip ? 20 : 10; const maxM = vip ? 6 : 3; const maxS = vip ? 30 : 5;
+  /** Blocs de Mon profil en menus déroulants : un clic (ou Entrée) sur le titre ouvre / ferme le bloc. */
+  const toggleCard = (e: React.MouseEvent) => { const h = (e.target as HTMLElement).closest(".acc .dcard > h3") as HTMLElement | null; if (!h) return; const c = h.parentElement!; c.classList.toggle("open"); h.setAttribute("aria-expanded", String(c.classList.contains("open"))); };
+  const keyCard = (e: React.KeyboardEvent) => { if ((e.key === "Enter" || e.key === " ") && (e.target as HTMLElement).matches(".acc .dcard > h3")) { e.preventDefault(); toggleCard(e as unknown as React.MouseEvent); } };
   const move = (i: number, d: number) => { const a = [...photos]; const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setPhotos(a); };
 
   async function save(e: React.FormEvent) {
@@ -224,10 +228,10 @@ export default function MyProfile() {
               {msg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
               <button className="btn" type="submit" disabled={busy}>{tr("Créer mon profil membre")}</button>
             </fieldset></form>)}
-          {(kind === "createur" || kind === "livecam") && <form onSubmit={save}><fieldset className="fs dform">
+          {(kind === "createur" || kind === "livecam") && <form onSubmit={save} onInvalidCapture={(e) => (e.target as HTMLElement).closest(".dcard")?.classList.add("open")}><fieldset className="fs dform acc" onClick={toggleCard} onKeyDown={keyCard}>
             {kind === "livecam" && <p className="note">{tr("Pas de ville pour un profil livecam : ton profil apparaît uniquement dans la section Livecam.")}</p>}
             {kind === "livecam" && <p className="note">{tr("Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).")}</p>}
-<section className="dcard"><h3>{tr("Qui es-tu ?")}</h3><div className="row2">
+<section className="dcard open"><h3>{tr("Qui es-tu ?")}</h3><div className="row2">
               <label className="f">{tr("Pseudonyme")}<input value={f.name} onChange={set("name")} required minLength={2} maxLength={40} /></label>
             </div>
             <div className="f vipopt"><span style={L}>{tr("Adresse personnalisée et slogan")} <span className="gchip" style={{ marginLeft: 6 }}>VIP</span></span>

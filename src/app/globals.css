@@ -1178,3 +1178,11 @@ h1.pbn{margin:0}
 /* Recherche du panneau de droite (ordinateur) : vrai champ de saisie */
 .dsearch .sp{max-width:none;width:100%;margin:0}
 .dsearch .citylist{left:0;right:0;z-index:30}
+
+/* Mon profil : blocs en menus déroulants (le bouton Enregistrer et les messages restent toujours visibles) */
+.acc .dcard>h3{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none;-webkit-tap-highlight-color:transparent}
+.acc .dcard>h3::after{content:"";flex:none;width:9px;height:9px;margin:0 6px 4px 0;border-right:3px solid var(--btn);border-bottom:3px solid var(--btn);transform:rotate(45deg);transition:transform .2s}
+.acc .dcard.open>h3::after{transform:translateY(3px) rotate(-135deg)}
+.acc .dcard>h3:focus-visible{outline:2px solid var(--btn);outline-offset:4px;border-radius:8px}
+.acc .dcard:has(>h3):not(.open)>*:not(h3):not(.dbtn):not([role=alert]){display:none}
+@media (prefers-reduced-motion:reduce){.acc .dcard>h3::after{transition:none}}
