@@ -1415,3 +1415,4 @@ h1.pbn{margin:0}
 .acc .dcard .subh.first{margin-top:6px;padding-top:0;border-top:0}
 .dedit .dcard.actbox,.dcard.actbox{padding:0;display:block;gap:0}
 .dcard.actbox>.dcard{display:grid}
+.trow{align-items:end}.trow>.tdate input,.trow input{margin:0}
