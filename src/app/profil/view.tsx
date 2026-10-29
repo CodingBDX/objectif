@@ -18,6 +18,7 @@ import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
 import { TrackLink, TrackView } from "@/components/Track";
 import { GPATH, siteUrl, slug } from "@/lib/site";
+import Ld, { crumbs } from "@/components/Ld";
 
 export const dynamic = "force-dynamic";
 export type Ref = { param?: string; slug?: string };
@@ -77,6 +78,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
   return (
     <section id="pf" className="gut">
       <TrackView id={p.id} skip={mine} />
+      <Ld data={crumbs([["Accueil", "/"], [`Profils ${CATS[p.genre] || ""}`, `/genre/${GPATH[p.genre]}`], ...(live ? [] : [[p.city, `/genre/${GPATH[p.genre]}/${slug(p.city)}`] as [string, string]]), [p.name, want]])} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}${want}`, dateCreated: p.created_at,
         mainEntity: { "@type": "Person", name: p.name, description: plain(p.bio).slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),

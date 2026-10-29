@@ -20,8 +20,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   openGraph: { siteName: "Sex-Escorte", locale: "fr_FR", type: "website" },
   twitter: { card: "summary_large_image" },
-  title: { default: "Sex-Escorte, annuaire des escortes populaire, sexy, numéro un", template: "%s · Sex-Escorte" },
-  description: "Annuaire des escortes : profils vérifiés, photos, disponibilités et villes visitées. 50 % reversés aux associations."
+  title: { default: "Escortes en France : filles, hommes, trans | Sex-Escorte", template: "%s · Sex-Escorte" },
+  description: "Annuaire d’escortes en France : filles, hommes, trans et livecam. Photos, disponibilités, villes visitées et contact direct.",
+  other: { rating: "RTA-5042-1996-1400-1577-RTA" }
 };
 export const dynamic = "force-dynamic";
 

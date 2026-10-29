@@ -16,6 +16,7 @@ import { useT } from "@/lib/i18n";
 import { tooFar, MAX_KM_VIP, MAX_KM_STD } from "@/lib/dist";
 import { LIVE_CITY } from "@/lib/types";
 import { slug as toSlug } from "@/lib/site";
+import { plain } from "@/lib/rich";
 import VipPrices from "@/components/VipPrices";
 import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 const ordn = (n: number) => (n === 1 ? "1er" : n + "e");
@@ -132,6 +133,7 @@ export default function MyProfile() {
     e.preventDefault(); setMsg(null);
     const genre = kind === "livecam" ? "livecam" : f.genre;
     if (!genre) { setMsg({ t: tr("Choisis ton profil (obligatoire).") }); return; }
+    if (plain(bio).trim().length < 150) { setMsg({ t: tr("Ta présentation doit faire au moins 150 caractères (elle aide Google à bien référencer ton profil).") }); return; }
     if (kind === "livecam" && !/^https?:\/\//.test(vlink)) { setMsg({ t: tr("Indique le lien de ton live (https://…).") }); return; }
     if (kind !== "livecam") { const bad = (await Promise.all(more.filter(Boolean).map(async (c) => ((await tooFar(f.city, c, maxKm)) ? c : "")))).find(Boolean); if (bad) { setFarMsg(bad); setMsg({ t: tr("{c} est trop loin de ta ville principale (plus de {n} km).", { c: bad, n: maxKm }) }); return; } }
     if (f.phone.replace(/\D/g, "").length < 8) { setMsg({ t: tr("Indique ton numéro de téléphone (obligatoire).") }); return; }
@@ -253,7 +255,7 @@ export default function MyProfile() {
             <fieldset className="fs"><legend className="note">{tr("Langues parlées (8 maximum)")}</legend>
               <div className="tags">{LANGS.map((l) => <button type="button" key={l} className="chip" aria-pressed={langs.includes(l)} onClick={() => setLangs(langs.includes(l) ? langs.filter((x) => x !== l) : langs.length < 8 ? [...langs, l] : langs)}>{tr(l)}</button>)}</div></fieldset>
             <p className="note" style={{ margin: 0 }}>{tr("Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.")}</p>
-</section><section className="dcard"><h3>{tr("Présentation et contact")}</h3><div className="f"><span style={L}>{tr("Présentation")}</span><RichEditor label={tr("Présentation")} value={bio} onChange={setBio} /></div>
+</section><section className="dcard"><h3>{tr("Présentation et contact")}</h3><div className="f"><span style={L}>{tr("Présentation")}</span><RichEditor label={tr("Présentation")} value={bio} onChange={setBio} /><small className="note" style={{ color: plain(bio).trim().length < 150 ? "var(--btn)" : undefined }}>{plain(bio).trim().length}/150 {tr("caractères minimum")}</small></div>
             <div className="row2"><label className="f">{tr("Site ou réseau (optionnel)")}<input type="url" placeholder="https://" value={f.site} onChange={set("site")} /></label></div>
             <div className="f"><span style={L}>{tr("Tarifs 🌹 (optionnel, nombres uniquement)")}</span>{!canRate && <p className="note" style={{ margin: 0 }}>{tr("🔒 Les tarifs sont réservés aux profils VIP : ils ne s’affichent pas sur ton profil. ")}<Link href="/contact?s=vip">{tr("Devenir VIP")}</Link></p>}<div className="rlist">{rates.map((r, i) => <div className="rrow" key={i}>
                 <select aria-label={tr("Durée")} value={r.d} disabled={!canRate} onChange={(e) => setRates(rates.map((x, j) => (j === i ? { ...x, d: e.target.value } : x)))}>{RATE_OPTS.map(([v, l]) => <option key={v} value={v}>{tr(l)}</option>)}</select>

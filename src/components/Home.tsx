@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GPATH, slug } from "@/lib/site";
 import { profilePath } from "@/lib/profilUrl";
+import { CATS } from "@/lib/types";
 import { nearestCity, coordsOf, km } from "@/lib/geo";
 import { thumbUrl } from "@/lib/img";
 import Ic from "./Ic";
@@ -225,7 +226,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {!searchMode && hl.length > 0 && <section className="mhl" aria-label={tr("Mis en avant")}>
           <h2><Ic n="star" s={20} />{tr("Mis en avant")}</h2>
           <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={tr("Voir le profil de {n}", { n: p.name })}>
-            <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} alt="" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
+            <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
             <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
         {!searchMode && <section className={`panel top${isHome ? " topx" : ""}${topAll ? " all" : ""}`} aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">{isHome ? 18 : 9}</span><span className="t6">{isHome ? 12 : 6}</span><span className="t3">3</span> {region || "France"}</h2>

@@ -8,6 +8,7 @@ import CityIntro from "@/components/CityIntro";
 import CityAssos from "@/components/CityAssos";
 import CityNearby from "@/components/CityNearby";
 import { regionMap } from "@/lib/cityinfo";
+import Ld, { crumbs, itemList } from "@/components/Ld";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { ville: string } }): Promise<Metadata> {
@@ -18,5 +19,6 @@ export async function generateMetadata({ params }: { params: { ville: string } }
 export default async function Page({ params }: { params: { ville: string } }) {
   const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville) || cityFromSlug(params.ville); if (!city || !/^[a-z0-9-]+$/.test(params.ville)) notFound();
   const regions = await regionMap(profiles);
-  return <Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Escortes à ${city}`} intro={<><Suspense fallback={null}><CityAssos city={city} /></Suspense><Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>Chargement des infos de la ville…</p>}><CityIntro city={city} profiles={profiles} /></Suspense><Suspense fallback={null}><CityNearby city={city} profiles={profiles} /></Suspense></>} /></Suspense>;
+  const here = profiles.filter((p) => p.genre !== "livecam" && cityList(p).includes(city));
+  return <><Ld data={crumbs([["Accueil", "/"], [`Escortes à ${city}`, `/ville/${params.ville}`]])} /><Ld data={itemList(here, `Escortes à ${city}`)} /><Suspense><Home region={regions[city] || ""} regions={regions} key={params.ville} profiles={profiles} initialCity={city} h1={`Escortes à ${city}`} intro={<><Suspense fallback={null}><CityAssos city={city} /></Suspense><Suspense fallback={<p className="note" style={{ margin: "0 0 12px" }}>Chargement des infos de la ville…</p>}><CityIntro city={city} profiles={profiles} /></Suspense><Suspense fallback={null}><CityNearby city={city} profiles={profiles} /></Suspense></>} /></Suspense></>;
 }

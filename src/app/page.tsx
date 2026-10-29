@@ -6,8 +6,8 @@ import Faq from "@/components/Faq";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: { absolute: "Sex-Escorte, annuaire des escortes populaire, sexy, numéro un" },
-  description: "Trouve des escortes près de chez toi. Profils vérifiés, photos, disponibilités et agenda des villes visitées. 50 % reversés aux associations.",
+  title: { absolute: "Escortes en France : filles, hommes, trans | Sex-Escorte" },
+  description: "Annuaire d’escortes en France : filles, hommes, trans et livecam. Photos, disponibilités, villes visitées et contact direct. Profils majeurs, protégés des arnaqueurs.",
   alternates: { canonical: "/" }
 };
 export default async function Page() {
