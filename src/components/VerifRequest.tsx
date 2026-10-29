@@ -1,4 +1,5 @@
 "use client";
+import { notifyAdmin } from "@/lib/notifyAdmin";
 import { useEffect, useState } from "react";
 import { useT } from "@/lib/i18n";
 import { sbLazy } from "@/lib/supabase/lazy";
@@ -23,7 +24,7 @@ export default function VerifRequest({ uid, verified, embedded }: { uid: string;
     if (up.error) { setBusy(false); setMsg(up.error.message); return; }
     const { error } = await sb.rpc("submit_verif", { p_path: path });
     setBusy(false); if (error) { setMsg(error.message); return; }
-    setReq({ status: "pending", note: "" });
+    setReq({ status: "pending", note: "" }); notifyAdmin("verification");
   }
   if (verified) return <div className="subcard"><h4 className="subh">{tr("✔ Profil vérifié")}</h4><p className="note" style={{ margin: 0 }}>{tr("Ton profil est vérifié : le badge est visible sur ta fiche.")}</p></div>;
   return (

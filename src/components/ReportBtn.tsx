@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { sbLazy } from "@/lib/supabase/lazy";
 import { logSec, HONEYPOT } from "@/lib/secEvent";
+import { notifyAdmin } from "@/lib/notifyAdmin";
 
 const REASONS = ["Photos ou vidéos publiées sans mon accord", "Personne mineure", "Usurpation d’identité", "Contenu sexuel ou inapproprié", "Arnaque ou faux profil", "Harcèlement", "Autre"];
 
@@ -12,7 +13,7 @@ export default function ReportBtn({ profileId }: { profileId: string }) {
     const f = new FormData(e.currentTarget);
     if (f.get("website")) { logSec("piege_signalement", ""); setBusy(false); setDone(true); return; }
     const { error } = await (await sbLazy()).from("reports").insert({ profile_id: profileId, reason: f.get("reason"), details: f.get("details") || "", contact: f.get("contact") || "" });
-    setBusy(false); if (error) setErr("Envoi impossible, réessaie dans un instant."); else setDone(true);
+    setBusy(false); if (error) setErr("Envoi impossible, réessaie dans un instant."); else { setDone(true); notifyAdmin("signalement"); }
   }
   if (done) return <p className="note" role="status" style={{ margin: 0 }}><b>Merci, ton signalement est bien reçu.</b> Nous l’examinons rapidement.</p>;
   return (

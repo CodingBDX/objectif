@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import VipPrices from "@/components/VipPrices";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { logSec, HONEYPOT } from "@/lib/secEvent";
+import { notifyAdmin } from "@/lib/notifyAdmin";
 
 function Form() {
   const vip = useSearchParams().get("s") === "vip";
@@ -15,7 +16,7 @@ function Form() {
     if (f.get("website")) { logSec("piege_contact", String(f.get("website")).slice(0, 80)); setDone(true); return; } // robot : on fait semblant
     if (Date.now() - t0.current < 3000) { logSec("trop_rapide", "contact"); setErr("Un instant, réessaie dans quelques secondes."); return; }
     const { error } = await supabaseBrowser().from("messages").insert({ name: f.get("n"), contact: f.get("e"), subject: f.get("s"), body: f.get("m") });
-    if (error) setErr("Envoi impossible, réessaie."); else setDone(true);
+    if (error) setErr("Envoi impossible, réessaie."); else { setDone(true); notifyAdmin("message"); }
   }
   return (
     <section id="con" className="gut">

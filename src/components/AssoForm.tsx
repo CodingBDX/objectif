@@ -1,4 +1,5 @@
 "use client";
+import { notifyAdmin } from "@/lib/notifyAdmin";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import CityInput from "@/components/CityInput";
@@ -38,7 +39,7 @@ export default function AssoForm({ onInfo }: { onInfo?: (i: { row: Row | null; n
       : await sb.from("associations").insert({ ...body, owner: uid, slug: `${slug(f.name)}-${slug(f.city)}-${Math.random().toString(36).slice(2, 6)}` }).select("*").single();
     setBusy(false);
     if (error) { setMsg({ t: "Enregistrement impossible : vérifie les champs (e-mail, site commençant par http…)." }); return; }
-    setRow(data as Row);
+    setRow(data as Row); notifyAdmin("association");
     setMsg({ t: "Fiche enregistrée. Elle sera visible du public après validation par notre équipe.", ok: true });
   }
   async function del() { if (!row) return; await sb.from("associations").delete().eq("id", row.id); setRow(null); setF(EMPTY); setMore([]); setSvc([]); setSure(false); setMsg({ t: "Fiche supprimée.", ok: true }); }
