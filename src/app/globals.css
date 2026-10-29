@@ -1147,8 +1147,8 @@ h1.pbn{margin:0}
 
 /* Mobile : icônes réseaux plus grandes, sous le numéro, sur toute la largeur */
 @media (max-width:640px){
- .pcontact .soc{flex:1 1 0;min-width:0;max-width:110px;width:auto;height:56px;border-radius:28px}
- .pcontact .soc .ic{width:28px;height:28px}
+ .pcontact .soc{flex:1 1 0;min-width:0;max-width:110px;width:auto;height:48px;border-radius:24px}
+ .pcontact .soc .ic{width:24px;height:24px}
 }
 
 /* WhatsApp / SMS : sur la ligne des réseaux sociaux */
