@@ -1112,7 +1112,6 @@ h1.pbn{margin:0}
 @keyframes sbOut{from{opacity:1}to{opacity:0}}
 @media (prefers-reduced-motion:reduce){.panel.msearch.sheet,.sheetbg{animation:none!important}}
 
-/* Ville choisie dans la fenêtre de recherche (en attente) : dans l'en-tête, la fenêtre ne change pas de taille */
-.pendc{display:inline-flex;align-items:center;gap:8px;flex:0 1 auto;min-width:0;max-width:56%;height:36px;margin:0 8px 0 auto;padding:0 6px 0 12px;border-radius:999px;background:var(--soft);border:1px solid var(--line);font:700 14px var(--fb);animation:pop .3s both}
-.pendc>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.pendc button{flex:none;border:0;background:var(--card);color:var(--ink);width:26px;height:26px;border-radius:50%;font-size:12px;line-height:1}
+/* Ville choisie dans la fenêtre de recherche (en attente) */
+.pendc{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 0;padding:10px 14px;border-radius:16px;background:var(--soft);border:1px solid var(--line);font:700 16px var(--fb);animation:pop .3s both}
+.pendc button{border:0;background:var(--card);color:var(--ink);width:30px;height:30px;border-radius:50%;font-size:13px}
