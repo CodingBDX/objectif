@@ -12,6 +12,7 @@ import PauseBtn from "@/components/PauseBtn";
 import { Tr, TDate } from "@/lib/i18n";
 import { RichText, plain } from "@/lib/rich";
 import CopyBtn from "@/components/CopyBtn";
+import PhoneReveal from "@/components/PhoneReveal";
 import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
 import { TrackLink, TrackView } from "@/components/Track";
@@ -36,9 +37,6 @@ const SOC: Record<string, [string, string, (h: string) => string]> = {
 };
 const handle = (h: string | null) => String(h || "").trim().replace(/^@/, "");
 const okHandle = (h: string) => /^[A-Za-z0-9._]{1,30}$/.test(h);
-const telHref = (s: string) => { const d = s.replace(/[^\d+]/g, ""); return /^0\d{9}$/.test(d) ? "+33" + d.slice(1) : d.replace(/^00/, "+"); };
-const waHref = (s: string) => { let d = s.replace(/\D/g, ""); if (/^0\d{9}$/.test(d)) d = "33" + d.slice(1); else d = d.replace(/^00/, ""); return `https://wa.me/${d}`; };
-const fmtPh = (s: string) => { const d = s.replace(/\D/g, ""); return /^0\d{9}$/.test(d) ? d.replace(/(\d{2})(?=\d)/g, "$1 ") : s; };
 
 const HL: Record<string, string> = { non: "Non", parfois: "Parfois", oui: "Oui" };
 export default async function ProfilePage({ params }: { params: { id: string } }) {
@@ -73,7 +71,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="pcontact">
           {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
           {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
-          {p.phone && !asleep && <span className="pph"><Ic n="phone" s={18} /><TrackLink id={p.id} kind="call" skip={mine} className="nb" href={live ? waHref(p.phone) : `tel:${telHref(p.phone)}`} aria-label={live ? `WhatsApp ${p.name}` : `Appeler ${p.name}`} {...(live ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{fmtPh(p.phone)}</TrackLink><CopyBtn text={p.phone} label="Copier" className="" trackId={mine ? undefined : p.id} /></span>}
+          {!asleep && <PhoneReveal id={p.id} live={live} mine={mine} name={p.name} />}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>

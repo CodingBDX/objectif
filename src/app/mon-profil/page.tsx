@@ -45,7 +45,8 @@ export default function MyProfile() {
     const { data: mem } = await sb.from("members").select("pseudo,phone_hash").eq("id", user.id).maybeSingle();
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); setHasPhone(!!mem.phone_hash); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
-      setF({ name: data.name, genre: data.genre, city: data.city, phone: data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
+      const { data: ph } = await sb.from("profile_phones").select("phone").eq("profile_id", user.id).maybeSingle();
+      setF({ name: data.name, genre: data.genre, city: data.city, phone: ph?.phone || data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
       setRecv(!!data.receives); setTrav(!!data.travels);
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setLangs(data.languages || []);
@@ -135,8 +136,10 @@ export default function MyProfile() {
     const num = (v: string, a: number, b: number) => { const n = Math.round(Number(v)); return v && n >= a && n <= b ? n : null; };
     const cleanRates = rates.map((r) => ({ d: r.d, p: Math.max(0, Math.min(10000, Math.round(Number(r.p)))) })).filter((r) => r.p > 0 && RATE_OPTS.some((o) => o[0] === r.d)).filter((r, i, a) => a.findIndex((x) => x.d === r.d) === i).slice(0, 8);
     const row = { ...(region !== undefined ? { region } : {}), age: nAge, receives: isLive ? false : recv, travels: isLive ? false : trav, pay_wero: isLive ? wero.trim().slice(0, 80) || null : null, pay_paypal: isLive ? paypal.trim().slice(0, 80) || null : null, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: isLive ? LIVE_CITY : f.city, bio, more: isLive ? [] : more.map((x) => x.trim()).filter(Boolean),
-      phone: f.phone || null, instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
+      instagram: f.instagram.replace("@", "") || null, snapchat: f.snapchat.replace("@", "") || null, tiktok: f.tiktok.replace("@", "") || null, site: f.site || null,
       tarif_visible: tshow, rates: canRate ? cleanRates : [], tarif_30: canRate ? (cleanRates.find((r) => r.d === "30min")?.p ?? null) : t30 ? Math.max(0, Math.min(10000, Math.round(Number(t30)))) : null, tarif_60: canRate ? (cleanRates.find((r) => r.d === "1h")?.p ?? null) : t60 ? Math.max(0, Math.min(10000, Math.round(Number(t60)))) : null, specialties: spec.slice(0, maxS), photos, video, h24, hours, trips: isLive ? [] : trips.filter((t) => t.city && t.from), paused };
+    const { error: pe } = await sb.rpc("set_my_phone", { p_phone: f.phone.trim() });
+    if (pe) { setBusy(false); setMsg({ t: pe.message }); return; }
     const { error } = isNewP ? await sb.from("profiles").insert({ id: uid, ...row }) : await sb.from("profiles").update(row).eq("id", uid);
     if (!error) await refreshListings();
     setBusy(false);

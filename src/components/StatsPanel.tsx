@@ -48,9 +48,10 @@ export default function StatsPanel() {
   useEffect(() => { (async () => {
     const { data: { user } } = await sb.auth.getUser();
     if (!user) { location.href = "/connexion"; return; }
-    const { data: p } = await sb.from("profiles").select("name,vip,photos,video,bio,phone,instagram,snapchat,tiktok,site,specialties,h24,hours").eq("id", user.id).maybeSingle();
+    const { data: p } = await sb.from("profiles").select("name,vip,photos,video,bio,instagram,snapchat,tiktok,site,specialties,h24,hours").eq("id", user.id).maybeSingle();
     if (!p) { setNoProfile(true); setReady(true); return; }
-    setMe(p as Me); setUid(user.id);
+    const { data: ph } = await sb.from("profile_phones").select("phone").eq("profile_id", user.id).maybeSingle();
+    setMe({ ...(p as object), phone: ph?.phone ?? null } as Me); setUid(user.id);
     const from = iso(new Date(Date.now() - 59 * 864e5));
     const { data } = await sb.from("profile_stats").select("*").eq("profile_id", user.id).gte("day", from).order("day");
     setRows((data || []) as Row[]);

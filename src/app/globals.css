@@ -1043,3 +1043,7 @@ h1.pbn{margin:0}
  .pcontact .pph.zz{padding:6px 16px;border-radius:22px}
  .pcontact .pph.zz small{flex-basis:100%;text-align:center;font-size:12.5px}
 }
+
+/* Bouton « Afficher le numéro » (le numéro n'est plus dans la page) */
+.pph button.phb2{background:transparent;color:inherit;border:0;min-height:34px;padding:0 4px;font:800 14px var(--fb);cursor:pointer;text-align:left}
+.pph button.phb2:hover{color:var(--btn)}
