@@ -18,7 +18,7 @@ import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
 import { TrackLink, TrackView } from "@/components/Track";
 import { GPATH, siteUrl, slug } from "@/lib/site";
-import Ld, { crumbs } from "@/components/Ld";
+import Ld, { crumbs, Crumbs } from "@/components/Ld";
 
 export const dynamic = "force-dynamic";
 export type Ref = { param?: string; slug?: string };
@@ -75,10 +75,11 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
   const seen: { k: string; v?: Record<string, number> } | null = st?.last_seen_day ? (() => { const n = nbd(st.last_seen_day); return n <= 0 ? { k: "Aujourd’hui" } : n === 1 ? { k: "Hier" } : n < 30 ? { k: "Il y a {n} jours", v: { n } } : { k: "Il y a plus d’un mois" }; })() : null;
   const since = new Date(p.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Paris" });
   const fmtN = (n: number) => n.toLocaleString("fr-FR");
+  const cr: [string, string][] = [["Accueil", "/"], [`Profils ${CATS[p.genre] || ""}`, `/genre/${GPATH[p.genre]}`], ...(live ? [] : [[p.city, `/genre/${GPATH[p.genre]}/${slug(p.city)}`] as [string, string]]), [p.name, want]];
   return (
     <section id="pf" className="gut">
       <TrackView id={p.id} skip={mine} />
-      <Ld data={crumbs([["Accueil", "/"], [`Profils ${CATS[p.genre] || ""}`, `/genre/${GPATH[p.genre]}`], ...(live ? [] : [[p.city, `/genre/${GPATH[p.genre]}/${slug(p.city)}`] as [string, string]]), [p.name, want]])} />
+      <Ld data={crumbs(cr)} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org", "@type": "ProfilePage", url: `${siteUrl()}${want}`, dateCreated: p.created_at,
         mainEntity: { "@type": "Person", name: p.name, description: plain(p.bio).slice(0, 300), image: p.photos.slice(0, 3).map((u) => (u.startsWith("http") ? u : siteUrl() + u)),
@@ -96,6 +97,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
+      <Crumbs items={cr} />
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">

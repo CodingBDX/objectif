@@ -1154,6 +1154,14 @@ h1.pbn{margin:0}
 /* WhatsApp / SMS : sur la ligne des réseaux sociaux */
 .pcontact .soc.wab{background:#25d366;color:#fff;cursor:pointer}
 .pcontact .soc.wab .ic{stroke:#fff}
-.pcontact .soc.wab.smsb{background:var(--btn);color:var(--btnt)}
-.pcontact .soc.wab.smsb .ic{stroke:var(--btnt)}
+.pcontact .soc.wab.smsb{background:var(--card);color:var(--btn)}
+.pcontact .soc.wab.smsb .ic{stroke:var(--btn)}
 .pcontact .soc.wab:hover{filter:brightness(1.08)}
+
+/* Fil d'Ariane visible */
+.crumbs{max-width:1180px;margin:0 auto;padding:4px 0 10px}
+.crumbs ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 8px;font:600 13px var(--fb);color:var(--mut)}
+.crumbs li{display:inline-flex;gap:8px;align-items:center;min-width:0}
+.crumbs li+li::before{content:"›";opacity:.6}
+.crumbs a{color:inherit;text-decoration:none}.crumbs a:hover{color:var(--btn);text-decoration:underline}
+.crumbs li[aria-current]{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw}

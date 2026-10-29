@@ -14,3 +14,8 @@ export const itemList = (ps: Profile[], name: string) => ({
   "@context": "https://schema.org", "@type": "ItemList", name,
   itemListElement: ps.slice(0, 20).map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.name, url: siteUrl() + profilePath(p) }))
 });
+
+/** Fil d'Ariane visible (même contenu que les données structurées). */
+export function Crumbs({ items }: { items: [string, string][] }) {
+  return <nav className="crumbs gut" aria-label="Fil d’Ariane"><ol>{items.map(([n, h], i) => <li key={h} {...(i === items.length - 1 ? { "aria-current": "page" as const } : {})}>{i === items.length - 1 ? n : <a href={h}>{n}</a>}</li>)}</ol></nav>;
+}
