@@ -1268,3 +1268,10 @@ h1.pbn{margin:0}
 
 .nowchip.qf{font-size:14px}
 .nowchip.qf.on{background:var(--soft);border-color:var(--btn);color:var(--btn)}
+@media(max-width:700px){
+.nowbar{flex-wrap:nowrap;overflow-x:auto;gap:6px;margin:0 0 10px;padding:2px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.nowbar::-webkit-scrollbar{display:none}
+.nowchip,.nowchip.qf{flex:none;min-height:34px;padding:4px 12px;gap:6px;font-size:13px;white-space:nowrap;box-shadow:none;border-width:1.5px}
+.nowchip i{width:9px;height:9px}
+.nowchip b{font-size:12px;padding:0 7px}
+}
