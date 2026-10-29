@@ -1374,3 +1374,5 @@ h1.pbn{margin:0}
 .mprof i{box-sizing:border-box;flex:none;width:56px;height:56px;min-width:56px;min-height:56px;max-width:56px;max-height:56px;aspect-ratio:1/1;overflow:visible;transform:none}
 .mprof i img{position:absolute;inset:0;width:100%;height:100%;max-width:none!important;max-height:none!important;object-fit:cover;object-position:center top;border-radius:50%;display:block;transform:none}
 .mprof i::before{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05);pointer-events:none}
+/* Leaflet impose width:auto aux images des marqueurs (priorité plus forte) : on la reprend pour que la photo remplisse tout le rond */
+.leaflet-container .leaflet-marker-pane .mprof i img{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:cover;object-position:center top;border-radius:50%}
