@@ -6,6 +6,7 @@
 -- Classement : VIP d'abord, puis remontee de moins de 24 h, puis le plus de points, puis la date.
 -- Depenses : remontee immediate 60 pts · 7 jours de VIP 400 pts.
 alter table public.profiles add column if not exists crown smallint not null default 0;
+alter table public.profiles add column if not exists crown_forced smallint check (crown_forced is null or crown_forced between 0 and 4);  -- choisi par l'admin (vide = automatique)
 alter table public.profiles add column if not exists points int not null default 0;  -- sert au classement : plus de points = plus haut dans la liste (apres le VIP)
 
 create table if not exists public.loyalty (
@@ -15,7 +16,8 @@ create table if not exists public.loyalty (
   last_login date,
   vip_credited date,
   spent int not null default 0,
-  best_level smallint not null default 0
+  best_level smallint not null default 0,
+  bonus int not null default 0  -- points ajoutes ou retires a la main par l'admin
 );
 alter table public.loyalty enable row level security;  -- aucune regle : seules les fonctions ci-dessous y accedent
 
@@ -41,9 +43,9 @@ begin
   else l.vip_credited := null; end if;
   done := coalesce(cardinality(p.photos), 0) >= 3 and char_length(coalesce(p.bio, '')) >= 150;
   select least(count(*) filter (where referral_rewarded), 6)::int into refs from public.profiles where referred_by = me;
-  earned := (case when done then 50 else 0 end) + (case when p.verified then 100 else 0 end) + 150 * coalesce(refs, 0) + l.login_days + l.vip_days;
-  lvl := greatest(public.loyalty_level(earned), l.best_level);
-  update public.loyalty set login_days = l.login_days, vip_days = l.vip_days, last_login = l.last_login, vip_credited = l.vip_credited, best_level = lvl where profile_id = me;
+  earned := (case when done then 50 else 0 end) + (case when p.verified then 100 else 0 end) + 150 * coalesce(refs, 0) + l.login_days + l.vip_days + l.bonus;
+  lvl := coalesce(p.crown_forced, greatest(public.loyalty_level(earned), l.best_level));
+  update public.loyalty set login_days = l.login_days, vip_days = l.vip_days, last_login = l.last_login, vip_credited = l.vip_credited, best_level = greatest(public.loyalty_level(earned), l.best_level) where profile_id = me;
   if p.crown is distinct from lvl or p.points is distinct from earned then update public.profiles set crown = lvl, points = earned where id = me; end if;
   return json_build_object('earned', earned, 'spent', l.spent, 'balance', earned - l.spent, 'level', lvl, 'login_days', l.login_days, 'vip_days', l.vip_days, 'done', done, 'verified', p.verified, 'refs', coalesce(refs, 0));
 end $$;
@@ -72,3 +74,33 @@ begin
 end $$;
 revoke all on function public.loyalty_redeem(text) from public, anon;
 grant execute on function public.loyalty_redeem(text) to authenticated;
+
+-- ADMIN : choisir la couronne d'un profil (0 = aucune, 1 Bronze, 2 Argent, 3 Or, 4 Diamant ; null = automatique selon les points)
+create or replace function public.admin_set_crown(p_id uuid, p_level int) returns void
+language plpgsql security definer set search_path = public as $$
+declare pts int; best smallint;
+begin
+  if not public.is_admin() then raise exception 'Accès réservé'; end if;
+  insert into public.loyalty (profile_id) values (p_id) on conflict do nothing;
+  select points into pts from public.profiles where id = p_id;
+  select best_level into best from public.loyalty where profile_id = p_id;
+  update public.profiles set crown_forced = p_level::smallint,
+    crown = coalesce(p_level, greatest(public.loyalty_level(coalesce(pts, 0)), coalesce(best, 0)))::smallint where id = p_id;
+end $$;
+revoke all on function public.admin_set_crown(uuid, int) from public, anon;
+grant execute on function public.admin_set_crown(uuid, int) to authenticated;
+
+-- ADMIN : ajouter (ou retirer, avec un nombre negatif) des points a un profil
+create or replace function public.admin_add_points(p_id uuid, p_pts int) returns void
+language plpgsql security definer set search_path = public as $$
+declare np int; best smallint; forced smallint;
+begin
+  if not public.is_admin() then raise exception 'Accès réservé'; end if;
+  insert into public.loyalty (profile_id) values (p_id) on conflict do nothing;
+  update public.loyalty set bonus = bonus + p_pts where profile_id = p_id;
+  select greatest(points + p_pts, 0), crown_forced into np, forced from public.profiles where id = p_id;
+  select best_level into best from public.loyalty where profile_id = p_id;
+  update public.profiles set points = np, crown = coalesce(forced, greatest(public.loyalty_level(np), coalesce(best, 0)))::smallint where id = p_id;
+end $$;
+revoke all on function public.admin_add_points(uuid, int) from public, anon;
+grant execute on function public.admin_add_points(uuid, int) to authenticated;

@@ -32,7 +32,7 @@ export default function Admin() {
     const { data } = await sb.from("reports").select("*, profiles(id,name,city,paused,vip,verified)").order("created_at", { ascending: false }).limit(300); setReports(data || []);
   }, []);
   const loadProfiles = useCallback(async () => {
-    let qq = sb.from("profiles").select("id,name,city,genre,vip,verified,paused,created_at").order("created_at", { ascending: false }).limit(200);
+    let qq = sb.from("profiles").select("id,name,city,genre,vip,verified,paused,created_at,crown,crown_forced,points").order("created_at", { ascending: false }).limit(200);
     if (q.trim()) qq = qq.ilike("name", `%${q.trim()}%`);
     const { data } = await qq; setProfiles(data || []);
     const { data: ve } = await sb.from("vip_until").select("profile_id,until,paused_at"); setVipEnd(Object.fromEntries((ve || []).map((x: any) => [x.profile_id, x])));
@@ -94,6 +94,19 @@ export default function Admin() {
   }
   const vipBtns = (p: any) => <span className="vipadm">{p.vip && <small className="note">{vipEnd[p.id] ? `jusqu’au ${fmt(vipEnd[p.id].until)}${vipEnd[p.id].paused_at ? " (gelé, en pause)" : ""}` : "sans fin"}</small>}
     {[2, 5, 30].map((d) => <button key={d} type="button" className="btn ghost" onClick={() => giveVip(p.id, d)}>+{d} j</button>)}</span>;
+  async function setCrown(id: string, v: string) {
+    setErr(""); const { error } = await sb.rpc("admin_set_crown", { p_id: id, p_level: v === "auto" ? null : Number(v) });
+    if (error) setErr(error.message); else loadProfiles();
+  }
+  async function addPts(id: string, n: number) {
+    setErr(""); const { error } = await sb.rpc("admin_add_points", { p_id: id, p_pts: n });
+    if (error) setErr(error.message); else loadProfiles();
+  }
+  const crownBtns = (p: any) => <span className="vipadm" title="Couronne et points de fidélité">
+    <small className="note">👑 {p.points || 0} pts</small>
+    <select aria-label="Couronne" value={p.crown_forced === null || p.crown_forced === undefined ? "auto" : String(p.crown_forced)} onChange={(e) => setCrown(p.id, e.target.value)}>
+      <option value="auto">Couronne : auto{!(p.crown_forced ?? null) && p.crown ? ` (${["", "Bronze", "Argent", "Or", "Diamant"][p.crown]})` : ""}</option><option value="0">Aucune</option><option value="1">Bronze</option><option value="2">Argent</option><option value="3">Or</option><option value="4">Diamant</option></select>
+    {[-50, 50, 100].map((n) => <button key={n} type="button" className="btn ghost" onClick={() => addPts(p.id, n)}>{n > 0 ? "+" : ""}{n} pts</button>)}</span>;
   async function del(id: string) {
     setErr(""); const { error } = await sb.rpc("admin_delete_profile", { p_id: id }); setSure("");
     if (error) setErr(error.message); else { loadProfiles(); loadReports(); loadCounts(); loadExtra(); }
@@ -208,7 +221,7 @@ export default function Admin() {
               {profiles.slice(0, 8).map((p) => (
                 <div key={p.id} className="dprow">
                   <div style={{ flex: "1 1 200px", minWidth: 0 }}><Link href={`/profil/${p.id}`}><b>{p.name}</b></Link><div className="note">{CATS[p.genre]} · {p.city} · {fmt(p.created_at)}{p.paused && " · masqué"}</div></div>
-                  <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}
+                  <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}{crownBtns(p)}
                   <label className="ck"><input type="checkbox" checked={p.verified} onChange={(e) => setProfile(p, { verified: e.target.checked })} /> Vérifié</label>
                   <label className="ck"><input type="checkbox" checked={p.paused} onChange={(e) => setProfile(p, { paused: e.target.checked })} /> Masqué</label>
                 </div>))}
@@ -241,7 +254,7 @@ export default function Admin() {
           {profiles.map((p) => (
             <div className="dcard" key={p.id} style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", padding: "10px 16px" }}>
               <div style={{ flex: "1 1 200px", minWidth: 0 }}><Link href={`/profil/${p.id}`}><b>{p.name}</b></Link><div className="note">{CATS[p.genre]} · {p.city} · {fmt(p.created_at)}{p.paused && " · masqué"}</div></div>
-              <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}
+              <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}{crownBtns(p)}
               <label className="ck"><input type="checkbox" checked={p.verified} onChange={(e) => setProfile(p, { verified: e.target.checked })} /> Vérifié</label>
               <label className="ck"><input type="checkbox" checked={p.paused} onChange={(e) => setProfile(p, { paused: e.target.checked })} /> Masqué</label>
               {sure === "p" + p.id
