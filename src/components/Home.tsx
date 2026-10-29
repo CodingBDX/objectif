@@ -75,6 +75,7 @@ function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; dela
         {a && (a.on
           ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? tr("Disponible 24h/24, 7j/7") : tr("Disponible jusqu’à {u}", { u: a.until || "" })}</div>
           : <div className="meta"><Ic n="clock" s={15} />{tr("Indisponible")}{a.next ? tr(" · reprend {n}", { n: a.next }) : ""}</div>)}
+        {p.street && <div className="meta"><Ic n="pin" s={15} />{p.zone ? tr("Rue · {z}", { z: p.zone }) : tr("Escorte de rue")}</div>}
         <div className="meta"><Ic n={CIC[p.genre] || "camera"} s={15} />{lab(p) ? lab(p) + " · " : ""}{p.photos.length} photos</div>
         {showTarif(p) ? <div className="meta"><Ic n="rose" s={15} />{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
         {trip ? <div className="meta avl on"><Ic n="pin" s={15} />{trip.to !== trip.from ? tr("Passe du {a} au {b}", { a: dShort(trip.from), b: dShort(trip.to) }) : tr("Passe le {a}", { a: dShort(trip.from) })}</div> : null}
@@ -140,7 +141,7 @@ function NoResult({ onClear }: { onClear: () => void }) {
 export default function Home({ profiles, initialType = "tous", initialCity = "", initialTag = "", h1 = "Tous les profils", intro = "", region = "", regions = {}, searchMode = false }: { searchMode?: boolean; profiles: Profile[]; initialType?: string; initialCity?: string; initialTag?: string; h1?: string; intro?: React.ReactNode; region?: string; regions?: Record<string, string> }) {
   const { tr } = useT(); const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || initialTag); const [q, setQ] = useState(sp.get("q") || "");
-  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
+  const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [rue, setRue] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
   const [df, setDf] = useState(DF0); const upd = (k: keyof typeof DF0, v: string | boolean) => setDf((d) => ({ ...d, [k]: v }));
   const [view, setView] = useState<"cards" | "list" | "map">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
@@ -168,7 +169,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const pm = sp.get("pm");
   useEffect(() => { if (pm && canNear) { try { localStorage.removeItem("objectif_pm"); } catch {} locate(); } }, [pm]);
   useEffect(() => { // clic sur le logo : on repart de zéro (recherche, filtres, ville, « près de moi »)
-    const h = () => { setType(initialType); setTag(initialTag); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); setNear(""); setGeoMsg(""); setGeoHelp(false); setShown(PAGE); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    const h = () => { setType(initialType); setTag(initialTag); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setRue(false); setTar(0); setVisit(0); setDur(60); setNear(""); setGeoMsg(""); setGeoHelp(false); setShown(PAGE); window.scrollTo({ top: 0, behavior: "smooth" }); };
     window.addEventListener("hp-home", h); return () => window.removeEventListener("hp-home", h);
   }, [initialType]);
   const stopNear = () => { setNear(""); try { localStorage.setItem("objectif_pm", JSON.stringify({ off: true })); } catch {} };
@@ -180,7 +181,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
   useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
-  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, df]);
+  useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, rue, tar, dur, visit, city, fav, df]);
   const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
   const list = useMemo(() => {
@@ -188,12 +189,12 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       && (!fav || favs.includes(p.id)) && inRange(p.age, df.amin, df.amax) && inRange(p.height_cm, df.hmin, df.hmax) && inRange(p.weight_kg, df.wmin, df.wmax)
       && (!df.eth || p.ethnicity === df.eth) && (!df.lang || (p.languages || []).includes(df.lang)) && (!df.hair || p.hair === df.hair) && (!df.eyes || p.eyes === df.eyes) && (!df.bra || p.bra === df.bra)
       && (!df.smk || p.smoker === df.smk) && (!df.drk || p.drinker === df.drk) && (!df.recv || p.receives) && (!df.trav || p.travels)
-      && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
+      && (!vid || p.video) && (!ver || p.verified) && (!rue || p.street) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio.replace(/[*#]/g, "") + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
     l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.bumped_at || b.created_at) - +new Date(a.bumped_at || a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
-  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [profiles, type, tag, q, sort, vid, ver, now, rue, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
   const [une, setUne] = useState<Profile | null>(null); // « À la une » : un VIP du contexte (ville / genre / spécialité), change chaque jour
   useEffect(() => {
     const pool = profiles.filter((x) => x.vip && (type === "tous" ? x.genre !== "livecam" : x.genre === type) && (!tag || x.specialties.some((t) => t.toLowerCase() === tag)) && (!city || inCities(x))).sort((a, b) => a.id < b.id ? -1 : 1);
@@ -248,7 +249,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const open = (id: string) => { const pp = profiles.find((x) => x.id === id); r.push(pp ? profilePath(pp) : `/profil/${id}`); };
   const setCities = (l: string[]) => r.push(l.length ? `/${searchMode ? "recherche" : ""}?${l.map((c) => "ville=" + encodeURIComponent(c)).join("&")}` : searchMode ? "/recherche" : "/");
   const setCity = (c: string) => r.push(c ? `/${searchMode ? "recherche" : ""}?ville=${encodeURIComponent(c)}` : searchMode ? "/recherche" : "/");
-  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); setDf(DF0); r.push(searchMode ? "/recherche" : "/"); };
+  const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setRue(false); setTar(0); setVisit(0); setDur(60); setDf(DF0); r.push(searchMode ? "/recherche" : "/"); };
 
   return (
     <div className={`shell gut${searchMode ? " srch" : ""}`} id="shell">
@@ -323,7 +324,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{tr(intro)}</p> : null) : intro}
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
-        {view !== "map" && <div className="nowbar">{(nNow > 0 || now) && <button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button>}<button type="button" className={`nowchip qf${vid ? " on" : ""}`} aria-pressed={vid} onClick={() => setVid(!vid)}><Ic n="video" s={16} />{tr("Avec vidéo de présentation")}</button><button type="button" className={`nowchip qf${ver ? " on" : ""}`} aria-pressed={ver} onClick={() => setVer(!ver)}><Ic n="check" s={16} />{tr("Profils vérifiés uniquement")}</button></div>}
+        {view !== "map" && <div className="nowbar">{(nNow > 0 || now) && <button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button>}<button type="button" className={`nowchip qf${vid ? " on" : ""}`} aria-pressed={vid} onClick={() => setVid(!vid)}><Ic n="video" s={16} />{tr("Avec vidéo de présentation")}</button>{(rue || profiles.some((x) => x.street)) && <button type="button" className={`nowchip qf${rue ? " on" : ""}`} aria-pressed={rue} onClick={() => setRue(!rue)}><Ic n="pin" s={16} />{tr("Escorte de rue")}</button>}<button type="button" className={`nowchip qf${ver ? " on" : ""}`} aria-pressed={ver} onClick={() => setVer(!ver)}><Ic n="check" s={16} />{tr("Profils vérifiés uniquement")}</button></div>}
         {une && view !== "map" && <UneBanner p={une} onOpen={() => open(une.id)} />}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).flatMap((p, i) => { const c = <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
