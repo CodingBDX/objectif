@@ -91,3 +91,7 @@ insert into public.profile_phones (profile_id, phone) values
   ('00000000-0000-4000-8000-000000000438',$q$06 39 98 38 86$q$),
   ('00000000-0000-4000-8000-000000000439',$q$06 39 98 39 82$q$),
   ('00000000-0000-4000-8000-000000000440',$q$06 39 98 40 78$q$) on conflict (profile_id) do nothing;
+
+-- 4 : quartiers fictifs
+update public.profiles set district = (array['Chartrons','Saint-Pierre','La Bastide','Saint-Michel','Caudéran','Bacalan','Nansouty','Saint-Augustin'])[1 + mod(get_byte(decode(right(replace(id::text, '-', ''), 2), 'hex'), 0), 8)]
+where id between '00000000-0000-4000-8000-000000000401'::uuid and '00000000-0000-4000-8000-000000000440'::uuid;

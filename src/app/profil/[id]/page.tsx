@@ -78,7 +78,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">
-            {!live && <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} /><Tr k="Villes" /></h2><div className="mvs"><Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
+            {!live && <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} /><Tr k="Villes" /></h2><div className="mvs"><Link className={`bubble base${p.district ? " hasd" : ""}`} href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★{p.district && <small className="bdist">{p.district}</small>}</Link>
                 {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}
             <Slider imgs={p.photos} vip={p.vip} video={p.video} alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer"><Tr k="▶ Rejoindre le live" /></a></p>}
@@ -105,7 +105,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           </div>
           <aside className="pside" aria-label="Villes, déplacements et disponibilités">
             {!live && <section className="bsec dsk"><h3 className="ph"><Ic n="pin" s={18} /><Tr k="Villes" /></h3><div className="bub">
-              <Link className="bubble base" href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★</Link>
+              <Link className={`bubble base${p.district ? " hasd" : ""}`} href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★{p.district && <small className="bdist">{p.district}</small>}</Link>
               {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}
             <section className="bsec dsk"><h3 className="ph"><Ic n="tag" s={18} /><Tr k="Spécialités" /></h3><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></section>
             {trips.length > 0 && <div className="panel"><h3 className="ph"><Ic n="pin" s={18} /><Tr k="Prochains passages" /></h3>

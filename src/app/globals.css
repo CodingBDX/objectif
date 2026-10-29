@@ -1053,3 +1053,7 @@ h1.pbn{margin:0}
 #lb .vmark{z-index:3}
 .stage img,#lb img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
 #lb .wm{font-size:clamp(12px,2vw,18px);color:rgba(255,255,255,.28)}
+
+/* Arrondissement / quartier sous la ville de base */
+.bubble.base.hasd{flex-direction:column;align-items:flex-start;line-height:1.2;border-radius:18px}
+.bubble.base .bdist{display:block;font:500 11px var(--fb);opacity:.85;margin-top:2px}

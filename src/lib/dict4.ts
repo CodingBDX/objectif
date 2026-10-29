@@ -76,6 +76,8 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Impossible d’afficher le numéro.": ["Unable to show the number.", "No se puede mostrar el número.", "Não foi possível mostrar o número."],
   "Nationalité (facultatif)": ["Nationality (optional)", "Nacionalidad (opcional)", "Nacionalidade (opcional)"],
   "🏳️ Nationalité": ["🏳️ Nationality", "🏳️ Nacionalidad", "🏳️ Nacionalidade"],
+  "Arrondissement ou quartier (facultatif)": ["District or neighbourhood (optional)", "Distrito o barrio (opcional)", "Distrito ou bairro (opcional)"],
+  "Ex. Chartrons": ["e.g. Chartrons", "p. ej. Chartrons", "ex. Chartrons"],
   "Numéro WhatsApp (obligatoire)": ["WhatsApp number (required)", "Número de WhatsApp (obligatorio)", "Número de WhatsApp (obrigatório)"],
   "Numéro de téléphone (obligatoire)": ["Phone number (required)", "Número de teléfono (obligatorio)", "Número de telefone (obrigatório)"],
   "Indique ton numéro de téléphone (obligatoire).": ["Enter your phone number (required).", "Indica tu número de teléfono (obligatorio).", "Indica o teu número de telefone (obrigatório)."],
