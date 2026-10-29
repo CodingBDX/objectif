@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Tr } from "@/lib/i18n";
 import { InstallLink } from "@/components/InstallBanner";
-import { slug } from "@/lib/site";
+import { cap } from "@/lib/types";
 
-/** Pied de page : bandeau d'invitation, marque, villes, colonnes de liens, bandeau 18+. */
-export default function SiteFooter({ escort, cities = [] }: { escort: boolean; cities?: string[] }) {
+/** Pied de page : bandeau d'invitation, marque, colonnes de liens, spécialités, bandeau 18+. */
+export default function SiteFooter({ escort, specs = [] }: { escort: boolean; specs?: string[] }) {
   return (
     <footer className="sf" id="foot">
       <div className="gut">
@@ -32,8 +32,11 @@ export default function SiteFooter({ escort, cities = [] }: { escort: boolean; c
             <h2>Informations</h2>
             <Link href="/mentions-legales">Mentions légales</Link><Link href="/cgu">Conditions d’utilisation</Link><Link href="/confidentialite">Confidentialité</Link><Link href="/contact">Contact</Link>
           </nav>
+          {specs.length > 0 && <nav className="sf-col sf-specs" aria-label="Spécialités">
+            <h2>Spécialités</h2>
+            <div>{specs.map((t) => <Link key={t} href={`/?tag=${encodeURIComponent(t)}`}>{cap(t)}</Link>)}</div>
+          </nav>}
         </div>
-        {cities.length > 0 && <nav className="sf-cities" aria-label="Escortes par ville"><h2>Escortes par ville</h2><div>{cities.map((c) => <Link key={c} href={`/ville/${slug(c)}`}>{c}</Link>)}</div></nav>}
         <div className="sf-bot">
           <span className="sf-18">18+</span>
           <span>© {new Date().getFullYear()} Sex-Escorte · <Tr k="Réservé aux adultes" /></span>
