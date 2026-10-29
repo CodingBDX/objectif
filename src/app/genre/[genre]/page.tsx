@@ -15,5 +15,5 @@ export default async function Page({ params }: { params: { genre: string } }) {
   const g = GFROM[params.genre]; if (!g) notFound();
   const profiles = await allProfiles();
   const cr: [string, string][] = [["Accueil", "/"], [`Profils ${GTITLE[g]}`, `/genre/${GPATH[g]}`]];
-  return <><Ld data={crumbs(cr)} /><Crumbs items={cr} /><Ld data={itemList(profiles.filter((p) => p.genre === g), `Profils ${GTITLE[g]}`)} /><Suspense><Home key={g} profiles={profiles} initialType={g} h1={`Profils ${GTITLE[g]}`} intro={`${profiles.filter((p) => p.genre === g).length} profils ${GTITLE[g].toLowerCase()} à découvrir : portfolios, disponibilités et agenda des villes visitées.`} /></Suspense></>;
+  return <><Ld data={crumbs(cr)} /><div className="gut"><div className="pbar"><Crumbs items={cr} inline /></div></div><Ld data={itemList(profiles.filter((p) => p.genre === g), `Profils ${GTITLE[g]}`)} /><Suspense><Home key={g} profiles={profiles} initialType={g} h1={`Profils ${GTITLE[g]}`} intro={`${profiles.filter((p) => p.genre === g).length} profils ${GTITLE[g].toLowerCase()} à découvrir : portfolios, disponibilités et agenda des villes visitées.`} /></Suspense></>;
 }
