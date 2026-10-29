@@ -280,7 +280,7 @@ export default function MyProfile() {
               <div className="tags">{LANGS.map((l) => <button type="button" key={l} className="chip" aria-pressed={langs.includes(l)} onClick={() => setLangs(langs.includes(l) ? langs.filter((x) => x !== l) : langs.length < 8 ? [...langs, l] : langs)}>{tr(l)}</button>)}</div></fieldset>
             <p className="note" style={{ margin: 0 }}>{tr("Ces informations sont affichées sur ton profil. Tout est facultatif sauf l’âge ; n’écris que ce que tu veux montrer.")}</p>
 </section>{!isLive && <section className="dcard" id="rue"><h3>{tr("Escorte de rue (zone)")}</h3>
-            <label className="ck"><input type="checkbox" checked={street} onChange={(e) => { setStreet(e.target.checked); setZTouch(true); }} /> {tr("Je travaille aussi dans la rue")}</label>
+            <label className="ck"><input type="checkbox" checked={street} onChange={(e) => { setStreet(e.target.checked); setZTouch(true); }} /> {tr("Je travaille dans la rue")}</label>
             {street && (quartiersOf(f.city).length ? <>
               <label className="f">{tr("Mon quartier")}<select value={zone} onChange={(e) => { setZone(e.target.value); setZTouch(true); }}><option value="">{tr("Choisir un quartier")}</option>{quartiersOf(f.city).map((q) => <option key={q.n} value={q.n}>{q.n}</option>)}</select></label>
               <label className="f">{tr("Créneaux habituels (optionnel)")}<input maxLength={40} placeholder={tr("ex. le soir, 20h–2h")} value={sHours} onChange={(e) => { setSHours(e.target.value); setZTouch(true); }} /></label>
