@@ -11,7 +11,7 @@ const load = () => new Promise<any>((res, rej) => {
 
 /** Zone approximative : un grand cercle sur un quartier (jamais de point ni de rue). Chargée seulement quand elle devient visible. */
 export default function ZoneMap({ lat, lon, label }: { lat: number; lon: number; label: string }) {
-  const box = useRef<HTMLDivElement>(null); const [go, setGo] = useState(false); const [err, setErr] = useState(false);
+  const box = useRef<HTMLDivElement>(null); const [go, setGo] = useState(false); const [err, setErr] = useState("");
   useEffect(() => {
     const el = box.current; if (!el) return;
     if (!("IntersectionObserver" in window)) { setGo(true); return; }
@@ -26,10 +26,10 @@ export default function ZoneMap({ lat, lon, label }: { lat: number; lon: number;
         map = L.map(box.current, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, boxZoom: false, keyboard: false, attributionControl: true });
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 14, attribution: "© OpenStreetMap" }).addTo(map);
         const c = L.circle([lat, lon], { radius: ZONE_RADIUS, color: "#d63384", weight: 2, fillColor: "#ee4f97", fillOpacity: 0.22 }).addTo(map);
-        map.fitBounds(c.getBounds(), { padding: [10, 10], maxZoom: 14 });
-      } catch { setErr(true); }
+        map.invalidateSize(); map.fitBounds(c.getBounds(), { padding: [10, 10], maxZoom: 14 }); setTimeout(() => { if (!dead && map) { map.invalidateSize(); map.fitBounds(c.getBounds(), { padding: [10, 10], maxZoom: 14 }); } }, 300);
+      } catch (e) { setErr(e instanceof Error ? e.message.slice(0, 80) : "chargement impossible"); }
     })();
     return () => { dead = true; if (map) map.remove(); };
   }, [go, lat, lon]);
-  return <div className="zmap" role="img" aria-label={`Zone approximative : ${label}`}>{err ? <p className="note">Carte indisponible.</p> : <div ref={box} className="zmapc" />}</div>;
+  return <div className="zmap" role="img" aria-label={`Zone approximative : ${label}`}>{err ? <p className="note">Carte indisponible ({err}). Recharge la page.</p> : <div ref={box} className="zmapc" />}</div>;
 }
