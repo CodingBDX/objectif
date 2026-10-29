@@ -1150,3 +1150,10 @@ h1.pbn{margin:0}
  .pcontact .soc{flex:1 1 0;min-width:0;max-width:110px;width:auto;height:56px;border-radius:28px}
  .pcontact .soc .ic{width:28px;height:28px}
 }
+
+/* WhatsApp / SMS : sur la ligne des réseaux sociaux */
+.pcontact .soc.wab{background:#25d366;color:#fff;cursor:pointer}
+.pcontact .soc.wab .ic{stroke:#fff}
+.pcontact .soc.wab.smsb{background:var(--btn);color:var(--btnt)}
+.pcontact .soc.wab.smsb .ic{stroke:var(--btnt)}
+.pcontact .soc.wab:hover{filter:brightness(1.08)}
