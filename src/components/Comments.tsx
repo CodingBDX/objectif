@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { logSec, HONEYPOT } from "@/lib/secEvent";
 
 type C = { id: number; author_id: string; author_name: string; body: string; created_at: string; parent_id?: number | null };
 const PAGE = 5;
@@ -35,12 +36,12 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
     io.observe(el); return () => io.disconnect();
   }, [shown, tops.length]);
   async function post() {
-    if (!me || !txt.trim()) return; setBusy(true); setErr("");
+    if (!me || !txt.trim()) return; if (document.querySelector<HTMLInputElement>(".hpf")?.value) { logSec("piege_commentaire", ""); setTxt(""); return; } setBusy(true); setErr("");
     const { error } = await sb.from("comments").insert({ profile_id: profileId, author_id: me.id, author_name: me.name, body: txt.trim() });
     setBusy(false); if (error) setErr("Impossible de publier : " + error.message); else { setTxt(""); load(); }
   }
   async function reply(parent: number) {
-    if (!me || !rtxt.trim()) return; setBusy(true); setErr("");
+    if (!me || !rtxt.trim()) return; if (document.querySelector<HTMLInputElement>(".hpf")?.value) { logSec("piege_commentaire", ""); setRtxt(""); setRep(null); return; } setBusy(true); setErr("");
     const { error } = await sb.from("comments").insert({ profile_id: profileId, author_id: me.id, author_name: me.name, body: rtxt.trim(), parent_id: parent });
     setBusy(false); if (error) setErr("Impossible de répondre : " + error.message); else { setRtxt(""); setRep(null); load(); }
   }
@@ -65,6 +66,7 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
         <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>Ajoute ton numéro de téléphone pour pouvoir commenter.</p>
         <div><Link className="btn" href="/mon-profil">Ajouter mon numéro</Link></div>
       </>) : me && me.name ? (<>
+        <input {...HONEYPOT} defaultValue="" />
         <label className="f">Commenter en tant que {me.name || "moi"}<textarea maxLength={500} value={txt} onChange={(e) => setTxt(e.target.value)} placeholder="Votre commentaire respectueux…" /></label>
         {err && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{err}</p>}
         <div><button className="btn" onClick={post} disabled={busy}>Publier le commentaire</button></div>

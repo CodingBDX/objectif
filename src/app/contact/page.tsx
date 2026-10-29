@@ -1,16 +1,19 @@
 "use client";
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import VipPrices from "@/components/VipPrices";
 import { supabaseBrowser } from "@/lib/supabase/client";
+import { logSec, HONEYPOT } from "@/lib/secEvent";
 
 function Form() {
   const vip = useSearchParams().get("s") === "vip";
-  const [done, setDone] = useState(false); const [err, setErr] = useState("");
+  const [done, setDone] = useState(false); const [err, setErr] = useState(""); const t0 = useRef(Date.now());
   async function send(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); const f = new FormData(e.currentTarget);
+    if (f.get("website")) { logSec("piege_contact", String(f.get("website")).slice(0, 80)); setDone(true); return; } // robot : on fait semblant
+    if (Date.now() - t0.current < 3000) { logSec("trop_rapide", "contact"); setErr("Un instant, réessaie dans quelques secondes."); return; }
     const { error } = await supabaseBrowser().from("messages").insert({ name: f.get("n"), contact: f.get("e"), subject: f.get("s"), body: f.get("m") });
     if (error) setErr("Envoi impossible, réessaie."); else setDone(true);
   }
@@ -24,6 +27,7 @@ function Form() {
           {vip && !done && <div style={{ margin: "0 0 16px" }}><b>👑 VIP</b><VipPrices pay /></div>}
           {done ? <p className="note" role="status"><b>Message envoyé, merci !</b> Nous te répondons dès que possible.</p> : (
             <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={send}>
+              <input {...HONEYPOT} defaultValue="" />
               <div className="row2"><label className="f">Nom<input name="n" required maxLength={60} autoComplete="name" /></label>
                 <label className="f">Adresse e-mail pour te répondre<input name="e" type="email" required maxLength={120} autoComplete="email" /></label></div>
               <label className="f">Sujet<select name="s" required defaultValue={vip ? "Devenir VIP" : ""}><option value="" disabled>Choisir…</option>

@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -22,7 +22,7 @@ export default function Admin() {
   const [verifs, setVerifs] = useState<any[]>([]); const [ai, setAi] = useState<Record<string, any>>({});
   const [lodgs, setLodgs] = useState<any[]>([]); const [lAddr, setLAddr] = useState<Record<string, string>>({});
   const [vipEnd, setVipEnd] = useState<Record<string, { until: string; paused_at: string | null }>>({});
-  const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]);
+  const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]); const [secEv, setSecEv] = useState<any[]>([]);
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
   const [cnt, setCnt] = useState<{ total: number; vip: number; paused: number; month: number; g: Record<string, number> }>({ total: 0, vip: 0, paused: 0, month: 0, g: {} });
   const [specs, setSpecs] = useState<string[]>([]); const [specDb, setSpecDb] = useState(true); const [specEd, setSpecEd] = useState<Record<string, string>>({}); const [specNew, setSpecNew] = useState(""); const [specUse, setSpecUse] = useState<Record<string, number>>({}); const [specOk, setSpecOk] = useState("");
@@ -52,6 +52,7 @@ export default function Admin() {
     if (error) { setDailyErr(true); return; } setDailyErr(false); setDaily((data || []).map((r: any) => ({ day: r.day, views: Number(r.views), calls: Number(r.calls) })));
   }, []);
   const loadExtra = useCallback(async () => {
+    { const se = await sb.from("security_events").select("id,kind,detail,created_at").order("created_at", { ascending: false }).limit(300); setSecEv(se.error ? [] : se.data || []); }
     const a = await sb.from("client_reports").select("id,category,note,created_at,profiles(name)").order("created_at", { ascending: false }).limit(200); setClients(a.error ? [] : a.data || []);
     const v = await sb.from("verif_requests").select("profile_id,path,status,created_at,profiles(name,city)").eq("status", "pending").order("created_at"); 
     const vr = v.error ? [] : (v.data || []) as any[];
@@ -150,7 +151,7 @@ export default function Admin() {
     setVerifs((l) => l.filter((y) => y.profile_id !== x.profile_id)); loadProfiles(); refreshListings();
   }
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", verifs: "Demandes de vérification", lodgings: "Logements" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", verifs: "Demandes de vérification", lodgings: "Logements" };
 
   return (
     <div className="dash gut">
@@ -159,7 +160,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
           <Link href="/">📖 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -346,6 +347,21 @@ export default function Admin() {
             </div>))}
         </div>)}
 
+        {tab === "secu" && (() => {
+          const day = (x: any) => Date.now() - new Date(x.created_at).getTime() < 864e5;
+          const KIND: Record<string, string> = { piege_contact: "🤖 Robot bloqué (contact)", piege_signalement: "🤖 Robot bloqué (signalement)", piege_commentaire: "🤖 Robot bloqué (commentaire)", connexion_echec: "🔑 Connexion échouée", trop_rapide: "⚡ Envoi trop rapide" };
+          const by = Object.keys(KIND).map((k) => [k, secEv.filter((x) => x.kind === k && day(x)).length] as const);
+          const nouveaux = profiles.filter((p: any) => p.created_at && Date.now() - new Date(p.created_at).getTime() < 7 * 864e5);
+          return (<div style={{ display: "grid", gap: 12 }}>
+            <div className="dcard"><h3 style={{ marginTop: 0 }}>Dernières 24 h</h3>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{by.map(([k, n]) => <span key={k} className="chip" style={{ cursor: "default" }}>{KIND[k]} : <b>{n}</b></span>)}</div>
+              {secEv.length === 0 && <p className="note">Aucun événement (ou <code>migration-securite.sql</code> pas encore lancé).</p>}</div>
+            <div className="dcard"><h3 style={{ marginTop: 0 }}>Nouveaux profils (7 jours) : {nouveaux.length}</h3>
+              <div className="note">{nouveaux.slice(0, 40).map((p: any) => `${p.name} (${p.city})`).join(" · ") || "Aucun."}</div></div>
+            <div className="dcard"><h3 style={{ marginTop: 0 }}>Derniers événements</h3>
+              {secEv.slice(0, 80).map((x) => <div key={x.id} className="note" style={{ padding: "2px 0" }}>{fmt(x.created_at)} · {ago(x.created_at)} — <b>{KIND[x.kind] || x.kind}</b>{x.detail ? ` · ${x.detail}` : ""}</div>)}</div>
+          </div>);
+        })()}
         {tab === "journal" && (<div style={{ display: "grid", gap: 10 }}>
           {journal.length === 0 && <p className="note">Journal vide (ou <code>migration-journal-admin.sql</code> pas encore lancé).</p>}
           {journal.map((j) => (

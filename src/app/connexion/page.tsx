@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
 import Turnstile from "@/components/Turnstile";
+import { logSec } from "@/lib/secEvent";
 
 /** Force du mot de passe : 0 (trop court) à 4 (très solide). */
 function strength(pw: string) {
@@ -39,7 +40,7 @@ function Form() {
       setMsg(error ? { t: error.message } : { t: tr("Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi."), ok: true });
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw, options: { captchaToken: cap || undefined } });
-      if (error) setMsg({ t: tr("E-mail ou mot de passe incorrect.") }); else location.href = nx;
+      if (error) { setMsg({ t: tr("E-mail ou mot de passe incorrect.") }); logSec("connexion_echec", error.message.slice(0, 60)); } else location.href = nx;
     }
     setBusy(false); setCap(""); setCapN((n) => n + 1);
   }

@@ -1211,3 +1211,6 @@ h1.pbn{margin:0}
 .pwh small{color:var(--mut);line-height:1.4}
 .pwa{display:flex;gap:8px;flex-wrap:wrap}
 .pwa .btn{min-height:38px;padding:6px 14px;font-size:14px}
+
+/* Champ piege anti-robots : invisible pour les humains */
+.hpf{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0;pointer-events:none}
