@@ -15,7 +15,7 @@ export default function ViewerMark() {
   const [bg, setBg] = useState("");
   useEffect(() => {
     const t = `sex-escorte.com · ${code()} · ${new Date().toISOString().slice(0, 10)}`;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200"><text x="160" y="100" text-anchor="middle" transform="rotate(-24 160 100)" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#fff" fill-opacity=".34" stroke="#000" stroke-opacity=".18" stroke-width=".6">${t}</text></svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="170"><text x="150" y="85" text-anchor="middle" transform="rotate(-24 150 85)" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#fff" fill-opacity=".16" stroke="#000" stroke-opacity=".08" stroke-width=".6">${t}</text></svg>`;
     setBg(`url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
   }, []);
   if (!bg) return null;

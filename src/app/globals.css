@@ -1049,6 +1049,7 @@ h1.pbn{margin:0}
 .pph button.phb2:hover{color:var(--btn)}
 
 /* Filigrane visiteur (anti-capture) */
-.vmark{position:absolute;inset:0;z-index:3;pointer-events:none;background-repeat:repeat;background-size:320px 200px;user-select:none}
+.vmark{position:absolute;inset:0;z-index:3;pointer-events:none;background-repeat:repeat;background-size:300px 170px;user-select:none}
 #lb .vmark{z-index:3}
 .stage img,#lb img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
+#lb .wm{font-size:clamp(12px,2vw,18px);color:rgba(255,255,255,.28)}
