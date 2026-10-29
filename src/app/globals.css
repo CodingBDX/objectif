@@ -1296,3 +1296,12 @@ h1.pbn{margin:0}
 /* Description / Spécialités : aperçu + « Voir tout » */
 .dscr{list-style:none;margin:0;padding:0}
 .cmore{margin:10px auto 0;display:flex;min-height:38px;padding:4px 16px;font-size:14px}
+
+/* Vue liste sur mobile : pastilles (VIP, New, genre, Dispo, vidéo) à droite, hors de la photo */
+.bdgs{display:none}
+@media(max-width:560px){
+.grid.lst .card .cover .tr .vipb,.grid.lst .card .cover .nwb,.grid.lst .card .cover .badge,.grid.lst .card .cover .avb,.grid.lst .card .cover .vid-ic{display:none}
+.grid.lst .card .bdgs{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 2px}
+.grid.lst .card .bdgs>*{position:static;inset:auto;box-shadow:none;padding:1px 8px 1px 6px;font-size:11px;line-height:18px}
+.grid.lst .card .bdgs .badge{padding:1px 8px}
+}
