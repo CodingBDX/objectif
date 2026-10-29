@@ -179,7 +179,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       && (!df.smk || p.smoker === df.smk) && (!df.drk || p.drinker === df.drk) && (!df.recv || p.receives) && (!df.trav || p.travels)
       && (!vid || p.video) && (!ver || p.verified) && (!now || avail(p)?.on) && (!tar || (showTarif(p) && (dur === 30 ? p.tarif_30 : p.tarif_60) ? (tar === 999 ? (dur === 30 ? p.tarif_30 : p.tarif_60)! > (dur === 30 ? 150 : 300) : (dur === 30 ? p.tarif_30 : p.tarif_60)! <= tar) : false))
       && (!q || (p.name + " " + cityList(p).join(" ") + " " + p.specialties.join(" ") + " " + p.bio.replace(/[*#]/g, "") + " " + lab(p)).toLowerCase().includes(q.toLowerCase())));
-    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
+    l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.bumped_at || b.created_at) - +new Date(a.bumped_at || a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
