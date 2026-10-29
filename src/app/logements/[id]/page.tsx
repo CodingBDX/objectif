@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -23,7 +24,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   if (!mine && (l.status !== "approved" || !o || !o.vip || !o.verified || (o as any).paused)) notFound();
   return (
     <section id="lg" className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/logements"><Tr k="← Tous les logements" /></Link><h1 className="pbn">{l.title}</h1></div>
+      <div className="pbar"><Crumbs inline items={[["Accueil", "/"], ["Logements", "/logements"], [l.title, "#"]]} /><h1 className="pbn">{l.title}</h1></div>
       <div className="pfc"><div className="pgrid"><div className="pmain">
         {l.status !== "approved" && mine && <p className="note" role="status"><b><Tr k="⏳ Aperçu : ton logement n’est pas encore visible par les autres." /></b></p>}
         <Slider imgs={l.photos || []} vip={true} alt={l.title} />

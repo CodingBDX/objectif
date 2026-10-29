@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Crumbs } from "@/components/Ld";
 
 /** Structure « tableau de bord » (colonne latérale + zone principale) partagée par les pages associations. */
 export default function AssoShell({ title, active, cities, extra, children, avatar = "🤝", hi = "Associations", top, list = true }: {
@@ -23,6 +24,7 @@ export default function AssoShell({ title, active, cities, extra, children, avat
         <div className="dvip"><div className="crown">🤝</div><b>Tu es une association ?</b><span>Publie ta fiche : elle est validée avant d’apparaître.</span><Link className="dbtn pink" href="/mon-association">Ma fiche</Link></div>
       </aside>
       <main className="dmain dedit">
+        <div className="pbar"><Crumbs inline items={active === "fiche" ? [["Accueil", "/"], ["Mon profil", "/mon-profil"], ["Ma fiche association", "#"]] : title === "Associations et soutien" ? [["Accueil", "/"], ["Associations", "#"]] : [["Accueil", "/"], ["Associations", "/associations"], [title, "#"]]} /></div>
         <div className="dtop"><h1>{title}</h1>{top}</div>
         {children}
       </main>

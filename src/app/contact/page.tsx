@@ -1,5 +1,6 @@
 "use client";
 import { Suspense, useState } from "react";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import VipPrices from "@/components/VipPrices";
@@ -15,7 +16,7 @@ function Form() {
   }
   return (
     <section id="con" className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/">← Retour à l’annuaire</Link></div>
+      <div className="pbar"><Crumbs inline items={[["Accueil", "/"], ["Contact", "#"]]} /></div>
       <div className="pfc" style={{ maxWidth: 640 }}>
         <div className="panel regp">
           <h1 style={{ font: "700 clamp(28px,5vw,38px)/1.1 var(--fd)", color: "var(--pink)", margin: "0 0 6px" }}>Nous contacter</h1>

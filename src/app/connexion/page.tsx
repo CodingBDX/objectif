@@ -1,5 +1,6 @@
 "use client";
 import { Suspense, useState } from "react";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
@@ -44,7 +45,7 @@ function Form() {
   }
   return (
     <section className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/">{tr("← Retour à l’annuaire")}</Link></div>
+      <div className="pbar"><Crumbs inline items={[[tr("Accueil"), "/"], [signup ? tr("Créer mon profil") : tr("Se connecter"), "#"]]} /></div>
       <div className="pfc" style={{ maxWidth: 520 }}>
         <div className="panel regp">
           <h1 className="regh">{signup ? tr("Créer mon profil") : tr("Se connecter")}</h1>

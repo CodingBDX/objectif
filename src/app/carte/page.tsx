@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { allProfiles } from "@/lib/data";
 import { lab } from "@/lib/types";
@@ -35,6 +36,7 @@ export default async function Page() {
         {allowed && <div className="dvip"><div className="crown">🤝</div><b>Soutien près de toi</b><span>{assos.length} association{assos.length > 1 ? "s" : ""} sur la carte, à leur adresse d’accueil.</span></div>}
       </aside>
       <main className="dmain dedit">
+        <div className="pbar"><Crumbs inline items={[["Accueil", "/"], ["Carte des profils", "#"]]} /></div>
         <div className="dtop"><h1>Carte des profils</h1></div>
         <section className="dcard">
           <p className="note" style={{ margin: "0 0 10px" }}>{ps.length} profil{ps.length > 1 ? "s" : ""} dans {cities.length} ville{cities.length > 1 ? "s" : ""}. Pour les profils, seule la ville est affichée, jamais une adresse.{allowed ? " Les 🤝 sont des associations de soutien." : ""}</p>

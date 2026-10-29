@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import AssoForm from "@/components/AssoForm";
 import StatsPanel from "@/components/StatsPanel";
@@ -195,6 +196,7 @@ export default function MyProfile() {
         {!isNewP && !vip && <div className="dvip"><div className="crown">👑</div><b>{tr("Passe en VIP")}</b><span>{tr("Plus de visibilité dans l’annuaire.")}</span><VipPrices /><Link className="dbtn pink" href="/contact?s=vip">{tr("Devenir VIP")}</Link></div>}
       </aside>
       <main className="dmain dedit">
+        <div className="pbar"><Crumbs inline items={[[tr("Accueil"), "/"], [isNewP ? tr("Créer mon profil") : tr("Mon espace"), "#"]]} /></div>
         <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
         {!isNewP && <StatsPanel />}
         {!isNewP && <LodgingFinder />}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -15,7 +16,7 @@ export default async function Page() {
   if (!(await canSeeLodgings())) notFound();
   return (
     <section className="gut">
-      <div className="pbar"><Link className="btn ghost" href="/mon-profil"><Tr k="← Modifier mon profil" /></Link><h1 className="pbn"><Tr k="🏠 Mon logement" /></h1></div>
+      <div className="pbar"><Crumbs inline items={[["Accueil", "/"], ["Mon profil", "/mon-profil"], ["Mon logement", "#"]]} /><h1 className="pbn"><Tr k="🏠 Mon logement" /></h1></div>
       <div className="pfc" style={{ maxWidth: 720 }}><LodgingEditor uid={user.id} /></div>
     </section>
   );

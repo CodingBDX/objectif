@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
 import { Tr } from "@/lib/i18n";
 import Faq from "@/components/Faq";
@@ -30,6 +31,7 @@ const STEPS: [string, string][] = [
 export default function Page() {
   return (
     <div className="rj gut">
+      <div className="pbar"><Crumbs inline items={[["Accueil", "/"], ["Rejoindre l’annuaire", "#"]]} /></div>
       <section className="rjh">
         <span className="rjk"><Tr k="Pour les escortes indépendantes" /></span>
         <h1><Tr k="Ton annuaire, ta protection." /></h1>

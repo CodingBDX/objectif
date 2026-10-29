@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Crumbs } from "@/components/Ld";
 import { Tr } from "@/lib/i18n";
 
 /** Structure « tableau de bord » (colonne latérale + zone principale) de la page Logements, calquée sur celle des associations. */
@@ -21,6 +22,7 @@ export default function LodgingShell({ title, cities, children }: { title: strin
         <div className="dvip"><div className="crown">🏠</div><b><Tr k="Tu as un logement ?" /></b><span><Tr k="Publie ton annonce : elle est validée avant d’apparaître." /></span><Link className="dbtn pink" href="/mon-logement"><Tr k="Mon logement" /></Link></div>
       </aside>
       <main className="dmain dedit">
+        <div className="pbar"><Crumbs inline items={[["Accueil", "/"], [title.replace(/^\P{L}+/u, ""), "#"]]} /></div>
         <div className="dtop"><h1>{title}</h1></div>
         {children}
       </main>
