@@ -1,17 +1,18 @@
 import { slug } from "./site";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-type P = { id: string; name: string; city: string; vip?: boolean; genre?: string };
+export const GENRES = ["fille", "homme", "trans", "livecam"];
+type P = { id: string; name: string; city: string; vip?: boolean; genre?: string; friendly_url?: boolean | null; url_slug?: string | null };
 
-/** Segment d'adresse d'un profil : « camille-bordeaux-1a2b3c4d » pour les VIP, l'identifiant simple sinon. */
-export function profileSeg(p: P): string {
-  if (!p.vip) return p.id;
-  const parts = [slug(p.name), p.genre === "livecam" ? "" : slug(p.city)].filter(Boolean);
-  return [...parts, p.id.slice(0, 8)].join("-");
+/** Adresse officielle d'un profil : /fille/bordeaux/camille si c'est un VIP qui a coché l'option, /profil/<identifiant> sinon. */
+export function profilePath(p: P): string {
+  if (p.vip && p.friendly_url && p.url_slug && p.genre && GENRES.includes(p.genre)) {
+    return `/${p.genre}/${p.genre === "livecam" ? "en-ligne" : slug(p.city) || "france"}/${p.url_slug}`;
+  }
+  return `/profil/${p.id}`;
 }
-export const profilePath = (p: P) => `/profil/${profileSeg(p)}`;
 
-/** Ce que contient l'adresse : un identifiant complet, ou le début (8 caractères) de l'identifiant d'une adresse « jolie ». */
+/** Ce que contient l'adresse /profil/… : un identifiant complet, ou le début (8 caractères) d'une ancienne adresse « jolie ». */
 export const safeDecode = (s: string) => { try { return decodeURIComponent(s); } catch { return s; } };
 export function parseProfileParam(param: string): { id?: string; prefix?: string } {
   const s = safeDecode(param).toLowerCase();

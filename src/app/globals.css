@@ -1140,3 +1140,13 @@ h1.pbn{margin:0}
 .pph a.wab .ic{stroke:#fff}
 .pph a.wab:hover{filter:brightness(1.08)}
 .pph a.wab.smsb{background:var(--btn)}.pph a.wab.smsb .ic{stroke:var(--btnt)}
+
+/* Slogan VIP sous le nom */
+.pslogan{margin:0 0 14px;font:italic 600 17px/1.35 var(--fd);color:var(--mut);text-wrap:balance}
+.vipopt{display:flex;flex-direction:column;gap:8px}
+
+/* Mobile : icônes réseaux plus grandes, sous le numéro, sur toute la largeur */
+@media (max-width:640px){
+ .pcontact .soc{flex:1 1 0;min-width:0;max-width:110px;width:auto;height:56px;border-radius:28px}
+ .pcontact .soc .ic{width:28px;height:28px}
+}

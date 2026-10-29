@@ -1,14 +1,14 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { GPATH, siteUrl, slug } from "@/lib/site";
-import { profileSeg } from "@/lib/profilUrl";
+import { profilePath } from "@/lib/profilUrl";
 
 export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const { data } = await sb.from("profiles").select("id,name,vip,city,more,genre,created_at").eq("paused", false).limit(5000);
-  const ps = (data || []) as { id: string; name: string; vip: boolean; city: string; more: string[]; genre: string; created_at: string }[];
+  const { data } = await sb.from("profiles").select("id,name,vip,city,more,genre,created_at,friendly_url,url_slug").eq("paused", false).limit(5000);
+  const ps = (data || []) as { id: string; name: string; vip: boolean; city: string; more: string[]; genre: string; created_at: string; friendly_url?: boolean; url_slug?: string | null }[];
   const cities = new Set<string>(); const gc = new Set<string>();
   ps.filter((p) => p.genre !== "livecam").forEach((p) => [p.city, ...(p.more || [])].filter(Boolean).forEach((c) => { cities.add(slug(c)); gc.add(`${GPATH[p.genre]}/${slug(c)}`); }));
   const now = new Date();
@@ -19,6 +19,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...Object.values(GPATH).map((g) => ({ url: `${base}/genre/${g}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.8 })),
     ...[...cities].map((c) => ({ url: `${base}/ville/${c}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.8 })),
     ...[...gc].map((x) => ({ url: `${base}/genre/${x}`, lastModified: now, changeFrequency: "daily" as const, priority: 0.6 })),
-    ...ps.map((p) => ({ url: `${base}/profil/${profileSeg(p)}`, lastModified: new Date(p.created_at), changeFrequency: "weekly" as const, priority: 0.7 }))
+    ...ps.map((p) => ({ url: `${base}${profilePath(p)}`, lastModified: new Date(p.created_at), changeFrequency: "weekly" as const, priority: 0.7 }))
   ];
 }
