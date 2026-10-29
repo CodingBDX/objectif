@@ -29,7 +29,6 @@ export const rateList = (p: Profile): Rate[] => {
 export const showTarif = (p: Profile) => (!!p.vip || p.genre === "livecam") && p.tarif_visible !== false && rateList(p).length > 0;
 
 export const LANGS = ["Français", "Anglais", "Espagnol", "Portugais", "Italien", "Allemand", "Arabe", "Russe", "Roumain", "Chinois", "Néerlandais", "Polonais"];
-export const NATIONALITES = ["Française", "Belge", "Suisse", "Luxembourgeoise", "Monégasque", "Italienne", "Espagnole", "Portugaise", "Allemande", "Britannique", "Roumaine", "Polonaise", "Russe", "Ukrainienne", "Brésilienne", "Colombienne", "Vénézuélienne", "Marocaine", "Algérienne", "Tunisienne", "Sénégalaise", "Ivoirienne", "Camerounaise", "Congolaise", "Thaïlandaise", "Chinoise", "Libanaise", "Turque"];
 export const ETHNIES = ["Africaine", "Antillaise", "Asiatique", "Caucasienne", "Latine", "Métisse", "Maghrébine", "Moyen-orientale", "Indienne", "Autre"];
 export const HAIRS = ["Blonds", "Châtains", "Bruns", "Noirs", "Roux", "Auburn", "Gris / blancs", "Colorés"];
 export const EYES = ["Bleus", "Verts", "Marron", "Noisette", "Noirs", "Gris"];
