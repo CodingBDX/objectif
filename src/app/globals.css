@@ -1047,3 +1047,8 @@ h1.pbn{margin:0}
 /* Bouton « Afficher le numéro » (le numéro n'est plus dans la page) */
 .pph button.phb2{background:transparent;color:inherit;border:0;min-height:34px;padding:0 4px;font:800 14px var(--fb);cursor:pointer;text-align:left}
 .pph button.phb2:hover{color:var(--btn)}
+
+/* Filigrane visiteur (anti-capture) */
+.vmark{position:absolute;inset:0;z-index:3;pointer-events:none;background-repeat:repeat;background-size:320px 200px;user-select:none}
+#lb .vmark{z-index:3}
+.stage img,#lb img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}

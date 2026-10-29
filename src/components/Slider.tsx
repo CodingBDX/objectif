@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { thumbUrl } from "@/lib/img";
+import ViewerMark from "./ViewerMark";
 
 /** Si la miniature n'existe pas (anciennes photos), on retombe sur l'image d'origine. */
 const fb = (src: string) => (e: React.SyntheticEvent<HTMLImageElement>) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.removeAttribute("srcset"); el.src = src; } };
@@ -30,6 +31,7 @@ export default function Slider({ imgs, vip, video, alt }: { imgs: string[]; vip:
               <img src={it.src} srcSet={thumbUrl(it.src) !== it.src ? `${thumbUrl(it.src)} 640w, ${it.src} 1600w` : undefined} sizes="(max-width: 700px) 100vw, 800px" alt={alt ? `${alt}${imgs.length > 1 ? ` (${video ? k : k + 1})` : ""}` : ""} width={1600} height={900}
                 loading={k === 0 ? "eager" : "lazy"} fetchPriority={k === 0 ? "high" : "auto"} decoding="async" onError={fb(it.src)} /></button>)}
           {N > 1 && <><button className="nv prev" aria-label="Précédent" onClick={() => go(-1, true)}>‹</button><button className="nv next" aria-label="Suivant" onClick={() => go(1, true)}>›</button></>}
+          <ViewerMark />
           <div className="pc">{i + 1} / {N}</div>
         </div>
         <div className="thumbs">{items.map((it, k) => it.v
@@ -40,7 +42,7 @@ export default function Slider({ imgs, vip, video, alt }: { imgs: string[]; vip:
         <dialog id="lb" open style={{ position: "fixed", inset: 0, margin: "auto", zIndex: 60 }} onClick={() => setLb(false)}>
           <button className="x" style={{ position: "absolute", right: 8, top: 8 }} aria-label="Fermer" onClick={() => setLb(false)}>✕</button>
           {items[i].v ? <><video controls autoPlay playsInline src={items[i].src} onClick={(e) => e.stopPropagation()} onLoadedMetadata={(e) => setVbad(!e.currentTarget.videoWidth)} />{vbad && <p className="vbad" onClick={(e) => e.stopPropagation()}>Ton navigateur ne peut pas afficher l’image de cette vidéo (format HEVC / H.265). Essaie sur un téléphone ou avec Safari.</p>}</> : <img id="lbi" src={items[i].src} alt="" />}
-          <span className="wm">© Sex-Escorte</span>
+          <ViewerMark /><span className="wm">© Sex-Escorte</span>
         </dialog>
       )}
     </>
