@@ -23,8 +23,8 @@ const fmtPh = (s: string) => { const d = s.replace(/\D/g, ""); return /^0\d{9}$/
 export default function PhoneReveal({ id, live, mine, name, wa, sms }: { id: string; live: boolean; mine: boolean; name: string; wa?: boolean; sms?: boolean }) {
   const { tr } = useT();
   const origin = typeof location !== "undefined" ? location.origin : "https://sex-escorte.com";
-  // Le lien du profil donne un aperçu avec photo dans WhatsApp / SMS ; une image ne peut pas être jointe automatiquement.
-  const msg = tr("Bonjour {n} 👋\nJ’ai vu votre profil : {u}\nJe vous contacte depuis Sex-Escorte.com : {h}\nÊtes-vous disponible ?", { n: name, u: `${origin}/profil/${id}`, h: origin });
+  // Le lien de l’accueil donne un bel aperçu (image du site) dans WhatsApp / SMS ; une image ne peut pas être jointe automatiquement.
+  const msg = tr("Bonjour {n} 👋\nJe vous contacte depuis Sex-Escorte.com : {h}\nÊtes-vous disponible ?", { n: name, h: origin });
   const [ph, setPh] = useState<string | null>(null); const [busy, setBusy] = useState(false); const [err, setErr] = useState("");
   async function show() {
     setBusy(true); setErr("");
