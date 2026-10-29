@@ -12,6 +12,8 @@ import Slider from "@/components/Slider";
 import PauseBtn from "@/components/PauseBtn";
 import { Tr, TDate } from "@/lib/i18n";
 import { RichText, plain } from "@/lib/rich";
+import ZoneMap from "@/components/ZoneMap";
+import { quartierOf } from "@/lib/quartiers";
 import Collapse from "@/components/Collapse";
 import CopyBtn from "@/components/CopyBtn";
 import PhoneReveal from "@/components/PhoneReveal";
@@ -121,6 +123,10 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
                 {p.pay_paypal && (/^https:\/\/(www\.)?paypal\.me\/[\w./-]+$/i.test(p.pay_paypal) ? <span><Ic n="rose" s={18} />PayPal <a className="nb" href={p.pay_paypal} target="_blank" rel="noopener noreferrer">{p.pay_paypal.replace(/^https:\/\/(www\.)?/i, "")}</a></span> : <span><Ic n="rose" s={18} />PayPal <b>{p.pay_paypal}</b><CopyBtn text={p.pay_paypal} label="Copier" className="" /></span>)}</div>}
               {(p.genre || p.receives || p.travels || p.age || p.hair || p.eyes || p.bra || p.smoker || p.drinker || p.height_cm || p.weight_kg || p.ethnicity || p.nationality || (p.languages || []).length > 0) && <><h2 className="pres"><Tr k="Description" /></h2>
                 <Collapse n={4} as="ul" className="dscr">{p.genre ? <li><span><Tr k="👤 Genre" /></span><b><Tr k={CATS[p.genre]} /></b></li> : null}{p.receives ? <li><span><Tr k="🏠 Rencontre" /></span><b><Tr k="Reçoit" /></b></li> : null}{p.travels ? <li><span><Tr k="🚗 Rencontre" /></span><b><Tr k="Se déplace" /></b></li> : null}{p.age ? <li><span><Tr k="🎂 Âge" /></span><b>{p.age} <Tr k="ans" /></b></li> : null}{p.height_cm ? <li><span><Tr k="📏 Taille" /></span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span><Tr k="⚖️ Poids" /></span><b>{p.weight_kg} kg</b></li> : null}{p.hair ? <li><span><Tr k="💇 Cheveux" /></span><b><Tr k={p.hair!} /></b></li> : null}{p.eyes ? <li><span><Tr k="👁 Yeux" /></span><b><Tr k={p.eyes!} /></b></li> : null}{p.bra ? <li><span><Tr k="👙 Bonnet" /></span><b>{p.bra}</b></li> : null}{p.smoker ? <li><span><Tr k="🚬 Fume" /></span><b><Tr k={HL[p.smoker]} /></b></li> : null}{p.drinker ? <li><span><Tr k="🍷 Boit" /></span><b><Tr k={HL[p.drinker]} /></b></li> : null}{p.ethnicity ? <li><span><Tr k="🌍 Ethnie" /></span><b><Tr k={p.ethnicity!} /></b></li> : null}{p.nationality ? <li><span><Tr k="🏳️ Nationalité" /></span><b>{p.nationality}</b></li> : null}{(p.languages || []).length > 0 ? <li><span><Tr k="🗣 Langues" /></span><b>{p.languages!.map((l, i) => <span key={l}>{i > 0 ? ", " : ""}<Tr k={l} /></span>)}</b></li> : null}</Collapse></>}
+              {p.street && p.zone && <section className="zbox" aria-label="Zone"><h2 className="pres"><Tr k="Zone" /></h2>
+                <div className="zhd"><b>📍 {p.zone}</b>{p.street_hours && <span>🕒 {p.street_hours}</span>}</div>
+                {p.zone_map && p.verified && quartierOf(p.city, p.zone) && <ZoneMap lat={quartierOf(p.city, p.zone)!.lat} lon={quartierOf(p.city, p.zone)!.lon} label={p.zone} />}
+                <p className="znote"><Tr k="Zone approximative : la position exacte n’est jamais affichée." /></p></section>}
               {p.specialties.length > 0 && <div className="mspec"><h2 className="pres"><Tr k="Spécialités" /></h2><Collapse n={4} className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</Collapse></div>}
               {p.bio && <h2 className="pres"><Tr k="Présentation" /></h2>}
               <div className="bio"><RichText text={p.bio} /></div>

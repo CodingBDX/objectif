@@ -1305,3 +1305,12 @@ h1.pbn{margin:0}
 .grid.lst .card .bdgs>*{position:static;inset:auto;box-shadow:none;padding:1px 8px 1px 6px;font-size:11px;line-height:18px}
 .grid.lst .card .bdgs .badge{padding:1px 8px}
 }
+
+/* Zone (escorte de rue) */
+.zmap{border-radius:18px;overflow:hidden;border:1px solid var(--line)}
+.zmapc{height:220px;background:var(--soft)}
+.zbox{display:grid;gap:10px}
+.zbox .zhd{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.zbox .zhd b{font:700 16px var(--fd)}
+.zbox .zhd span{font-size:13px;color:var(--mut)}
+.zbox .znote{margin:0;font-size:12.5px;color:var(--mut)}
