@@ -1057,3 +1057,11 @@ h1.pbn{margin:0}
 /* Arrondissement / quartier sous la ville de base */
 .bubble.base.hasd{flex-direction:column;align-items:flex-start;line-height:1.2;border-radius:18px}
 .bubble.base .bdist{display:block;font:500 11px var(--fb);opacity:.85;margin-top:2px}
+
+/* Suggestions de villes proches (Mon profil) */
+.nsug{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 0}
+.nsugh{font:600 12px var(--fb);opacity:.8;flex-basis:100%}
+.nsug .nbub{cursor:pointer;border:1px solid var(--line,#e5d3dc);background:var(--card,#fff);color:inherit;border-radius:999px;padding:5px 11px;font:600 13px var(--fb)}
+.nsug .nbub:hover:not(:disabled){background:var(--btn);color:var(--btnt);border-color:var(--btn)}
+.nsug .nbub:disabled{opacity:.45;cursor:not-allowed}
+.nsugf{font:500 12px var(--fb);opacity:.8;flex-basis:100%}
