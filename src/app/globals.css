@@ -1427,3 +1427,7 @@ h1.pbn{margin:0}
 #logements .acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
 #logements .acts .btn{display:flex;align-items:center;justify-content:center;text-align:center;min-height:48px;margin:0;width:100%;padding-inline:10px;line-height:1.2}
 @media (max-width:420px){#logements .acts{grid-template-columns:1fr}}
+
+/* La carte de zone ne doit jamais passer au-dessus de la barre de contact flottante (Leaflet utilise des z-index élevés) */
+.zmap,.zmapc,.leaflet-container{isolation:isolate;z-index:0}
+.zmap{position:relative}
