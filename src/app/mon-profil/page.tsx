@@ -7,6 +7,7 @@ import LodgingFinder from "@/components/LodgingFinder";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { SPECIALTIES, Trip } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
+import { geoNom } from "@/lib/cityname";
 import NearbySuggest from "@/components/NearbySuggest";
 import CityInput from "@/components/CityInput";
 import RichEditor from "@/components/RichEditor";
@@ -138,7 +139,7 @@ export default function MyProfile() {
     if (!h24 && !Object.values(hours).some((h) => h && h[0] && h[1])) { setMsg({ t: tr("Indique tes disponibilités (obligatoire) : coche « 24h/24, 7j/7 » ou au moins un jour avec ses horaires.") }); document.getElementById("dispo")?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     setBusy(true);
     let region: string | null | undefined = isLive ? null : undefined;
-    if (!isLive) try { const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
+    if (!isLive) try { const r = await fetch(`https://geo.api.gouv.fr/communes?${geoNom(f.city)}&fields=nom,region&boost=population&limit=1`, { signal: AbortSignal.timeout(2500) }); if (r.ok) { const j = await r.json(); region = j?.[0]?.region?.nom || null; } } catch {}
     const num = (v: string, a: number, b: number) => { const n = Math.round(Number(v)); return v && n >= a && n <= b ? n : null; };
     const cleanRates = rates.map((r) => ({ d: r.d, p: Math.max(0, Math.min(10000, Math.round(Number(r.p)))) })).filter((r) => r.p > 0 && RATE_OPTS.some((o) => o[0] === r.d)).filter((r, i, a) => a.findIndex((x) => x.d === r.d) === i).slice(0, 8);
     const row = { ...(region !== undefined ? { region } : {}), age: nAge, receives: isLive ? false : recv, travels: isLive ? false : trav, pay_wero: isLive ? wero.trim().slice(0, 80) || null : null, pay_paypal: isLive ? paypal.trim().slice(0, 80) || null : null, hair: hair || null, eyes: eyes || null, bra: bra || null, smoker: smoker || null, drinker: drinker || null, height_cm: num(hcm, 120, 230), weight_kg: num(wkg, 30, 200), ethnicity: eth.trim().slice(0, 40) || null, nationality: nat.trim().slice(0, 40) || null, district: isLive ? null : dist.trim().slice(0, 40) || null, languages: langs.slice(0, 8), name: f.name, genre, vlink: kind === "livecam" ? vlink : null, city: isLive ? LIVE_CITY : f.city, bio, more: isLive ? [] : more.map((x) => x.trim()).filter(Boolean),

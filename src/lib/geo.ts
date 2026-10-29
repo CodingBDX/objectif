@@ -1,4 +1,5 @@
 import { slug } from "./site";
+import { geoNom } from "./cityname";
 // Coordonnées (lat, lon) des grandes villes de France : sert de repli si le service d'adresses ne répond pas
 export const COORDS: Record<string, [number, number]> = {
   paris: [48.8566, 2.3522], marseille: [43.2965, 5.3698], lyon: [45.764, 4.8357], toulouse: [43.6047, 1.4442], nice: [43.7102, 7.262],
@@ -38,7 +39,7 @@ export async function coordsOf(name: string): Promise<[number, number] | null> {
     const ls = localStorage.getItem("hp_c_" + k); if (ls) { const v = JSON.parse(ls); cc.set(k, v); return v; }
   } catch {}
   try {
-    const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(name)}&fields=centre&boost=population&limit=1`);
+    const r = await fetch(`https://geo.api.gouv.fr/communes?${geoNom(name)}&fields=centre&boost=population&limit=1`);
     const j = await r.json(); const c = j?.[0]?.centre?.coordinates; const v: [number, number] | null = c ? [c[1], c[0]] : null;
     cc.set(k, v); try { localStorage.setItem("hp_c_" + k, JSON.stringify(v)); } catch {} return v;
   } catch { return null; }

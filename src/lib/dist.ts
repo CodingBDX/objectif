@@ -4,13 +4,14 @@ export const MAX_KM_VIP = 100;
 export const MAX_KM_STD = 20;
 
 import { extraCity } from "./extraCities";
+import { geoNom } from "./cityname";
 export function cityCentre(name: string): Promise<[number, number] | null> {
   const ex = extraCity(name); if (ex) return Promise.resolve([ex.lon, ex.lat]);
   const k = name.trim().toLowerCase();
   if (!cache.has(k)) {
     cache.set(k, (async () => {
       try {
-        const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(name.trim())}&fields=centre&boost=population&limit=1`);
+        const r = await fetch(`https://geo.api.gouv.fr/communes?${geoNom(name)}&fields=centre&boost=population&limit=1`);
         if (!r.ok) return null;
         const j = (await r.json()) as { centre?: { coordinates: [number, number] } }[];
         return j[0]?.centre?.coordinates || null;

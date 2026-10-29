@@ -1,6 +1,7 @@
 import { cap, cityList, Profile } from "./types";
 import { km } from "./geo";
 import { extraCity } from "./extraCities";
+import { geoNom } from "./cityname";
 
 type Com = { nom: string; population?: number; centre?: { coordinates: [number, number] } };
 const GEO = "https://geo.api.gouv.fr";
@@ -9,7 +10,7 @@ const get = async (u: string) => { try { const r = await fetch(u, { next: { reva
 /** Les 3 communes les plus proches (même département, ≥ 2 000 habitants), avec ou sans profil. API officielle, mise en cache 24 h. */
 export async function nearbyCommunes(city: string, n = 3): Promise<string[]> {
   const ex = extraCity(city);
-  const me: Com[] | null = ex ? [{ nom: ex.nom, centre: { coordinates: [ex.lon, ex.lat] }, codeDepartement: ex.near } as Com] : await get(`${GEO}/communes?nom=${encodeURIComponent(city)}&fields=nom,centre,codeDepartement&boost=population&limit=1`);
+  const me: Com[] | null = ex ? [{ nom: ex.nom, centre: { coordinates: [ex.lon, ex.lat] }, codeDepartement: ex.near } as Com] : await get(`${GEO}/communes?${geoNom(city)}&fields=nom,centre,codeDepartement&boost=population&limit=1`);
   const m = me?.[0] as (Com & { codeDepartement?: string }) | undefined; if (!m?.centre || !m.codeDepartement) return [];
   const all: Com[] | null = await get(`${GEO}/communes?codeDepartement=${m.codeDepartement}&fields=nom,centre,population`);
   if (!all) return [];
@@ -42,7 +43,7 @@ export async function regionMap(profiles: Profile[]): Promise<Record<string, str
   const missing = Array.from(new Set(profiles.map((p) => p.city))).filter((c) => !out[c]).slice(0, 40);
   await Promise.all(missing.map(async (c) => {
     try {
-      const r = await fetch(`${GEO}/communes?nom=${encodeURIComponent(c)}&fields=nom,region&boost=population&limit=1`, { next: { revalidate: 604800 }, signal: AbortSignal.timeout(1200) });
+      const r = await fetch(`${GEO}/communes?${geoNom(c)}&fields=nom,region&boost=population&limit=1`, { next: { revalidate: 604800 }, signal: AbortSignal.timeout(1200) });
       if (!r.ok) return; const j = (await r.json()) as { region?: { nom: string } }[];
       if (j?.[0]?.region?.nom) out[c] = j[0].region.nom;
     } catch {}

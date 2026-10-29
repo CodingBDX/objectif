@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { extraMatches } from "@/lib/extraCities";
 import { primeCity } from "@/lib/dist";
+import { withDep } from "@/lib/cityname";
 
 type Commune = { nom: string; departement?: { code: string; nom: string }; centre?: { coordinates: [number, number] } };
 const cache = new Map<string, Commune[]>();
@@ -34,7 +35,7 @@ export default function CityInput({ value, onChange, required, placeholder, labe
     const h = (e: MouseEvent) => { if (box.current && !box.current.contains(e.target as Node)) revert(); };
     document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h);
   }, [value]);
-  const pick = (c: Commune) => { if (c.centre) primeCity(c.nom, c.centre.coordinates); setText(c.nom); onChange(c.nom); onPick?.(c.nom); setOpen(false); setHi(-1); };
+  const pick = (c: Commune) => { const nm = withDep(c.nom, c.departement?.code && c.departement.code !== "MC" ? c.departement.code : undefined, list); if (c.centre) primeCity(nm, c.centre.coordinates); setText(nm); onChange(nm); onPick?.(nm); setOpen(false); setHi(-1); };
   return (
     <div className="cityin" ref={box} onBlur={(e) => { if (!box.current?.contains(e.relatedTarget as Node)) revert(); }}>
       <input ref={inp} value={text} required={required} maxLength={40} placeholder={placeholder} aria-label={label} autoComplete="off" role="combobox" aria-expanded={open && list.length > 0}
