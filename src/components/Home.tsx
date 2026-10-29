@@ -30,6 +30,17 @@ const ITEMS: [string, string, string][] = [["tous", "Tous les profils", "grid"],
 function Tile({ u, alt = "" }: { u: string; alt?: string }) {
   return <div>{u && <img src={thumbUrl(u)} referrerPolicy="no-referrer" alt={alt} width={640} height={550} loading="lazy" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = u; } }} />}</div>;
 }
+function VipAd() {
+  const { tr } = useT();
+  return (
+    <aside className="vipad" aria-label={tr("Passer en VIP")}>
+      <span className="vipad-c" aria-hidden="true"><Ic n="crown" s={26} /></span>
+      <b>{tr("Passe en VIP")}</b>
+      <p>{tr("Plus de photos, tarifs et réseaux visibles, adresse personnalisée et une meilleure place dans les listes.")}</p>
+      <Link className="btn" href="/contact?s=vip">{tr("Devenir VIP")} <span aria-hidden="true">→</span></Link>
+    </aside>
+  );
+}
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
   const { tr } = useT();
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
@@ -172,6 +183,11 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
   }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [adAt, setAdAt] = useState(-1); // pub VIP : place aleatoire parmi les profils standard (choisie apres le rendu serveur)
+  useEffect(() => {
+    const ids = list.slice(0, 12).map((x, i) => (x.vip ? -1 : i)).filter((i) => i >= 0);
+    setAdAt(ids.length > 1 ? ids[1 + Math.floor(Math.random() * (ids.length - 1))] : -1);
+  }, [list.length, view]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.filter((p) => p.genre !== "livecam").forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
   const inCity = useMemo(() => (city ? profiles.filter((p) => inCities(p)) : profiles), [profiles, cities]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -289,7 +305,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
-          {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
+          {list.length ? list.slice(0, shown).flatMap((p, i) => { const c = <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
         </div>
         {view !== "map" && !!city && cities.length < 2 && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}
