@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
+import Turnstile from "@/components/Turnstile";
 
 function Form() {
   const { tr } = useT();
@@ -11,18 +12,19 @@ function Form() {
   const nx = sp.get("next") === "/mon-association" ? "/mon-association" : "/mon-profil";
   const [adult, setAdult] = useState(false); const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
+  const [cap, setCap] = useState(""); const [capN, setCapN] = useState(0);
   async function go(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null);
     const sb = supabaseBrowser();
     if (signup) {
-      const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: `${location.origin}${nx}`, data: { adult_confirmed_at: new Date().toISOString() } } });
+      const { data, error } = await sb.auth.signUp({ email, password: pw, options: { captchaToken: cap || undefined, emailRedirectTo: `${location.origin}${nx}`, data: { adult_confirmed_at: new Date().toISOString() } } });
       if (!error && data?.session) { location.href = nx; return; }
       setMsg(error ? { t: error.message } : { t: tr("Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi."), ok: true });
     } else {
-      const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+      const { error } = await sb.auth.signInWithPassword({ email, password: pw, options: { captchaToken: cap || undefined } });
       if (error) setMsg({ t: tr("E-mail ou mot de passe incorrect.") }); else location.href = nx;
     }
-    setBusy(false);
+    setBusy(false); setCap(""); setCapN((n) => n + 1);
   }
   return (
     <section className="gut">
@@ -35,8 +37,9 @@ function Form() {
             <label className="f">{tr("Adresse e-mail")}<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
             <label className="f">{tr("Mot de passe (8 caractères minimum)")}<input type="password" required minLength={8} value={pw} onChange={(e) => setPw(e.target.value)} autoComplete={signup ? "new-password" : "current-password"} /></label>
             {signup && <label className="chk"><input type="checkbox" required checked={adult} onChange={(e) => setAdult(e.target.checked)} /> <span>{tr("Je certifie avoir")} <b>{tr("18 ans ou plus")}</b> {tr("et j’accepte les")} <Link href="/cgu" style={{ textDecoration: "underline" }}>{tr("conditions d’utilisation")}</Link> {tr("et la")} <Link href="/confidentialite" style={{ textDecoration: "underline" }}>{tr("politique de confidentialité")}</Link>.</span></label>}
+            <Turnstile onToken={setCap} resetKey={capN} />
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
-            <button className="btn" disabled={busy}>{signup ? tr("Créer mon compte") : tr("Me connecter")}</button>
+            <button className="btn" disabled={busy || !cap}>{signup ? tr("Créer mon compte") : tr("Me connecter")}</button>
             <button type="button" className="btn ghost" onClick={() => setSignup(!signup)}>{signup ? tr("J’ai déjà un compte") : tr("Pas encore de compte ?")}</button>
           </form>
         </div>
