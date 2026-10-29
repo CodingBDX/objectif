@@ -1167,3 +1167,10 @@ h1.pbn{margin:0}
 .crumbs li[aria-current]{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw}
 
 .snaptoast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font:700 13px var(--fb);max-width:calc(100vw - 32px);text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+
+/* Fil d'Ariane du profil : à la place du bouton « Tous les profils », mêmes tons */
+.crumbs.inline{max-width:100%;min-width:0;margin:0;padding:0 16px;min-height:44px;display:inline-flex;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:999px}
+.crumbs.inline ol{flex-wrap:nowrap;overflow:hidden;font:700 14px var(--fb)}
+.crumbs.inline li{flex:none}
+.crumbs.inline li[aria-current]{flex:0 1 auto;min-width:0;max-width:40vw;color:var(--ink)}
+.crumbs.inline a{color:var(--btn)}

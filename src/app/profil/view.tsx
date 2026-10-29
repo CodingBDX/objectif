@@ -87,7 +87,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
           ...(p.genre === "livecam" ? {} : { homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } } }), knowsAbout: p.specialties,
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return p.vip && h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
-      <div className="pbar"><Link className="btn ghost" href="/"><Tr k="← Tous les profils" /></Link><h1 className="pbn">{p.name}</h1>
+      <div className="pbar"><Crumbs items={cr} inline /><h1 className="pbn">{p.name}</h1>
         <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}<Heart id={p.id} />{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
           {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> <Tr k="Nouveau" /></span>}
           {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
@@ -99,7 +99,6 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
             if (k === "snapchat") return <SnapLink key={k} id={p.id} skip={mine} href={u(h)} name={p.name} path={want}><Ic n={i} s={22} /></SnapLink>;
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
-      <Crumbs items={cr} />
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">
