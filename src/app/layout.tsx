@@ -58,7 +58,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         {me && !me.vip && <VipBanner paused={me.paused} />}
         {children}
         <InstallBanner /><RefCapture />
-        <footer className="gut" id="foot"><Tr k="Sex-Escorte.com soutient les escortes et les protège des arnaqueurs et des réseaux de proxénétisme, d’adultes comme de mineurs. Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos." /><br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · {escort && <><Link href="/associations">Associations</Link> · </>}<Link href="/contact">Contact</Link> · <Link href="/rejoindre"><Tr k="Rejoindre" /></Link><InstallLink /></footer>
+        <footer className="gut" id="foot"><Tr k="Sex-Escorte.com soutient les escortes et les protège des arnaqueurs et des réseaux de proxénétisme, d’adultes comme de mineurs. Contenus professionnels uniquement. Les profils sont réservés aux personnes majeures qui détiennent les droits de leurs images et vidéos." /><br /><Link href="/mentions-legales">Mentions légales</Link> · <Link href="/cgu">Conditions d’utilisation</Link> · <Link href="/confidentialite">Confidentialité</Link> · {escort && <><Link href="/associations">Associations</Link> · </>}<Link href="/guides">Guides</Link> · <Link href="/contact">Contact</Link> · <Link href="/rejoindre"><Tr k="Rejoindre" /></Link><InstallLink /></footer>
       </body>
     </html>
   );

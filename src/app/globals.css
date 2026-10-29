@@ -1241,3 +1241,17 @@ h1.pbn{margin:0}
 .spel{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:18px auto;font-size:14px}
 .spel a{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--ink);text-decoration:none;font-weight:600}
 .spel a:hover{color:var(--btn);border-color:var(--btn)}
+
+/* Guides */
+.guides{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:14px}
+.gcard{display:grid;gap:6px;align-content:start;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--sh);text-decoration:none;color:var(--ink);min-width:0}
+.gcard:hover{border-color:var(--btn)}
+.gcard .ge{font-size:28px}
+.gcard b{font:700 17px/1.25 var(--fd)}
+.gcard span:last-child{color:var(--mut);font-size:14px;line-height:1.4}
+.guide h1{font:700 clamp(26px,5vw,36px)/1.15 var(--fd);color:var(--pink);margin:0 0 8px;text-wrap:balance}
+.guide h3{font:700 20px var(--fd);margin:22px 0 6px;color:var(--btn)}
+.guide p,.guide li{line-height:1.6}
+.guide ul{padding-left:20px;display:grid;gap:6px}
+.gcta{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--soft);border:2px dashed var(--btn);border-radius:22px;padding:16px;margin:26px 0}
+.gmore{font:600 20px var(--fd);margin:8px 0 12px}
