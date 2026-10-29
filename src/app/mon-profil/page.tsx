@@ -34,7 +34,7 @@ export default function MyProfile() {
   const [f, setF] = useState({ name: "", genre: "", city: "", phone: "", instagram: "", snapchat: "", tiktok: "", site: "" });
   const [recv, setRecv] = useState(false); const [trav, setTrav] = useState(false);
   const [hair, setHair] = useState(""); const [eyes, setEyes] = useState(""); const [bra, setBra] = useState(""); const [smoker, setSmoker] = useState(""); const [drinker, setDrinker] = useState("");
-  const [age, setAge] = useState(""); const [hcm, setHcm] = useState(""); const [wkg, setWkg] = useState(""); const [eth, setEth] = useState(""); const [nat, setNat] = useState(""); const [dist, setDist] = useState(""); const [slogan, setSlogan] = useState(""); const [furl, setFurl] = useState(false); const [uslug, setUslug] = useState(""); const [wa, setWa] = useState(false); const [sms, setSms] = useState(false); const memo = useRef<Record<string, { more: string[]; dist: string }>>({}); const [langs, setLangs] = useState<string[]>([]);
+  const [age, setAge] = useState(""); const [hcm, setHcm] = useState(""); const [wkg, setWkg] = useState(""); const [eth, setEth] = useState(""); const [nat, setNat] = useState(""); const [dist, setDist] = useState(""); const [plink, setPlink] = useState(""); const [slogan, setSlogan] = useState(""); const [furl, setFurl] = useState(false); const [uslug, setUslug] = useState(""); const [wa, setWa] = useState(false); const [sms, setSms] = useState(false); const memo = useRef<Record<string, { more: string[]; dist: string }>>({}); const [langs, setLangs] = useState<string[]>([]);
   const [bio, setBio] = useState(""); const [more, setMore] = useState(["", "", ""]);
   const [vdrag, setVdrag] = useState(false); const [spec, setSpec] = useState<string[]>([]); const [specList, setSpecList] = useState<string[]>(SPECIALTIES); const [photos, setPhotos] = useState<string[]>([]); const [video, setVideo] = useState<string | null>(null);
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
@@ -79,6 +79,14 @@ export default function MyProfile() {
     const { error } = await sb.storage.from("media").upload(path, file, { contentType: file.type, cacheControl: "31536000" });
     if (error) throw new Error(/size|exceed|payload/i.test(error.message) ? tr("fichier trop lourd (20 Mo maximum)") : error.message);
     return sb.storage.from("media").getPublicUrl(path).data.publicUrl;
+  }
+  /** Ajoute une photo à partir d'un lien d'image (https) hébergée ailleurs. */
+  function addLink() {
+    const u = plink.trim();
+    if (!/^https:\/\/[^\s]{4,600}$/i.test(u)) { setPMsg({ t: tr("Colle un lien d’image complet qui commence par https://") }); return; }
+    if (photos.length >= maxP) { setPMsg({ t: tr("Tu as déjà {n} photos : supprime-en une pour en ajouter.", { n: maxP }) }); return; }
+    if (photos.includes(u)) { setPMsg({ t: tr("Cette photo est déjà dans ton profil.") }); return; }
+    setPhotos([...photos, u]); setPlink(""); setPMsg({ ok: true, t: tr("✔ 1 photo ajoutée.") });
   }
   async function addPhotos(files: FileList | File[] | null) {
     const all = files ? Array.from(files).filter((f) => f.type.startsWith("image/")) : []; if (!all.length) { if (files && (files as any).length) setPMsg({ t: tr("Choisis des images (JPG, PNG, WebP, HEIC…).") }); return; }
@@ -290,6 +298,7 @@ export default function MyProfile() {
               <span>{tr("Sélectionne")} <u>{tr("plusieurs photos d’un coup")}</u> {tr("dans ta galerie")}{"\u00A0"}{tr("— ou glisse-les ici sur ordinateur. Minimum 3, maximum {n}", { n: maxP })}{vip ? "" : tr(" (20 en VIP)")}{tr(". Le filigrane est ajouté automatiquement.")}</span>
               {prog >= 0 && <i className="dzp"><u style={{ width: Math.round(prog * 100) + "%" }} /></i>}
             </label>}
+            {photos.length < maxP && <div className="f"><span style={L}>{tr("Ou ajoute une photo par lien (image hébergée ailleurs)")}</span><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input type="url" inputMode="url" placeholder="https://…/photo.jpg" aria-label={tr("Lien de la photo")} value={plink} onChange={(e) => setPlink(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addLink(); } }} style={{ flex: "1 1 220px", minWidth: 0 }} /><button type="button" className="btn ghost" onClick={addLink}>{tr("Ajouter le lien")}</button></div><small className="note">{tr("Le filigrane n’est pas ajouté sur les photos par lien, et la photo disparaît si l’autre site la retire.")}</small></div>}
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
 </section>{!isNewP && <VerifRequest uid={uid} verified={verif} />}<section className="dcard"><h3>{tr("Vidéo")}</h3>{kind === "livecam" && <label className="f">{tr("Lien de ton live (obligatoire pour un profil livecam)")}<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Ma vidéo")} ({video ? 1 : 0}/1)</b>{tr(" · une seule vidéo de présentation, 20 Mo maximum. ✕ pour la supprimer.")}</p>
