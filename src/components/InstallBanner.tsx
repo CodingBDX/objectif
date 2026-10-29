@@ -39,7 +39,7 @@ export default function InstallBanner() {
       <span aria-hidden="true">🌶️</span>
       <div>{tr("Ajoute Sex-Escorte à ton écran d’accueil")}{help && <small>{tr("Touche « Partager » puis « Sur l’écran d’accueil ».")}</small>}</div>
       {can ? <button type="button" className="btn" onClick={async () => { await install(); close(); }}>{tr("Installer")}</button>
-        : <button type="button" className="btn" onClick={() => setHelp(true)}>{tr("Comment ?")}</button>}
+        : <button type="button" className="btn" onClick={() => { setHelp(true); try { localStorage.setItem("hp_pwa_no", "1"); } catch {} }}>{tr("Comment ?")}</button>}
       <button type="button" className="pwax" onClick={close} aria-label={tr("Fermer")}>✕</button>
     </div>
   );
