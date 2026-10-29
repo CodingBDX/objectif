@@ -1330,3 +1330,5 @@ h1.pbn{margin:0}
 .nowchip b{font-size:13px;padding:1px 9px}
 .mchips,.nowbar{gap:8px}
 }
+/* Boutons désactivés : grisés partout (ex. Remonter mon annonce pendant le délai) */
+.btn:disabled,button.btn[disabled]{opacity:.45;filter:grayscale(.85);cursor:not-allowed;box-shadow:none;pointer-events:none}
