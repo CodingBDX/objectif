@@ -14,6 +14,7 @@ import { Tr, TDate } from "@/lib/i18n";
 import { RichText, plain } from "@/lib/rich";
 import CopyBtn from "@/components/CopyBtn";
 import PhoneReveal from "@/components/PhoneReveal";
+import SnapLink from "@/components/SnapLink";
 import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
 import { TrackLink, TrackView } from "@/components/Track";
@@ -95,6 +96,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
           {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
           {!asleep && <PhoneReveal id={p.id} path={want} live={live} mine={mine} name={p.name} wa={!!p.whatsapp} sms={!!p.sms} />}
           {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
+            if (k === "snapchat") return <SnapLink key={k} id={p.id} skip={mine} href={u(h)} name={p.name} path={want}><Ic n={i} s={22} /></SnapLink>;
             return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
         </div></div>
       <Crumbs items={cr} />
