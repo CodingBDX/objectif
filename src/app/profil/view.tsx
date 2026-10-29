@@ -34,7 +34,11 @@ export const get = async (r: Ref) => {
     const ref = parseProfileParam(r.param || ""); if (!ref.id && !ref.prefix) return null;
     if (ref.id) q = q.eq("id", ref.id); else { const [lo, hi] = prefixRange(ref.prefix!); q = q.gte("id", lo).lte("id", hi).limit(60); }
   }
-  const [{ data }, spec] = await Promise.all([q, publicSpecialties()]);
+  let [{ data }, spec] = await Promise.all([q, publicSpecialties()]);
+  if (r.slug && !(data || []).length) { // ancienne adresse conservée après un changement de pseudo : on retrouve le profil (puis redirection vers la nouvelle)
+    const { data: o } = await sb.from("profile_old_slugs").select("profile_id").eq("slug", r.slug.toLowerCase()).maybeSingle();
+    if (o?.profile_id) data = (await sb.from("profiles").select("*").eq("id", o.profile_id).limit(1)).data;
+  }
   const rows = (data || []) as Profile[];
   const p = rows.find((x) => !r.param || parseProfileParam(r.param).id || x.id.startsWith(parseProfileParam(r.param).prefix!)) || null; // ancienne adresse « jolie » : on garde le premier identifiant qui commence pareil
   if (p) p.specialties = (p.specialties || []).filter((x) => spec.includes(x));
