@@ -25,8 +25,10 @@ export default function ZoneMap({ lat, lon, label }: { lat: number; lon: number;
         const L = await load(); if (dead || !box.current) return;
         map = L.map(box.current, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, boxZoom: false, keyboard: false, attributionControl: true });
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 14, attribution: "© OpenStreetMap" }).addTo(map);
-        const c = L.circle([lat, lon], { radius: ZONE_RADIUS, color: "#d63384", weight: 2, fillColor: "#ee4f97", fillOpacity: 0.22 }).addTo(map);
-        map.invalidateSize(); map.fitBounds(c.getBounds(), { padding: [10, 10], maxZoom: 14 }); setTimeout(() => { if (!dead && map) { map.invalidateSize(); map.fitBounds(c.getBounds(), { padding: [10, 10], maxZoom: 14 }); } }, 300);
+        map.setView([lat, lon], 14);
+        L.circle([lat, lon], { radius: ZONE_RADIUS, color: "#d63384", weight: 2, fillColor: "#ee4f97", fillOpacity: 0.22 }).addTo(map);
+        const bounds = L.latLng(lat, lon).toBounds(ZONE_RADIUS * 2.6);
+        map.invalidateSize(); map.fitBounds(bounds, { padding: [10, 10], maxZoom: 14 }); setTimeout(() => { if (!dead && map) { map.invalidateSize(); map.fitBounds(bounds, { padding: [10, 10], maxZoom: 14 }); } }, 300);
       } catch (e) { setErr(e instanceof Error ? e.message.slice(0, 80) : "chargement impossible"); }
     })();
     return () => { dead = true; if (map) map.remove(); };
