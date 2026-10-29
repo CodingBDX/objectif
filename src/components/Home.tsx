@@ -95,6 +95,24 @@ function EmptyCityNearby({ profiles, city, onOpen }: { profiles: Profile[]; city
   );
 }
 
+/** Recherche sans résultat : encart d'aide (retirer les filtres, ou s'inscrire). */
+function NoResult({ onClear }: { onClear: () => void }) {
+  const { tr } = useT();
+  return (
+    <div className="ejoin nores">
+      <span className="ejico" aria-hidden="true"><Ic n="search" s={30} /></span>
+      <div className="ejtx">
+        <h2>{tr("Aucun profil ne correspond à ta recherche")}</h2>
+        <p>{tr("Essaie d’autres mots, une autre ville, ou retire quelques filtres. Tu es escort ? Ton profil peut être le premier.")}</p>
+      </div>
+      <div className="ejbtns">
+        <button type="button" className="btn ghost" onClick={onClear}>{tr("Tout effacer")}</button>
+        <Link className="btn ejbtn" href="/rejoindre">{tr("Créer mon profil gratuit")} <span aria-hidden="true">→</span></Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Home({ profiles, initialType = "tous", initialCity = "", h1 = "Tous les profils", intro = "", region = "", regions = {}, searchMode = false }: { searchMode?: boolean; profiles: Profile[]; initialType?: string; initialCity?: string; h1?: string; intro?: React.ReactNode; region?: string; regions?: Record<string, string> }) {
   const { tr } = useT(); const r = useRouter(); const sp = useSearchParams(); const { favs } = useFavs();
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || ""); const [q, setQ] = useState(sp.get("q") || "");
@@ -265,7 +283,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
-            : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : tr("Aucun profil ne correspond à votre recherche.")) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
+            : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
         </div>
         {view !== "map" && !!city && cities.length < 2 && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}
         {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{tr("{n} profils à venir", { n: list.length - shown })}</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>{tr("Voir plus")}</button></div>}

@@ -1122,3 +1122,8 @@ h1.pbn{margin:0}
 
 /* Fenêtre de recherche : pas de zoom automatique du téléphone au clic dans un champ (il décalait la fenêtre) */
 @media (max-width:700px){.panel.msearch.sheet input,.panel.msearch.sheet select,.panel.msearch.sheet textarea{font-size:16px}.panel.msearch.sheet{touch-action:pan-y}}
+
+.ejoin.nores{grid-column:1/-1;width:100%;margin-top:4px}
+.ejbtns{display:flex;gap:10px;flex-wrap:wrap}
+@media (max-width:560px){.ejbtns{width:100%;flex-direction:column}.ejbtns .btn{width:100%}}
+.empty:has(.nores){padding:0;color:var(--ink)}.nores{text-align:left}
