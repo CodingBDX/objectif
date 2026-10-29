@@ -1275,3 +1275,10 @@ h1.pbn{margin:0}
 .nowchip i{width:9px;height:9px}
 .nowchip b{font-size:12px;padding:0 7px}
 }
+@media(max-width:700px){
+.sh{align-items:center}
+.sh h1{flex:1 1 100%}
+.sh>.btn.ghost{margin-left:0!important;min-height:40px;padding:6px 14px;font-size:14px;order:2}
+.sh .cnt0{order:1;margin-right:auto}
+.sh .vsw{order:3;margin-left:auto}
+}
