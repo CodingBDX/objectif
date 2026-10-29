@@ -1322,3 +1322,11 @@ h1.pbn{margin:0}
 }
 @keyframes msin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.msfloat{animation:none}}
+/* Puces mobiles (genres + filtres rapides) : plus grandes et lisibles, toujours sur une ligne défilante */
+@media(max-width:700px){
+.chip{min-height:44px;padding:6px 18px;font-size:16px;border-width:1.5px}
+.nowchip,.nowchip.qf{min-height:44px;padding:6px 16px;gap:8px;font-size:15px}
+.nowchip i{width:11px;height:11px}
+.nowchip b{font-size:13px;padding:1px 9px}
+.mchips,.nowbar{gap:8px}
+}
