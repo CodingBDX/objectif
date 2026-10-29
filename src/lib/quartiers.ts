@@ -6,7 +6,7 @@ export const QUARTIERS: Record<string, Quartier[]> = {
   Paris: [
     { n: "Pigalle", lat: 48.8822, lon: 2.3377 }, { n: "Strasbourg-Saint-Denis", lat: 48.869, lon: 2.354 }, { n: "Gare du Nord", lat: 48.8809, lon: 2.3553 },
     { n: "Châtelet-Les Halles", lat: 48.8606, lon: 2.347 }, { n: "Bastille", lat: 48.8531, lon: 2.3691 }, { n: "Belleville", lat: 48.872, lon: 2.385 },
-    { n: "Montparnasse", lat: 48.8422, lon: 2.3219 }, { n: "Ternes", lat: 48.878, lon: 2.298 }
+    { n: "Montparnasse", lat: 48.8422, lon: 2.3219 }, { n: "Ternes", lat: 48.878, lon: 2.298 }, { n: "Bois de Boulogne", lat: 48.8635, lon: 2.2525 }, { n: "Bois de Vincennes", lat: 48.8285, lon: 2.4350 }
   ],
   Lyon: [
     { n: "Perrache", lat: 45.749, lon: 4.826 }, { n: "Guillotière", lat: 45.7545, lon: 4.842 }, { n: "Part-Dieu", lat: 45.7605, lon: 4.859 },
