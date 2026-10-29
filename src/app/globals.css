@@ -1224,3 +1224,13 @@ h1.pbn{margin:0}
 .pwax{background:transparent;border:0;font-size:18px;color:var(--mut);padding:6px}
 @media(min-width:900px){.pwab{display:none}}
 .pwal button{background:none;border:0;color:inherit;text-decoration:underline;padding:0;font:inherit}
+
+/* Bouton rapide « Disponibles maintenant » au-dessus de la liste */
+.nowbar{margin:0 0 12px}
+.nowchip{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:8px 16px;border-radius:999px;background:var(--card);border:2px solid var(--line);color:var(--ink);font:700 15px var(--fb);box-shadow:var(--sh)}
+.nowchip i{width:11px;height:11px;border-radius:50%;background:#2ecc71;box-shadow:0 0 0 0 rgba(46,204,113,.6);animation:nowp 1.8s infinite}
+.nowchip b{background:var(--btn);color:var(--btnt);border-radius:99px;padding:1px 9px;font-size:13px}
+.nowchip.on{background:#e6f7ec;border-color:#2ecc71;color:#14663a}
+.nowchip.on b{background:#2ecc71;color:#fff}
+@keyframes nowp{70%{box-shadow:0 0 0 9px rgba(46,204,113,0)}100%{box-shadow:0 0 0 0 rgba(46,204,113,0)}}
+@media(prefers-reduced-motion:reduce){.nowchip i{animation:none}}

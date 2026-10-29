@@ -194,6 +194,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
+  const nNow = useMemo(() => inCity.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && avail(p)?.on).length, [inCity, type]);
   const sidx = useMemo(() => { // index de la recherche du panneau de droite (mêmes suggestions que le menu du haut)
     const cc: Record<string, number> = {}, tc: Record<string, number> = {};
     profiles.forEach((p) => { if (p.genre !== "livecam") cc[p.city] = (cc[p.city] || 0) + 1; (p.specialties || []).forEach((x) => { const k = x.toLowerCase(); tc[k] = (tc[k] || 0) + 1; }); });
@@ -304,6 +305,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{tr(intro)}</p> : null) : intro}
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
+        {(nNow > 0 || now) && view !== "map" && <div className="nowbar"><button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button></div>}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).flatMap((p, i) => { const c = <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
