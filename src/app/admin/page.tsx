@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu" | "membres";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -22,7 +22,7 @@ export default function Admin() {
   const [verifs, setVerifs] = useState<any[]>([]); const [ai, setAi] = useState<Record<string, any>>({});
   const [lodgs, setLodgs] = useState<any[]>([]); const [lAddr, setLAddr] = useState<Record<string, string>>({});
   const [vipEnd, setVipEnd] = useState<Record<string, { until: string; paused_at: string | null }>>({});
-  const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]); const [secEv, setSecEv] = useState<any[]>([]);
+  const [assos, setAssos] = useState<any[]>([]); const [clients, setClients] = useState<any[]>([]); const [journal, setJournal] = useState<any[]>([]); const [secEv, setSecEv] = useState<any[]>([]); const [membres, setMembres] = useState<any[]>([]); const [mver, setMver] = useState<Record<string, boolean>>({});
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
   const [cnt, setCnt] = useState<{ total: number; vip: number; paused: number; month: number; g: Record<string, number> }>({ total: 0, vip: 0, paused: 0, month: 0, g: {} });
   const [specs, setSpecs] = useState<string[]>([]); const [specDb, setSpecDb] = useState(true); const [specEd, setSpecEd] = useState<Record<string, string>>({}); const [specNew, setSpecNew] = useState(""); const [specUse, setSpecUse] = useState<Record<string, number>>({}); const [specOk, setSpecOk] = useState("");
@@ -52,6 +52,7 @@ export default function Admin() {
     if (error) { setDailyErr(true); return; } setDailyErr(false); setDaily((data || []).map((r: any) => ({ day: r.day, views: Number(r.views), calls: Number(r.calls) })));
   }, []);
   const loadExtra = useCallback(async () => {
+    { const mm = await sb.from("members").select("id,pseudo,created_at").order("created_at", { ascending: false }).limit(500); setMembres(mm.error ? [] : mm.data || []); const mv = await sb.from("member_verified").select("member_id"); setMver(Object.fromEntries((mv.data || []).map((x: any) => [x.member_id, true]))); }
     { const se = await sb.from("security_events").select("id,kind,detail,created_at").order("created_at", { ascending: false }).limit(300); setSecEv(se.error ? [] : se.data || []); }
     const a = await sb.from("client_reports").select("id,category,note,created_at,profiles(name)").order("created_at", { ascending: false }).limit(200); setClients(a.error ? [] : a.data || []);
     const v = await sb.from("verif_requests").select("profile_id,path,status,created_at,profiles(name,city)").eq("status", "pending").order("created_at"); 
@@ -151,7 +152,7 @@ export default function Admin() {
     setVerifs((l) => l.filter((y) => y.profile_id !== x.profile_id)); loadProfiles(); refreshListings();
   }
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", verifs: "Demandes de vérification", lodgings: "Logements" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", membres: "Membres", verifs: "Demandes de vérification", lodgings: "Logements" };
 
   return (
     <div className="dash gut">
@@ -160,7 +161,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("membres", "👥 Membres")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
           <Link href="/">📖 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -347,6 +348,17 @@ export default function Admin() {
             </div>))}
         </div>)}
 
+        {tab === "membres" && (<div style={{ display: "grid", gap: 10 }}>
+          <p className="note" style={{ margin: 0 }}>Les membres peuvent commenter les profils. Donne le badge « ✔ Client vérifié » après avoir contrôlé la personne toi-même (appel ou message). Il s’affiche sous ses commentaires.</p>
+          {membres.length === 0 && <p className="note">Aucun membre (ou <code>migration-clients-verifies.sql</code> pas encore lancé).</p>}
+          {membres.map((m) => (
+            <div className="dcard" key={m.id} style={{ padding: "10px 16px", display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <b style={{ flex: 1, minWidth: 120 }}>{m.pseudo}</b>
+              <span className="note">{fmt(m.created_at)}</span>
+              {mver[m.id] ? <><span className="cmver">✔ Client vérifié</span><button className="btn ghost" onClick={async () => { await sb.from("member_verified").delete().eq("member_id", m.id); setMver({ ...mver, [m.id]: false }); }}>Retirer</button></>
+                : <button className="btn" onClick={async () => { const { error } = await sb.from("member_verified").insert({ member_id: m.id }); if (!error) setMver({ ...mver, [m.id]: true }); }}>✔ Vérifier</button>}
+            </div>))}
+        </div>)}
         {tab === "secu" && (() => {
           const day = (x: any) => Date.now() - new Date(x.created_at).getTime() < 864e5;
           const KIND: Record<string, string> = { piege_contact: "🤖 Robot bloqué (contact)", piege_signalement: "🤖 Robot bloqué (signalement)", piege_commentaire: "🤖 Robot bloqué (commentaire)", connexion_echec: "🔑 Connexion échouée", trop_rapide: "⚡ Envoi trop rapide" };
