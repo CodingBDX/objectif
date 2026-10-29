@@ -6,12 +6,13 @@ import { logSec, HONEYPOT } from "@/lib/secEvent";
 
 type C = { id: number; author_id: string; author_name: string; body: string; created_at: string; parent_id?: number | null };
 const PAGE = 5;
+const Ver = ({ on }: { on?: boolean }) => on ? <span className="cmver" title="Client vérifié par l’équipe">✔ Client vérifié</span> : null;
 const Flag = ({ n }: { n?: number }) => n ? <span className="cmflag" title={`Numéro signalé par ${n} profil${n > 1 ? "s" : ""}`}>🚩 Signalé · {n} signalement{n > 1 ? "s" : ""}</span> : null;
 const fmtD = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 
 export default function Comments({ profileId, ownerId }: { profileId: string; ownerId: string }) {
   const sb = supabaseBrowser();
-  const [list, setList] = useState<C[]>([]); const [flag, setFlag] = useState<Record<string, number>>({}); const [noPhone, setNoPhone] = useState(false); const [me, setMe] = useState<{ id: string; name: string } | null>(null);
+  const [list, setList] = useState<C[]>([]); const [flag, setFlag] = useState<Record<string, number>>({}); const [ver, setVer] = useState<Record<string, boolean>>({}); const [noPhone, setNoPhone] = useState(false); const [me, setMe] = useState<{ id: string; name: string } | null>(null);
   const [rep, setRep] = useState<number | null>(null); const [rtxt, setRtxt] = useState("");
   const [shown, setShown] = useState(PAGE); const sentinel = useRef<HTMLDivElement>(null);
   const [txt, setTxt] = useState(""); const [err, setErr] = useState(""); const [busy, setBusy] = useState(false);
@@ -19,6 +20,7 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
     const { data } = await sb.from("comments").select("*").eq("profile_id", profileId).order("created_at", { ascending: true });
     setList((data || []) as C[]);
     const ids = Array.from(new Set(((data || []) as C[]).map((c) => c.author_id)));
+    if (ids.length) { const { data: vr } = await sb.rpc("verified_authors", { p_ids: ids }); setVer(Object.fromEntries(((vr || []) as { author_id: string }[]).map((x) => [x.author_id, true]))); }
     if (ids.length) { const { data: fl } = await sb.rpc("flagged_authors", { p_ids: ids }); setFlag(Object.fromEntries(((fl || []) as { author_id: string; signalements: number }[]).map((x) => [x.author_id, x.signalements]))); }
   }, [profileId]);
   useEffect(() => { (async () => {
@@ -52,10 +54,10 @@ export default function Comments({ profileId, ownerId }: { profileId: string; ow
       {list.length ? tops.slice(0, shown).map((c, i) => {
         const kids = list.filter((r) => r.parent_id === c.id); const mine = me?.id === ownerId;
         return (<div className="cmt pop" key={c.id} style={{ animationDelay: (i % PAGE) * 45 + "ms" }}>
-          <div className={`cmi${c.author_id === ownerId ? " own" : ""}${flag[c.author_id] ? " flagged" : ""}`}><header>{c.author_name}<Flag n={flag[c.author_id]} />{c.author_id === ownerId && <span className="cmo">Profil</span>}<time>{fmtD(c.created_at)}</time>
+          <div className={`cmi${c.author_id === ownerId ? " own" : ""}${flag[c.author_id] ? " flagged" : ""}`}><header>{c.author_name}<Ver on={ver[c.author_id]} /><Flag n={flag[c.author_id]} />{c.author_id === ownerId && <span className="cmo">Profil</span>}<time>{fmtD(c.created_at)}</time>
             {mine && c.author_id !== ownerId && <button className="cmr" onClick={() => { setRep(rep === c.id ? null : c.id); setRtxt(""); }}>Répondre</button>}
             {(me?.id === c.author_id || me?.id === ownerId) && <button className="cmx" onClick={() => del(c.id)}>Supprimer</button>}</header><p>{c.body}</p></div>
-          {kids.map((r) => <div className={`cmi reply${flag[r.author_id] ? " flagged" : ""}`} key={r.id}><header>{r.author_name}<Flag n={flag[r.author_id]} /><span className="cmo">Réponse du profil</span><time>{fmtD(r.created_at)}</time>
+          {kids.map((r) => <div className={`cmi reply${flag[r.author_id] ? " flagged" : ""}`} key={r.id}><header>{r.author_name}<Ver on={ver[r.author_id]} /><Flag n={flag[r.author_id]} /><span className="cmo">Réponse du profil</span><time>{fmtD(r.created_at)}</time>
             {(me?.id === r.author_id || me?.id === ownerId) && <button className="cmx" onClick={() => del(r.id)}>Supprimer</button>}</header><p>{r.body}</p></div>)}
           {rep === c.id && <div className="cmi reply rform"><textarea maxLength={500} value={rtxt} autoFocus onChange={(e) => setRtxt(e.target.value)} placeholder={`Ta réponse à ${c.author_name}…`} aria-label={`Répondre à ${c.author_name}`} />
             <div><button className="btn" onClick={() => reply(c.id)} disabled={busy}>Publier la réponse</button> <button className="btn ghost" onClick={() => setRep(null)}>Annuler</button></div></div>}
