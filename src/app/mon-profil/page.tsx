@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import AssoForm from "@/components/AssoForm";
 import StatsPanel from "@/components/StatsPanel";
 import VerifRequest from "@/components/VerifRequest";
 import LodgingFinder from "@/components/LodgingFinder";
@@ -213,11 +214,12 @@ export default function MyProfile() {
             <div className="kinds" role="radiogroup" aria-label={tr("Type de profil")}>
               <label className={`kind${kind === "createur" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "createur"} onChange={() => setKind("createur")} /><b>{tr("💖 Profil escorte")}</b><span>{tr("Ton portfolio, ta vidéo, tes disponibilités et ton contact.")}</span></label>
               <label className={`kind${kind === "livecam" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "livecam"} onChange={() => setKind("livecam")} /><b>{tr("🔴 Profil livecam")}</b><span>{tr("Tu animes des lives créatifs (dessin, musique, cuisine, atelier). Catégorie à part.")}</span></label>
-              <Link className="kind" href="/mon-association"><b>{tr("🤝 Profil association")}</b><span>{tr("Tu représentes une association de soutien : fiche par ville, validée avant publication.")}</span></Link>
+              <label className={`kind${kind === "association" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "association"} onChange={() => setKind("association")} /><b>{tr("🤝 Profil association")}</b><span>{tr("Tu représentes une association de soutien : fiche par ville, validée avant publication.")}</span></label>
               {!isMember && <label className={`kind${kind === "membre" ? " on" : ""}`}><input type="radio" name="kind" checked={kind === "membre"} onChange={() => setKind("membre")} /><b>{tr("💬 Profil membre")}</b><span>{tr("Pour laisser des commentaires sous les profils. Rien d’autre.")}</span></label>}
             </div>
             {!kind && <p className="note" style={{ textAlign: "center", margin: 0 }}>{tr("👆 Clique sur un profil pour afficher le formulaire correspondant.")}</p>}
           </>)}
+          {kind === "association" && <AssoForm />}
           {kind === "membre" && (
             <form onSubmit={saveMember}><fieldset className="fs">
               <label className="f">{tr("Pseudo")}<input value={pseudo} onChange={(e) => setPseudo(e.target.value)} required minLength={2} maxLength={30} autoComplete="nickname" /></label>
