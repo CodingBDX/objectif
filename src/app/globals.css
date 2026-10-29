@@ -1017,7 +1017,7 @@ h1.pbn{margin:0}
 .panel.top.topx li:nth-child(n+7){display:list-item}
 .panel.top.topx li:nth-child(n+19){display:none}
 @media (min-width:701px) and (max-width:1100px){.panel.top.topx li:nth-child(n+13){display:none}}
-@media (max-width:700px){.panel.top.topx li:nth-child(n+4){display:list-item}.panel.top.topx li:nth-child(n+7){display:none}}
+@media (max-width:700px){.panel.top.topx li:nth-child(n+4){display:none}}
 .panel.top.topx.all li{display:list-item!important}
 .topmore{margin-top:12px;justify-self:center}
 .panel.top.topx{display:grid}
@@ -1115,3 +1115,7 @@ h1.pbn{margin:0}
 /* Ville choisie dans la fenêtre de recherche (en attente) */
 .pendc{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 0;padding:10px 14px;border-radius:16px;background:var(--soft);border:1px solid var(--line);font:700 16px var(--fb);animation:pop .3s both}
 .pendc button{border:0;background:var(--card);color:var(--ink);width:30px;height:30px;border-radius:50%;font-size:13px}
+
+.pendl{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.pendl .pendc{margin:0}
+.multic{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 12px}

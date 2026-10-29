@@ -103,7 +103,10 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const [view, setView] = useState<"cards" | "list" | "map">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
-  const city = initialCity || sp.get("ville") || (canNear ? near : "");
+  const spCities = sp.getAll("ville").filter(Boolean).slice(0, 5); // plusieurs villes : ?ville=Lyon&ville=Paris
+  const city = initialCity || spCities[0] || (canNear ? near : "");
+  const cities = useMemo(() => (initialCity ? [initialCity] : spCities.length ? spCities : city ? [city] : []), [initialCity, spCities.join("|"), city]); // eslint-disable-line react-hooks/exhaustive-deps
+  const inCities = (p: Profile) => cities.some((c) => cityList(p).includes(c));
   const allCities = useMemo(() => Array.from(new Set(profiles.flatMap(cityList))), [profiles]);
   const locate = (auto = false) => {
     if (!navigator.geolocation) { setGeoMsg(tr("La localisation n’est pas disponible sur cet appareil.")); return; }
@@ -139,7 +142,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
   const list = useMemo(() => {
-    const l = profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" || fav : p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : cityList(p).includes(city))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
+    const l = profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" || fav : p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : inCities(p))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
       && (!fav || favs.includes(p.id)) && inRange(p.age, df.amin, df.amax) && inRange(p.height_cm, df.hmin, df.hmax) && inRange(p.weight_kg, df.wmin, df.wmax)
       && (!df.eth || p.ethnicity === df.eth) && (!df.lang || (p.languages || []).includes(df.lang)) && (!df.hair || p.hair === df.hair) && (!df.eyes || p.eyes === df.eyes) && (!df.bra || p.bra === df.bra)
       && (!df.smk || p.smoker === df.smk) && (!df.drk || p.drinker === df.drk) && (!df.recv || p.receives) && (!df.trav || p.travels)
@@ -148,24 +151,24 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     l.sort((a, b) => sort === "az" ? a.name.localeCompare(b.name) : sort === "media" ? b.photos.length - a.photos.length : sort === "tarif" ? ((showTarif(a) && (dur === 30 ? a.tarif_30 : a.tarif_60)) || 1e9) - ((showTarif(b) && (dur === 30 ? b.tarif_30 : b.tarif_60)) || 1e9) : sort === "vus" ? (b.views || 0) - (a.views || 0) : +new Date(b.created_at) - +new Date(a.created_at));
     l.sort((a, b) => +b.vip - +a.vip);
     return l;
-  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, fav, favs, df]);
+  }, [profiles, type, tag, q, sort, vid, ver, now, tar, dur, visit, city, cities, fav, favs, df]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const mapCities = useMemo(() => { const by: Record<string, { city: string; n: number; p: { id: string; name: string; sub: string; g: string; img: string }[] }> = {}; list.filter((p) => p.genre !== "livecam").forEach((p) => { const c = (by[p.city] ||= { city: p.city, n: 0, p: [] }); c.n++; if (c.p.length < 14) c.p.push({ id: p.id, name: p.name, sub: lab(p), g: p.genre, img: p.photos[0] || "" }); }); return Object.values(by).sort((a, b) => b.n - a.n); }, [list]);
-  const inCity = useMemo(() => (city ? profiles.filter((p) => cityList(p).includes(city)) : profiles), [profiles, city]);
+  const inCity = useMemo(() => (city ? profiles.filter((p) => inCities(p)) : profiles), [profiles, cities]); // eslint-disable-line react-hooks/exhaustive-deps
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
   const isHome = usePathname() === "/"; const [topAll, setTopAll] = useState(false); const [sheet, setSheet] = useState<"" | "open" | "closing">("");
-  const [pend, setPend] = useState(""); // ville choisie dans la fenêtre de recherche, appliquée au clic sur « Voir les résultats »
-  const closeSheet = () => { setPend(""); setSheet("closing"); setTimeout(() => setSheet(""), 260); };
-  const applySheet = () => { const c = pend; setPend(""); setSheet("closing"); setTimeout(() => setSheet(""), 260); if (c) setCity(c); };
+  const [pend, setPend] = useState<string[]>([]); // ville choisie dans la fenêtre de recherche, appliquée au clic sur « Voir les résultats »
+  const closeSheet = () => { setPend([]); setSheet("closing"); setTimeout(() => setSheet(""), 260); };
+  const applySheet = () => { const l = pend; setPend([]); setSheet("closing"); setTimeout(() => setSheet(""), 260); if (l.length) setCities(l); };
   useEffect(() => { // la fenêtre suit la partie visible de l'écran (le clavier du téléphone la réduit au lieu de la faire sortir du cadre)
     if (!sheet) return; const vv = window.visualViewport; const fit = () => { const el = document.documentElement; if (vv) { el.style.setProperty("--vvh", vv.height + "px"); el.style.setProperty("--vvt", vv.offsetTop + "px"); } }; fit(); vv?.addEventListener("resize", fit); vv?.addEventListener("scroll", fit);
     return () => { vv?.removeEventListener("resize", fit); vv?.removeEventListener("scroll", fit); document.documentElement.style.removeProperty("--vvh"); document.documentElement.style.removeProperty("--vvt"); };
   }, [sheet === "" ? "" : "on"]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!sheet) return; document.body.style.overflow = "hidden"; const k = (e: KeyboardEvent) => { if (e.key === "Escape") closeSheet(); }; window.addEventListener("keydown", k); return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", k); }; }, [sheet === "" ? "" : "on"]); // eslint-disable-line react-hooks/exhaustive-deps
   const top = useMemo(() => { const cc: Record<string, number> = {}; profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type)).forEach((p) => cityList(p).forEach((c) => { if (!region || regions[c] === region) cc[c] = (cc[c] || 0) + 1; })); return Object.entries(cc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], "fr")).slice(0, isHome ? 1000 : 9); }, [profiles, type, region, regions, isHome]);
-  const hl = useMemo(() => profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || cityList(p).includes(city))).sort((a, b) => +b.vip - +a.vip || (b.views || 0) + 5 * (b.favs || 0) - (a.views || 0) - 5 * (a.favs || 0) || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 10), [profiles, type, tag, city]);
+  const hl = useMemo(() => profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && (!tag || p.specialties.some((x) => x.toLowerCase() === tag)) && (!city || inCities(p))).sort((a, b) => +b.vip - +a.vip || (b.views || 0) + 5 * (b.favs || 0) - (a.views || 0) - 5 * (a.favs || 0) || +new Date(b.created_at) - +new Date(a.created_at)).slice(0, 10), [profiles, type, tag, cities]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sentinel = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -183,6 +186,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   }, [hl]);
   useEffect(() => { setQ(sp.get("q") || ""); setTag(sp.get("tag") || ""); }, [sp]); // recherche venant du menu du haut
   const open = (id: string) => r.push(`/profil/${id}`);
+  const setCities = (l: string[]) => r.push(l.length ? `/${searchMode ? "recherche" : ""}?${l.map((c) => "ville=" + encodeURIComponent(c)).join("&")}` : searchMode ? "/recherche" : "/");
   const setCity = (c: string) => r.push(c ? `/${searchMode ? "recherche" : ""}?ville=${encodeURIComponent(c)}` : searchMode ? "/recherche" : "/");
   const clear = () => { setType("tous"); setTag(""); setQ(""); setSort("rec"); setVid(false); setVer(false); setNow(false); setTar(0); setVisit(0); setDur(60); setDf(DF0); r.push(searchMode ? "/recherche" : "/"); };
 
@@ -205,10 +209,10 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
             <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} alt="" decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
             <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
-        {!searchMode && <section className={`panel top${isHome ? " topx" : ""}${topAll ? " all" : ""}`} aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">{isHome ? 18 : 9}</span><span className="t6">{isHome ? 12 : 6}</span><span className="t3">{isHome ? 6 : 3}</span> {region || "France"}</h2>
+        {!searchMode && <section className={`panel top${isHome ? " topx" : ""}${topAll ? " all" : ""}`} aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">{isHome ? 18 : 9}</span><span className="t6">{isHome ? 12 : 6}</span><span className="t3">3</span> {region || "France"}</h2>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol>{(isHome && (canNear || top.length > 6)) && <div className="topbtns">{isHome && canNear && <button type="button" className="btn topnear" onClick={() => { locate(); document.getElementById("topH")?.scrollIntoView({ block: "nearest" }); }} disabled={geoBusy}>📍 {geoBusy ? tr("Localisation…") : tr("Villes près de moi")}</button>}{isHome && top.length > 6 && <button type="button" className="btn ghost topmore" aria-expanded={topAll} onClick={() => setTopAll(!topAll)}>{topAll ? tr("Voir moins de villes") : tr("Voir toutes les villes ({n})", { n: top.length })}</button>}</div>}<button type="button" className="btn msbtn" onClick={() => setSheet("open")}><Ic n="search" s={22} />{tr("Rechercher")}</button></section>}
         {sheet && <div className={`sheetbg${sheet === "closing" ? " out" : ""}`} onClick={closeSheet} />}
-        <div className={`panel msearch${searchMode ? " on" : ""}${sheet ? ` sheet ${sheet}` : ""}`} id="recherche" role={sheet ? "dialog" : undefined} aria-modal={sheet ? true : undefined} aria-label={sheet ? tr("Rechercher") : undefined}>{sheet && <div className="sheethd"><i aria-hidden="true" /><b>{tr("Rechercher")}</b><button type="button" className="x" aria-label={tr("Fermer")} onClick={closeSheet}>✕</button></div>}<div className={sheet ? "sheetbody" : "sbc"}>{(searchMode || !!sheet) && <div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => { if (sheet) { setPend(c); (document.activeElement as HTMLElement | null)?.blur(); } else setCity(c); }} onProfile={(id) => { if (sheet) { setPend(""); setSheet(""); } open(id); }} onTag={(t) => setTag(t)} /></div>}{sheet && pend && <p className="pendc"><span>📍 {pend}</span><button type="button" aria-label={tr("Retirer")} onClick={() => setPend("")}>✕</button></p>}{(searchMode || !!sheet) && <><h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
+        <div className={`panel msearch${searchMode ? " on" : ""}${sheet ? ` sheet ${sheet}` : ""}`} id="recherche" role={sheet ? "dialog" : undefined} aria-modal={sheet ? true : undefined} aria-label={sheet ? tr("Rechercher") : undefined}>{sheet && <div className="sheethd"><i aria-hidden="true" /><b>{tr("Rechercher")}</b><button type="button" className="x" aria-label={tr("Fermer")} onClick={closeSheet}>✕</button></div>}<div className={sheet ? "sheetbody" : "sbc"}>{(searchMode || !!sheet) && <div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => { if (sheet) { setPend((cur) => (cur.includes(c) || cur.length >= 5 ? cur : [...cur, c])); (document.activeElement as HTMLElement | null)?.blur(); } else setCity(c); }} onProfile={(id) => { if (sheet) { setPend([]); setSheet(""); } open(id); }} onTag={(t) => setTag(t)} /></div>}{sheet && pend.length > 0 && <div className="pendl">{pend.map((c) => <p key={c} className="pendc"><span>📍 {c}</span><button type="button" aria-label={tr("Retirer")} onClick={() => setPend((cur) => cur.filter((x) => x !== c))}>✕</button></p>)}</div>}{(searchMode || !!sheet) && <><h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
           <div className="row"><span>{tr("Profil")}</span><select aria-label={tr("Profil")} value={type} onChange={(e) => setType(e.target.value)}><option value="tous">{tr("Tous les profils")}</option><option value="fille">{tr("Filles")}</option><option value="homme">{tr("Hommes")}</option><option value="trans">{tr("Trans")}</option><option value="livecam">{tr("Livecam")}</option></select></div>
           <div className="row"><span>{tr("Trier par")}</span><select aria-label={tr("Tri")} value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">{tr("Plus récents")}</option><option value="az">{tr("Nom (A à Z)")}</option><option value="tarif">{tr("Tarif croissant (selon la durée)")}</option><option value="vus">{tr("Plus vus (30 jours)")}</option><option value="media">{tr("Plus de contenus")}</option></select></div>
           {city && <div className="row"><span>{tr("Passages dans {c}", { c: city })}</span><select aria-label={tr("Passages dans la ville")} value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>{tr("Profils de la ville")}</option><option value={7}>{tr("De passage cette semaine")}</option><option value={30}>{tr("De passage ce mois-ci")}</option></select></div>}
@@ -258,11 +262,12 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {city && <NearbyCities profiles={profiles} city={city} type={type} />}
         {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{tr(intro)}</p> : null) : intro}
         {view === "map" && (mapCities.length ? <MapView cities={mapCities} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
+        {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).map((p, i) => <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />)
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : tr("Aucun profil ne correspond à votre recherche.")) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
         </div>
-        {view !== "map" && !!city && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}
+        {view !== "map" && !!city && cities.length < 2 && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}
         {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{tr("{n} profils à venir", { n: list.length - shown })}</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>{tr("Voir plus")}</button></div>}
       </main>
 
