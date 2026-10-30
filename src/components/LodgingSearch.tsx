@@ -48,7 +48,7 @@ export default function LodgingSearch({ items, strip, initialCity = "" }: { item
           <Link key={l.id} href={`/logements/${l.id}`} className="lslide" aria-label={l.title}>
             <i>{l.photo ? <img src={l.photo} alt="" loading="lazy" /> : null}</i>
             <b>{l.title}</b><small>{l.city}{l.day ? ` · ${l.day} €` : l.week ? ` · ${l.week} €` : l.month ? ` · ${l.month} €` : ""}</small></Link>))}</div> : null}
-      {strip && list.length > 0 ? null : list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ne correspond pour le moment.")}</p> :
+      {strip && list.length > 0 ? null : list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ici pour l’instant. Élargis la distance, ou propose le tien depuis Modifier le profil.")}</p> :
         <div className="lgrid">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lcard">
             {l.photo ? <img src={l.photo} alt={l.title} width={640} height={420} loading="lazy" decoding="async" /> : <span className="lph" />}

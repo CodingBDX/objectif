@@ -180,8 +180,8 @@ function NoResult({ onClear }: { onClear: () => void }) {
     <div className="ejoin nores">
       <span className="ejico" aria-hidden="true"><Ic n="search" s={30} /></span>
       <div className="ejtx">
-        <h2>{tr("Aucun profil ne correspond à ta recherche")}</h2>
-        <p>{tr("Essaie d’autres mots, une autre ville, ou retire quelques filtres. Tu es escort ? Ton profil peut être le premier.")}</p>
+        <h2>{tr("Aucun profil ne correspond")}</h2>
+        <p>{tr("Élargis la distance, essaie une ville voisine ou retire un filtre.")}</p>
       </div>
       <div className="ejbtns">
         <button type="button" className="btn ghost" onClick={onClear}>{tr("Tout effacer")}</button>
@@ -211,7 +211,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
       const c = await nearestCity(pos.coords.latitude, pos.coords.longitude, allCities);
       setGeoBusy(false);
       if (c) { setNear(c); try { localStorage.setItem("objectif_pm", JSON.stringify({ city: c, t: Date.now() })); } catch {} }
-      else if (!auto) setGeoMsg(tr("Aucun créateur près de toi pour le moment. Essaie une autre ville dans le Top 10."));
+      else if (!auto) setGeoMsg(tr("Aucun profil près de toi pour l’instant. Essaie une ville du Top 10."));
     }, (err) => {
       setGeoBusy(false); if (auto) return;
       if (err.code === 1) { setGeoMsg(tr("La localisation est bloquée pour ce site. Autorise-la dans les réglages de ton appareil, puis réessaie.")); setGeoHelp(true); }
@@ -402,7 +402,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
           <span>{tr("📍 Profils près de toi : ")}<b>{near}</b></span><button type="button" className="btn ghost" onClick={stopNear}>{tr("Voir tous les profils")}</button></div>}
         {city && <NearbyCities profiles={profiles} city={city} type={type} />}
         {typeof intro === "string" ? (intro ? <p className="note" style={{ margin: "0 0 12px" }}>{tr(intro)}</p> : null) : intro}
-        {view === "map" && (mapCities.length ? <MapView cities={mapCities} zones={mapZones} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte.")}</div>)}
+        {view === "map" && (mapCities.length ? <MapView cities={mapCities} zones={mapZones} /> : <div className="empty">{tr("Aucun profil à afficher sur la carte. Élargis la zone ou retire un filtre.")}</div>)}
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         {view !== "map" && <div className="nowbar">{(nNow > 0 || now) && <button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button>}{!!city && (visit === 30 || nVis > 0) && <button type="button" className={`nowchip qf${visit === 30 ? " on" : ""}`} aria-pressed={visit === 30} onClick={() => setVisit(visit === 30 ? 0 : 30)}><Ic n="clock" s={16} />{tr("Arrive bientôt (1 mois)")}<b>{nVis}</b></button>}<button type="button" className={`nowchip qf${vid ? " on" : ""}`} aria-pressed={vid} onClick={() => setVid(!vid)}><Ic n="video" s={16} />{tr("Avec vidéo de présentation")}</button><button type="button" className={`nowchip qf${df.recv ? " on" : ""}`} aria-pressed={!!df.recv} onClick={() => setDf({ ...df, recv: !df.recv })}><Ic n="home" s={16} />{tr("Reçoit")}</button><button type="button" className={`nowchip qf${df.trav ? " on" : ""}`} aria-pressed={!!df.trav} onClick={() => setDf({ ...df, trav: !df.trav })}><Ic n="car" s={16} />{tr("Se déplace")}</button>{(rue || profiles.some((x) => x.street)) && <button type="button" className={`nowchip qf${rue ? " on" : ""}`} aria-pressed={rue} onClick={() => setRue(!rue)}><Ic n="pin" s={16} />{tr("Escorte de rue")}</button>}<button type="button" className={`nowchip qf${ver ? " on" : ""}`} aria-pressed={ver} onClick={() => setVer(!ver)}><Ic n="check" s={16} />{tr("Profils vérifiés uniquement")}</button></div>}
         {une && view !== "map" && <UneBanner p={une} onOpen={() => open(une.id)} />}
@@ -410,7 +410,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {arrivals.length > 0 && view !== "map" && <ArrivalsBanner items={arrivals} city={city} onOpen={open} />}
         <div className={`grid${view === "list" ? " lst" : ""}${view === "duo" ? " duo" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).flatMap((p, i) => { const tp = visit && city ? visitOf(p, city, visit) : undefined; const c = view === "duo" ? <CardDuo key={p.id} p={p} onOpen={() => open(p.id)} trip={tp} /> : <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={tp} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
-            : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
+            : <div className="empty">{fav ? tr("Aucun favori pour l’instant. Touche le cœur d’un profil pour le retrouver ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Pas encore de profil à {c}. Tu es escort ? Sois la première : ton profil sera en tête.", { c: city }) : <NoResult onClear={clear} />) : tr("Pas encore de profil ici. Tu es escort ? Crée ton profil gratuit : il sera en tête.")}</div>}
         </div>
         {view !== "map" && !!city && cities.length < 2 && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}
         {view !== "map" && shown < list.length && <div className="more" ref={sentinel}><i /><i /><i /><span>{tr("{n} profils à venir", { n: list.length - shown })}</span><button className="btn ghost" type="button" onClick={() => setShown((s) => s + PAGE)}>{tr("Voir plus")}</button></div>}

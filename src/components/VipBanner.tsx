@@ -12,8 +12,8 @@ export default function VipBanner({ paused }: { paused: boolean }) {
   if (hide || paused) return null;
   const close = () => { setHide(true); try { sessionStorage.setItem("hp_vipb", "1"); } catch {} };
   return (
-    <div className="pbanner" role="status"><span>👑 {tr("Passe en VIP : tarifs, réseaux sociaux, 20 photos et plus de visibilité.")} {plans.map((x) => `${tr(x.label)} ${x.price} €`).join(" · ")}</span>
-      <Link href="/contact?s=vip">{tr("Devenir VIP")}</Link>
+    <div className="pbanner" role="status"><span>👑 {tr("Passe devant dans ta ville : en VIP, ton profil s’affiche en tête, montre tes tarifs et peut avoir jusqu’à 20 photos.")}</span>
+      <Link href="/contact?s=vip">{tr("Devenir VIP, dès {p} €", { p: plans.length ? Math.min(...plans.map((x) => x.price)) : 20 })}</Link>
       <button type="button" onClick={close} aria-label={tr("Fermer")}>✕</button></div>
   );
 }
