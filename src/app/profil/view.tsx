@@ -97,22 +97,24 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
           ...(p.genre === "livecam" ? {} : { homeLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: p.city, addressCountry: "FR" } } }), knowsAbout: p.specialties,
           sameAs: (["instagram", "snapchat", "tiktok"] as const).map((k) => { const h = handle((p as any)[k]); return p.vip && h && okHandle(h) ? SOC[k][2](h) : null; }).filter(Boolean) }
       }).replace(/</g, "\\u003c") }} />
-      <div className="pbar"><Crumbs items={cr} inline /><h1 className="pbn">{p.name} <CrownBadge level={p.crown} size={28} /></h1>
-        <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}<Heart id={p.id} />{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
-          {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> <Tr k="Nouveau" /></span>}
-          {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
-        <div className="pcontact">
-          {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
-          {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
-          {!asleep && <PhoneReveal id={p.id} path={want} live={live} mine={mine} name={p.name} wa={!!p.whatsapp} sms={!!p.sms} />}
-          {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
-            if (k === "snapchat") return <SnapLink key={k} id={p.id} skip={mine} href={u(h)} name={p.name} path={want}><Ic n={i} s={22} /></SnapLink>;
-            return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
-        </div></div>
+      <div className="pbar"><Crumbs items={cr} inline /></div>
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">
             <Slider imgs={p.photos} vip={p.vip} video={p.video} alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} />
+            <div className="pbar phead"><h1 className="pbn">{p.name} <CrownBadge level={p.crown} size={28} /></h1>
+              <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
+                {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> <Tr k="Nouveau" /></span>}
+                {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
+              <div className="pcontact">
+                {!mine && <span className="pfav"><Heart id={p.id} /></span>}
+                {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
+                {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
+                {!asleep && <PhoneReveal id={p.id} path={want} live={live} mine={mine} name={p.name} wa={!!p.whatsapp} sms={!!p.sms} />}
+                {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
+                  if (k === "snapchat") return <SnapLink key={k} id={p.id} skip={mine} href={u(h)} name={p.name} path={want}><Ic n={i} s={22} /></SnapLink>;
+                  return <TrackLink key={k} id={p.id} kind="social" skip={mine} className="soc" href={u(h)} target="_blank" rel="noopener noreferrer" aria-label={`${n} de ${p.name}`} title={n}><Ic n={i} s={22} /></TrackLink>; })}
+              </div></div>
             {p.vip && p.slogan && <p className="pslogan">{p.slogan}</p>}
             {!live && <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} /><Tr k="Villes" /></h2><div className="mvs"><Link className={`bubble base${p.district ? " hasd" : ""}`} href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★{p.district && <small className="bdist">{p.district}</small>}</Link>
                 {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}

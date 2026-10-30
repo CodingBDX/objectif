@@ -1668,3 +1668,8 @@ h1.pbn{margin:0}
 @media (min-width:1100px){.ncity{flex-basis:calc((100% - 30px)/4)}.nearc:not(.all) .ncity:nth-child(n+9){display:none}}
 
 
+
+/* Fiche profil : photos en haut, nom + badges dessous ; cœur des favoris dans la barre de contact flottante */
+.phead{padding:16px 0 8px}
+.pcontact .pfav .fav{margin:0;width:44px;min-width:44px;height:44px;padding:0;border-radius:50%;background:var(--card)}
+.pcontact .pfav .fav .fc{display:none}
