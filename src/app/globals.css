@@ -1673,3 +1673,15 @@ h1.pbn{margin:0}
 .phead{padding:16px 0 8px}
 .pcontact .pfav .fav{margin:0;width:44px;min-width:44px;height:44px;padding:0;border-radius:50%;background:var(--card)}
 .pcontact .pfav .fav .fc{display:none}
+
+/* Barre de contact flottante : numéro, puis WhatsApp / SMS, puis le cœur, puis les réseaux — toujours sur la même ligne,
+   qu'il y ait 2 ou 5 boutons (les ronds rétrécissent un peu sur les petits écrans au lieu de passer à la ligne). */
+.pcontact>*{order:3}
+.pcontact>.pph{order:0}
+.pcontact>.wab{order:1}
+.pcontact>.pfav,.pcontact>.pz{order:2}
+.pcontact .pfav{display:flex;flex:0 1 44px;min-width:34px}
+.pcontact .pfav .fav{width:100%;min-width:0}
+@media (max-width:640px){
+ .pcontact .soc{flex:0 1 44px;min-width:34px;width:auto}
+}
