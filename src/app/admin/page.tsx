@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import CountUp from "@/components/CountUp";
 import VipPlansAdmin from "@/components/VipPlansAdmin";
@@ -175,6 +175,7 @@ export default function Admin() {
     if (x.path) await sb.storage.from("verif").remove([x.path]);
     setVerifs((l) => l.filter((y) => y.profile_id !== x.profile_id)); loadProfiles(); refreshListings();
   }
+  const grp = (label: string, tabs: Tab[], ...items: ReactNode[]) => <details className="ngrp" open={tabs.includes(tab)} key={label}><summary>{label}</summary>{items}</details>;
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
   const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", membres: "Membres", verifs: "Demandes de vérification", lodgings: "Logements", mails: "E-mails bloqués", paiements: "Paiements VIP" };
 
@@ -184,8 +185,11 @@ export default function Admin() {
         <div className="dav">A</div>
         <div className="dhi">Administration</div>
         <nav>
-          {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("membres", "👥 Membres")}{nav("paiements", "💳 Paiements", nPay)}{nav("mails", "📧 E-mails bloqués")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
+          {nav("dash", "📊 Tableau de bord")}
+          {grp("🚩 Modération", ["reports", "messages", "clients", "verifs", "lodgings", "assos"], nav("reports", "🚩 Signalements", nNew), nav("messages", "✉️ Messages", nMsg), nav("clients", "🛡️ Clients signalés"), nav("verifs", "✅ Vérifications", verifs.length), nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length), nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length))}
+          {grp("👤 Annuaire", ["profiles", "membres", "specs"], nav("profiles", "👤 Profils"), nav("membres", "👥 Membres"), nav("specs", "🏷 Spécialités"))}
+          {grp("💳 Argent", ["paiements"], nav("paiements", "💳 Paiements & tarifs", nPay))}
+          {grp("🔒 Sécurité", ["secu", "journal", "mails"], nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length), nav("journal", "📜 Journal"), nav("mails", "📧 E-mails bloqués"))}
           <Link href="/">📖 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>

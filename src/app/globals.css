@@ -1548,3 +1548,13 @@ h1.pbn{margin:0}
 .vplan.on{border-color:var(--btn);background:var(--soft)}
 .vplan b{font:700 20px var(--fd);color:var(--btn)}
 @media (max-width:420px){.vplans{grid-template-columns:1fr}}
+
+/* Admin : menu regroupé en rubriques repliables */
+.dside nav .ngrp{display:grid;gap:4px}
+.dside nav .ngrp>summary{list-style:none;cursor:pointer;padding:8px 12px;border-radius:14px;font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;justify-content:space-between;min-height:40px}
+.dside nav .ngrp>summary::-webkit-details-marker{display:none}
+.dside nav .ngrp>summary::after{content:"▾";transition:transform .15s}
+.dside nav .ngrp:not([open])>summary::after{transform:rotate(-90deg)}
+.dside nav .ngrp>summary:hover{background:var(--soft)}
+.dside nav .ngrp>a{margin-left:6px}
+@media (max-width:900px){.dside nav{display:grid;gap:4px;width:100%}.dside nav .ngrp>a{display:flex;font-size:14px}}

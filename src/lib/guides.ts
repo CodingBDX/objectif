@@ -244,6 +244,207 @@ Le site est **réservé aux adultes**, s'engage contre les **réseaux de proxén
 
 ## Et après ?
 À la fin de la période, ton profil repasse **tout seul en profil gratuit**, sans frais ni démarche. Tes informations VIP sont conservées si tu reviens plus tard.`
+  },
+  {
+    slug: "fixer-ses-tarifs", emoji: "💶", date: "2026-10-30",
+    title: "Fixer ses tarifs : comment trouver le bon prix",
+    desc: "Comment choisir ses tarifs, les structurer par durée, éviter les négociations et les ajuster dans le temps.",
+    body: `Un tarif bien pensé te protège des discussions interminables et attire des clients qui respectent ton temps. Voici une méthode simple.
+
+## Partir de ta réalité
+- Compte ce que tu dois couvrir : **déplacements, logement, tenues, entretien, publicité, impôts et cotisations** si tu es déclarée.
+- Regarde **3 à 5 profils comparables** dans ta ville (même âge, même style, même niveau de services). Ne copie pas : situe-toi.
+- Une ville touristique ou une grande métropole supporte des tarifs plus élevés qu'une petite ville.
+
+## Structurer ses tarifs
+- Propose **quelques durées claires** : 30 minutes, 1 heure, 2 heures, soirée, nuit. Trop d'options compliquent la lecture.
+- Plus la durée est longue, plus le **prix par heure baisse** : c'est normal et ça encourage les rendez-vous plus longs.
+- Indique ce qui est **inclus** (durée exacte, déplacement, accueil) et ce qui est **en supplément**.
+- Affiche tes tarifs sur ton profil : cela filtre les curieux et évite les messages sans suite.
+
+## Négociation et acompte
+- **Ne négocie pas ta valeur.** Une phrase courte et aimable suffit : « Mes tarifs sont fixes. »
+- Tu peux demander un **acompte raisonnable** pour un déplacement lointain ou une nuit entière. Évite les paiements par des moyens qui t'exposent (coordonnées bancaires complètes, liens suspects).
+- Méfie-toi des clients qui offrent beaucoup plus que ton tarif pour un « petit service » à l'avance : c'est un schéma d'arnaque classique.
+
+## Faire évoluer ses tarifs
+- Augmente **un peu et régulièrement** plutôt qu'une grosse fois : par exemple après un profil vérifié, de nouvelles photos ou une hausse de demandes.
+- Si tu reçois **trop** de demandes, c'est souvent le signe que tu peux monter. Si tu n'en reçois **aucune**, vérifie d'abord tes photos et ta présentation avant de baisser.
+- Note tes rendez-vous du mois : tu verras vite quelles durées te conviennent le mieux.`
+  },
+  {
+    slug: "bien-communiquer-avec-les-clients", emoji: "💬", date: "2026-10-30",
+    title: "Bien communiquer avec les clients : messages types et limites",
+    desc: "Des exemples de réponses courtes et polies pour filtrer les demandes, poser tes limites et rester maître de la conversation.",
+    body: `La façon dont tu écris donne le ton de tout le rendez-vous. Quelques phrases préparées à l'avance te font gagner du temps et de la tranquillité.
+
+## Les principes
+- **Reste courte, claire et polie.** Tu n'as pas à te justifier.
+- Réponds **quand ça te convient**. Un client sérieux sait attendre.
+- Garde la conversation **écrite** au début : elle t'aide à repérer les profils problématiques.
+- Ne donne **jamais** ton adresse avant d'avoir confirmé le rendez-vous et vérifié le client.
+
+## Messages types
+- **Première réponse** : « Bonjour, merci pour votre message. Je suis disponible [jour] à [heure]. Pour une durée de [durée], mon tarif est de [prix]. Pouvez-vous vous présenter en deux mots ? »
+- **Tarif non négociable** : « Mes tarifs sont fixes, merci de votre compréhension. »
+- **Demande hors de tes limites** : « Ce n'est pas quelque chose que je propose. Si le reste vous convient, je serai ravie de vous accueillir. »
+- **Client insistant** : « Je préfère en rester là. Je vous souhaite une bonne journée. » Puis **bloque** si ça continue.
+- **Annulation de ta part** : « Je dois malheureusement annuler pour raison personnelle. Je m'excuse pour la gêne. »
+
+## Les signaux d'alerte
+- Messages **flous**, pressants ou très insistants sur l'adresse dès le premier échange.
+- Refus de te donner un **prénom** ou une façon de le joindre.
+- Demande de **photos, vidéos ou documents** personnels avant toute rencontre.
+- Offre de **payer à l'avance en trop** et de se faire rembourser la différence.
+Dans ces cas, **ne réponds plus** et, si besoin, signale-le : tu n'as aucune obligation de continuer.
+
+## Après le rendez-vous
+Un message court et aimable (« Merci pour ce moment ») fidélise sans t'engager. Tu peux aussi signaler un client problématique pour protéger les autres escortes.`
+  },
+  {
+    slug: "choisir-et-preparer-son-logement", emoji: "🏠", date: "2026-10-30",
+    title: "Choisir et préparer son logement pour recevoir",
+    desc: "Appartement, hôtel, location courte durée : comment choisir un lieu discret et sûr, et le préparer pour accueillir.",
+    body: `Le lieu compte autant que ta présentation : il doit être **sûr, discret et agréable**. Voici les points à vérifier.
+
+## Les options
+- **Chez toi** : le plus simple, mais il expose ton adresse. À éviter si tu veux garder ta vie privée.
+- **Un appartement dédié** : sépare ta vie privée et ton activité. Vérifie ce que dit ton **bail** et le règlement de copropriété.
+- **Un hôtel** : discret et sans engagement, mais plus cher. Certains établissements n'acceptent pas les visites : renseigne-toi.
+- **Une location courte durée** : pratique en déplacement, mais lis bien les **conditions de la plateforme et du propriétaire**. Beaucoup interdisent expressément cet usage et peuvent te bannir.
+
+## Critères de choix
+- **Discrétion** : entrée sans passage, pas de voisins curieux, pas de gardien trop présent.
+- **Sécurité** : porte qui ferme bien, digicode ou interphone, bon éclairage, quartier calme.
+- **Accès** : facile à trouver pour un client, avec un transport ou un parking à proximité.
+- **Sortie** : sache toujours comment tu peux sortir rapidement.
+
+## Préparer les lieux
+- Un lieu **propre, rangé et aéré**, avec des draps et des serviettes propres.
+- Une **salle de bains** accessible, avec savon, serviettes et papier.
+- Un **éclairage doux** et une température agréable.
+- Cache ou range tes **documents personnels** et tout ce qui révèle ton identité.
+- Ne laisse pas d'**objets de valeur** visibles.
+
+## Règles pratiques
+- Ne donne l'adresse exacte qu'**après confirmation** du rendez-vous.
+- Prévois un **moyen d'alerte** (téléphone chargé, personne de confiance prévenue).
+- Reste attentive aux **voisins** : un va-et-vient régulier peut attirer l'attention et créer des conflits.
+
+Sur Sex-Escorte, tu peux consulter la rubrique **logements** pour trouver des lieux adaptés dans ta ville.`
+  },
+  {
+    slug: "preparer-un-deplacement-ou-une-tournee", emoji: "🧳", date: "2026-10-30",
+    title: "Préparer un déplacement ou une tournée dans une autre ville",
+    desc: "Annoncer son passage, organiser son voyage et rester en sécurité quand on travaille loin de chez soi.",
+    body: `Se déplacer dans une autre ville peut augmenter tes rendez-vous, à condition d'être bien organisée.
+
+## Avant de partir
+- **Choisis tes dates** et annonce-les à l'avance : les clients de la ville peuvent ainsi planifier et te réserver.
+- Sur Sex-Escorte, ajoute tes **prochains passages** dans ton profil : ils apparaissent dans la rubrique « Arrivent bientôt » et sur ta page.
+- Réserve ton **logement** à l'avance et vérifie les conditions d'accueil.
+- Prépare ta **présentation locale** : mentionne la ville, le quartier, les dates exactes.
+
+## Sur place
+- Garde une **personne de confiance** informée de ton adresse et de tes horaires.
+- Repère le **quartier** (transports, pharmacie, sorties) avant l'arrivée du premier client.
+- Évite de te déplacer seule la nuit dans un endroit que tu ne connais pas.
+- Garde ton **rythme** : mieux vaut peu de rendez-vous bien choisis que beaucoup en enchaîné.
+
+## Côté pratique
+- Prévois ton **budget** : transport, logement, repas, imprévus. Fixe un nombre minimal de rendez-vous pour rentabiliser le voyage.
+- Pense à ta **batterie**, ton chargeur, ton nécessaire d'hygiène et tes tenues.
+- Garde sur toi ta **pièce d'identité** et tes documents importants, mais **ne les montre jamais** à un client.
+
+## Après le déplacement
+- Mets à jour ton profil (ville, disponibilités).
+- Note ce qui a bien fonctionné pour ta prochaine tournée : ville, durée, tarifs, fréquentation.`
+  },
+  {
+    slug: "sante-et-prevention", emoji: "🩺", date: "2026-10-30",
+    title: "Santé et prévention : se protéger au quotidien",
+    desc: "Protection, dépistage, suivi médical et ressources utiles : les repères essentiels pour prendre soin de soi.",
+    body: `Ta santé est ton premier outil de travail. Quelques habitudes simples te protègent, toi et tes partenaires.
+
+## La protection
+- **Utilise toujours un préservatif**, pour toutes les pratiques à risque, et garde le tien : ne dépends pas de celui du client.
+- Prévois des préservatifs de **plusieurs tailles** et du gel à base d'eau, compatible avec le latex.
+- Tu as le droit de **refuser** toute pratique sans protection, quelle que soit la somme proposée.
+
+## Le suivi médical
+- Fais un **dépistage régulier** des IST (VIH, hépatites, syphilis, chlamydia, gonocoque) : en général tous les **3 mois** si tu as une activité régulière, ou selon l'avis de ton médecin.
+- Le **dépistage** est possible dans un **CeGIDD** (centre gratuit et anonyme), en laboratoire ou chez un médecin.
+- Demande à ton médecin des informations sur la **vaccination** (hépatite B, HPV) et sur la **PrEP** si elle est adaptée à ta situation.
+- En cas d'accident de préservatif, un **traitement post-exposition (TPE)** doit être pris **le plus tôt possible**, idéalement dans les 4 heures et au plus tard dans les 48 heures : rends-toi aux urgences.
+
+## Le bien-être
+- Dors, mange et bois suffisamment. Une fatigue chronique se voit sur le visage et le moral.
+- Accorde-toi des **jours sans rendez-vous**.
+- Si ton moral baisse ou si tu te sens épuisée, **parle-en** à une personne de confiance, à ton médecin ou à une association : tu n'as pas à tout porter seule.
+
+## Ressources
+Des associations de santé communautaire accompagnent les travailleuses du sexe, de façon confidentielle et sans jugement. Tu peux consulter la rubrique **associations** de Sex-Escorte pour trouver un contact dans ta région.
+
+Ces repères sont généraux et ne remplacent pas un avis médical.`
+  },
+  {
+    slug: "revenus-impots-et-statut", emoji: "🧾", date: "2026-10-30",
+    title: "Revenus, impôts et statut : les bases à connaître",
+    desc: "Des repères généraux sur la déclaration des revenus, les statuts possibles et l'organisation de ses comptes. Ce n'est pas un conseil juridique ou fiscal.",
+    body: `**Cette page donne des repères généraux, pas un conseil fiscal ou juridique.** Les règles changent et chaque situation est différente : pour ton cas, demande conseil à un comptable, à un avocat ou à une association spécialisée.
+
+## Pourquoi s'en préoccuper
+- Avoir des **comptes clairs** t'aide à prouver tes revenus (location, crédit, démarches), et à te protéger en cas de contrôle.
+- Une activité non déclarée peut te rattraper des années plus tard. Mieux vaut savoir où tu en es.
+
+## Garder une trace
+- Note tes **revenus et tes dépenses** : une simple feuille de calcul suffit.
+- Sépare si possible tes **comptes** (activité / personnel).
+- Conserve les **justificatifs** de tes frais (logement, transport, publicité, matériel).
+
+## Les statuts à étudier
+- Selon ta situation, il existe des statuts indépendants (par exemple le régime de la micro-entreprise), mais **la façon dont l'activité peut ou non être déclarée dépend de règles précises** que tu dois vérifier avec un professionnel.
+- Certaines personnes déclarent leurs revenus dans une catégorie adaptée, d'autres passent par un statut différent : **ne copie pas** ce que fait une amie sans vérifier.
+- Si tu perçois d'autres revenus (salaire, aides), tiens-en compte.
+
+## Protéger ton argent
+- N'accepte pas qu'une personne **gère ton argent à ta place** ou te prenne une part sans ton accord : c'est un signe d'emprise.
+- Garde l'accès à **tes comptes** et à **tes documents**.
+- Épargne une petite **réserve** pour les périodes creuses ou les imprévus.
+
+## Où demander de l'aide
+Des associations accompagnent les travailleuses du sexe sur les démarches administratives et fiscales, de façon confidentielle. Consulte la rubrique **associations** pour trouver un contact près de chez toi.`
+  },
+  {
+    slug: "pseudonyme-et-identite-numerique", emoji: "🎭", date: "2026-10-30",
+    title: "Pseudonyme et identité numérique : séparer vie privée et activité",
+    desc: "Choisir un nom d'artiste, créer des adresses et numéros dédiés et limiter les traces qui te relient à ta vie privée.",
+    body: `Séparer ton activité de ta vie privée, c'est la meilleure protection contre le harcèlement et les fuites d'information.
+
+## Choisir son pseudonyme
+- Choisis un nom **facile à retenir** et sans lien avec ton vrai nom, ton quartier ou ta famille.
+- Vérifie qu'il n'est pas **déjà utilisé** par quelqu'un d'autre dans ta ville.
+- Garde le **même pseudonyme** partout : c'est ce qui construit ta réputation.
+
+## Des outils dédiés
+- Une **adresse e-mail** réservée à l'activité, avec un mot de passe unique et solide.
+- Un **numéro de téléphone** séparé (seconde ligne, application ou carte prépayée).
+- Des **comptes** distincts sur les réseaux : ne te connecte jamais aux deux avec les mêmes appareils si tu peux l'éviter.
+- Active la **double authentification** partout où c'est possible.
+
+## Limiter les traces
+- Évite de publier des photos qui contiennent des **métadonnées** de localisation. Retire-les ou envoie la photo par une application qui les supprime.
+- Ne reprends pas de **photos déjà publiées** ailleurs sous ton vrai nom.
+- Fais une **recherche inversée** de tes photos de temps en temps pour voir où elles circulent.
+- Sois prudente avec les **contacts synchronisés** : ton numéro pro peut apparaître dans les suggestions de tes proches.
+
+## Si l'on te reconnaît
+- Reste calme et **ne confirme rien**.
+- Garde des **preuves** (captures d'écran, dates) en cas de harcèlement ou de menaces.
+- Demande la **suppression** de tes photos auprès de la plateforme qui les héberge, et **signale** l'incident si besoin.
+- Sur Sex-Escorte, tu peux masquer certaines informations et supprimer ton profil à tout moment depuis **Modifier mon profil**.
+
+Pour aller plus loin, consulte aussi le guide **Protéger sa vie privée**.`
   }
 ];
 
