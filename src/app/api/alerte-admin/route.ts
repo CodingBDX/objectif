@@ -8,6 +8,7 @@ const KINDS: Record<string, { sujet: string; lien: string; texte: string }> = {
   signalement: { sujet: "🚩 Nouveau signalement", lien: "/admin#reports", texte: "Un profil vient d’être signalé." },
   message: { sujet: "✉️ Nouveau message", lien: "/admin#messages", texte: "Un nouveau message est arrivé par le formulaire de contact." },
   verification: { sujet: "✅ Nouvelle demande de vérification", lien: "/admin#verifs", texte: "Une escorte demande la vérification de son profil." },
+  paiement: { sujet: "💳 Paiement VIP à vérifier", lien: "/admin#paiements", texte: "Une escorte indique avoir payé son forfait VIP. Vérifie la réception de l’argent puis valide." },
   association: { sujet: "🤝 Nouvelle fiche association", lien: "/admin#assos", texte: "Une fiche association attend ta validation." },
 };
 const last = new Map<string, number>();

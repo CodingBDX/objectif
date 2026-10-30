@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu" | "membres" | "mails";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu" | "membres" | "mails" | "paiements";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -26,6 +26,11 @@ export default function Admin() {
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
   const [cnt, setCnt] = useState<{ total: number; vip: number; paused: number; month: number; g: Record<string, number> }>({ total: 0, vip: 0, paused: 0, month: 0, g: {} });
   const [specs, setSpecs] = useState<string[]>([]); const [specDb, setSpecDb] = useState(true); const [specEd, setSpecEd] = useState<Record<string, string>>({}); const [specNew, setSpecNew] = useState(""); const [specUse, setSpecUse] = useState<Record<string, number>>({}); const [specOk, setSpecOk] = useState("");
+  const [orders, setOrders] = useState<any[]>([]); const [ordErr, setOrdErr] = useState("");
+  const loadOrders = useCallback(async () => { const { data, error } = await sb.from("vip_orders").select("*, profiles(id,name,city)").order("created_at", { ascending: false }).limit(200); if (error) { setOrdErr("Lance d’abord migration-vip-paiement.sql dans Supabase."); return; } setOrdErr(""); setOrders(data || []); }, []);
+  useEffect(() => { if (state === "ok") loadOrders(); }, [state, loadOrders]);
+  async function decide(id: string, ok: boolean) { setOrdErr(""); const { error } = await sb.rpc("admin_vip_order_decide", { p_id: id, p_ok: ok }); if (error) setOrdErr(/deja_traitee/.test(error.message) ? "Déjà traitée." : error.message); loadOrders(); loadProfiles(); loadCounts(); loadExtra(); }
+  const nPay = orders.filter((o) => o.status === "declared").length;
   const [doms, setDoms] = useState<string[]>([]); const [domNew, setDomNew] = useState(""); const [domErr, setDomErr] = useState(""); const [domQ, setDomQ] = useState("");
   const loadDoms = useCallback(async () => { const { data, error } = await sb.from("disposable_domains").select("domain").order("domain").limit(5000); if (error) { setDomErr("Lance d’abord migration-email-jetables.sql dans Supabase."); return; } setDomErr(""); setDoms((data || []).map((x: any) => x.domain)); }, []);
   useEffect(() => { if (state === "ok" && tab === "mails") loadDoms(); }, [state, tab, loadDoms]);
@@ -170,7 +175,7 @@ export default function Admin() {
     setVerifs((l) => l.filter((y) => y.profile_id !== x.profile_id)); loadProfiles(); refreshListings();
   }
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", membres: "Membres", verifs: "Demandes de vérification", lodgings: "Logements", mails: "E-mails bloqués" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", membres: "Membres", verifs: "Demandes de vérification", lodgings: "Logements", mails: "E-mails bloqués", paiements: "Paiements VIP" };
 
   return (
     <div className="dash gut">
@@ -179,7 +184,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("membres", "👥 Membres")}{nav("mails", "📧 E-mails bloqués")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("membres", "👥 Membres")}{nav("paiements", "💳 Paiements", nPay)}{nav("mails", "📧 E-mails bloqués")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
           <Link href="/">📖 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -279,6 +284,18 @@ export default function Admin() {
             </div>))}
         </div>)}
 
+        {tab === "paiements" && (<div style={{ display: "grid", gap: 10 }}>
+          <p className="note" style={{ margin: 0 }}>Une escorte clique sur « J’ai payé » : vérifie sur Wero / PayPal que l’argent est arrivé (montant et référence), puis valide. Le VIP est activé et prolongé à partir de sa fin actuelle.</p>
+          {ordErr && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>{ordErr}</p>}
+          {orders.length === 0 && !ordErr && <p className="note">Aucun paiement pour le moment.</p>}
+          {orders.map((o) => (
+            <div className="dcard" key={o.id} style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", padding: "10px 16px" }}>
+              <div style={{ flex: "1 1 220px", minWidth: 0 }}><Link href={`/profil/${o.profile_id}`}><b>{o.profiles?.name || "Profil"}</b></Link>
+                <div className="note">{o.plan} · <b>{o.amount} €</b> · réf. <code>{o.ref}</code> · {ago(o.declared_at || o.created_at)}</div></div>
+              {o.status === "declared" ? <><button type="button" className="btn" onClick={() => decide(o.id, true)}>✓ Argent reçu : valider</button><button type="button" className="btn ghost" onClick={() => decide(o.id, false)}>Refuser</button></>
+                : <span className="gchip">{({ pending: "en attente de paiement", validated: "validé", refused: "refusé", cancelled: "annulé" } as Record<string, string>)[o.status] || o.status}</span>}
+            </div>))}
+        </div>)}
         {tab === "mails" && (<div style={{ display: "grid", gap: 10 }}>
           <p className="note" style={{ margin: 0 }}>Les inscriptions avec ces domaines d’e-mail (jetables) sont refusées, sous-domaines compris. {doms.length} domaine{doms.length > 1 ? "s" : ""} bloqué{doms.length > 1 ? "s" : ""}.</p>
           {domErr && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>{domErr}</p>}

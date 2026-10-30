@@ -25,6 +25,7 @@ import { LIVE_CITY } from "@/lib/types";
 import { slug as toSlug } from "@/lib/site";
 import { plain } from "@/lib/rich";
 import VipPrices from "@/components/VipPrices";
+import VipPay from "@/components/VipPay";
 import { LANGS, ETHNIES, HAIRS, EYES, BRAS, HABIT, RATE_OPTS, rateList } from "@/lib/types";
 const ordn = (n: number) => (n === 1 ? "1er" : n + "e");
 const ARR: Record<string, string[]> = {
@@ -205,6 +206,7 @@ export default function MyProfile() {
         <div className="pbar"><Crumbs inline items={[[tr("Accueil"), "/"], [isNewP ? tr("Créer mon profil") : tr("Mon espace"), "#"]]} /></div>
         {msg && !msg.ok && <div className="errbar" role="alert"><span aria-hidden="true">⚠️</span><b>{msg.t}</b><button type="button" aria-label={tr("Fermer")} onClick={() => setMsg(null)}>✕</button></div>}
         <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
+        {!isNewP && <VipPay vip={vip} />}
         {!isNewP && <details className="dcard actbox"><summary>{tr("📊 Mon activité")}<small>{tr("Stats · Remonter · Points · Parrainage · Sécurité")}</small></summary>
           <StatsPanel />
           <BumpCard />
