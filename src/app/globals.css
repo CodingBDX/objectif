@@ -1605,3 +1605,10 @@ h1.pbn{margin:0}
  .side::-webkit-scrollbar,.aside::-webkit-scrollbar{width:6px}
  .side::-webkit-scrollbar-thumb,.aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
 }
+
+/* Associations de soutien : cartes en slide, comme « À la une » */
+.arrs.assos .arrh{justify-content:space-between}
+.arrs.assos .arrh a{font:700 13px var(--fb,inherit);text-transform:none;letter-spacing:0;color:var(--btn)}
+.une.asso{text-decoration:none;border-style:solid}
+.une.asso i{display:grid;place-items:center;font-size:28px;font-style:normal}
+.une.asso em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

@@ -12,11 +12,19 @@ export default async function CityAssos({ city }: { city: string }) {
   const nat = list.filter((a) => a.national);
   const show = [...here, ...nat.filter((n) => !here.some((h) => h.id === n.id))].slice(0, 6);
   if (!show.length) return null;
+  const cut = (t: string) => (t.length > 90 ? t.slice(0, 88).trimEnd() + "…" : t);
   return (
-    <nav className="nearb" aria-label={`Associations de soutien à ${city}`}>
-      <span className="nearh">🤝 Soutien à {city} :</span>
-      {show.map((a) => <Link key={a.id} className="nbub" href={`/associations/${a.slug}`}>{a.name}{a.national && <b>France</b>}</Link>)}
-      <Link className="nbub" href={`/associations?ville=${encodeURIComponent(city)}`}>Voir tout</Link>
-    </nav>
+    <section className="arrs assos" aria-label={`Associations de soutien à ${city}`}>
+      <p className="arrh"><span>🤝 Soutien à {city}</span><Link href={`/associations?ville=${encodeURIComponent(city)}`}>Voir tout →</Link></p>
+      <div className={`arrl${show.length === 1 ? " one" : ""}`}>
+        {show.map((a) => (
+          <Link key={a.id} className="une arr asso" href={`/associations/${a.slug}`}>
+            <i aria-hidden="true">🤝</i>
+            <span><small>{a.national ? "Association nationale" : a.city}</small><b>{a.name}</b><em>{cut(a.services?.length ? a.services.slice(0, 2).join(" · ") : a.description || "")}</em></span>
+            <u aria-hidden="true">→</u>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
