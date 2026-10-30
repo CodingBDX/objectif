@@ -79,6 +79,26 @@ function ArrivalsBanner({ items, city, onOpen }: { items: { p: Profile; from: st
 }
 /** Remontée de moins de 24 h : passe devant ; ensuite les profils sont classés par points (fidélité), puis par date. */
 const bumpedNow = (p: Profile) => (p.bumped_at && Date.now() - new Date(p.bumped_at).getTime() < 864e5 ? 1 : 0);
+function CardDuo({ p, onOpen, trip }: { p: Profile; onOpen: () => void; trip?: { from: string; to: string } }) {
+  const { tr } = useT();
+  const a = avail(p); const live = p.genre === "livecam";
+  return (
+    <article className={`c2${p.vip ? " vipc" : ""}${a && !a.on ? " off" : ""}`} tabIndex={0} aria-label={tr("Voir le profil de {n}", { n: p.name })} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
+      <div className="ph">
+        <div className="mos"><Tile u={p.photos[0] || ""} alt={`${p.name}${live ? "" : ", " + p.city}`} /></div>
+        <span className="tl">{p.vip && <span className="pill vip"><Ic n="crown" s={12} />VIP</span>}{isNew(p) && <span className="pill"><Ic n="spark" s={12} />{tr("New")}</span>}</span>
+        <span className="tr2"><Heart id={p.id} /></span>
+        <span className="bl">{a && a.on && <span className="pill on"><i />{live ? tr("En direct") : tr("Dispo")}</span>}{p.video && <span className="pill"><Ic n="video" s={12} />{tr("vidéo")}</span>}</span>
+      </div>
+      <div className="inf">
+        <div className="nm"><span>{p.name}</span><CrownBadge level={p.crown} size={18} />{p.verified && <span className="vf2" role="img" aria-label={tr("Profil vérifié")}><Ic n="check" s={10} /></span>}</div>
+        <div className="ct"><Ic n="pin" s={12} /> {live ? tr("En ligne") : p.city}{p.street ? " · " + tr("Rue") : ""}</div>
+        {trip ? <div className="ct on">{trip.to !== trip.from ? tr("Passe du {a} au {b}", { a: dShort(trip.from), b: dShort(trip.to) }) : tr("Passe le {a}", { a: dShort(trip.from) })}</div>
+          : showTarif(p) && (p.tarif_30 || p.tarif_60) ? <div className="pr">{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
+      </div>
+    </article>
+  );
+}
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
   const { tr } = useT();
   const a = avail(p); const live = p.genre === "livecam"; const pics = p.photos.slice(0, 3);
@@ -171,7 +191,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const [type, setType] = useState(initialType); const [tag, setTag] = useState(sp.get("tag") || initialTag); const [q, setQ] = useState(sp.get("q") || "");
   const [sort, setSort] = useState("rec"); const [vid, setVid] = useState(false); const [ver, setVer] = useState(false); const [now, setNow] = useState(false); const [rue, setRue] = useState(false); const [visit, setVisit] = useState(0); const [tar, setTar] = useState(0); const [dur, setDur] = useState<30 | 60>(60);
   const [df, setDf] = useState(DF0); const upd = (k: keyof typeof DF0, v: string | boolean) => setDf((d) => ({ ...d, [k]: v }));
-  const [view, setView] = useState<"cards" | "list" | "map">("cards"); const [shown, setShown] = useState(PAGE);
+  const [view, setView] = useState<"cards" | "list" | "duo" | "map">("cards"); const [shown, setShown] = useState(PAGE);
   const [near, setNear] = useState(""); const [geoBusy, setGeoBusy] = useState(false); const [geoMsg, setGeoMsg] = useState(""); const [geoHelp, setGeoHelp] = useState(false);
   const canNear = !initialCity && !sp.get("ville") && !sp.get("fav");
   const spCities = sp.getAll("ville").filter(Boolean).slice(0, 5); // plusieurs villes : ?ville=Lyon&ville=Paris
@@ -208,9 +228,9 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     if (saved?.city && allCities.includes(saved.city)) setNear(saved.city);
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
-  useEffect(() => { try { if (localStorage.getItem("objectif_vue") === "list") setView("list"); } catch {} }, []);
+  useEffect(() => { try { const sv = localStorage.getItem("objectif_vue"); if (sv === "list" || sv === "duo") setView(sv); } catch {} }, []);
   useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, rue, tar, dur, visit, city, fav, df]);
-  const chView = (v: "cards" | "list" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
+  const chView = (v: "cards" | "list" | "duo" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
   const list = useMemo(() => {
     const l = profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" || fav : p.genre === type) && (!city || (visit ? !!visitOf(p, city, visit) : inCities(p))) && (!tag || p.specialties.some((t) => t.toLowerCase() === tag))
@@ -348,6 +368,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
             <button type="button" aria-pressed={view === "cards"} title={tr("Affichage en cartes")} aria-label={tr("Cartes")} onClick={() => chView("cards")}><Ic n="grid" /></button>
             <button type="button" aria-pressed={view === "list"} title={tr("Affichage en liste")} aria-label={tr("Liste")} onClick={() => chView("list")}>
               <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="18" height="6" rx="2" /></svg></button>
+            <button type="button" className="vduo" aria-pressed={view === "duo"} title={tr("Affichage en 2 colonnes")} aria-label={tr("2 colonnes")} onClick={() => chView("duo")}>
+              <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" /><rect x="13" y="3" width="8" height="8" rx="2" /><rect x="3" y="13" width="8" height="8" rx="2" /><rect x="13" y="13" width="8" height="8" rx="2" /></svg></button>
             <button type="button" aria-pressed={view === "map"} title={tr("Affichage sur la carte")} aria-label={tr("Carte")} onClick={() => chView("map")}><Ic n="pin" /></button>
           </div>
         </div>
@@ -370,8 +392,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {view !== "map" && <div className="nowbar">{(nNow > 0 || now) && <button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button>}{!!city && (visit === 30 || nVis > 0) && <button type="button" className={`nowchip qf${visit === 30 ? " on" : ""}`} aria-pressed={visit === 30} onClick={() => setVisit(visit === 30 ? 0 : 30)}><Ic n="clock" s={16} />{tr("Arrive bientôt (1 mois)")}<b>{nVis}</b></button>}<button type="button" className={`nowchip qf${vid ? " on" : ""}`} aria-pressed={vid} onClick={() => setVid(!vid)}><Ic n="video" s={16} />{tr("Avec vidéo de présentation")}</button><button type="button" className={`nowchip qf${df.recv ? " on" : ""}`} aria-pressed={!!df.recv} onClick={() => setDf({ ...df, recv: !df.recv })}><Ic n="home" s={16} />{tr("Reçoit")}</button><button type="button" className={`nowchip qf${df.trav ? " on" : ""}`} aria-pressed={!!df.trav} onClick={() => setDf({ ...df, trav: !df.trav })}><Ic n="car" s={16} />{tr("Se déplace")}</button>{(rue || profiles.some((x) => x.street)) && <button type="button" className={`nowchip qf${rue ? " on" : ""}`} aria-pressed={rue} onClick={() => setRue(!rue)}><Ic n="pin" s={16} />{tr("Escorte de rue")}</button>}<button type="button" className={`nowchip qf${ver ? " on" : ""}`} aria-pressed={ver} onClick={() => setVer(!ver)}><Ic n="check" s={16} />{tr("Profils vérifiés uniquement")}</button></div>}
         {une && view !== "map" && <UneBanner p={une} onOpen={() => open(une.id)} />}
         {arrivals.length > 0 && view !== "map" && <ArrivalsBanner items={arrivals} city={city} onOpen={open} />}
-        <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
-          {list.length ? list.slice(0, shown).flatMap((p, i) => { const c = <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
+        <div className={`grid${view === "list" ? " lst" : ""}${view === "duo" ? " duo" : ""}`} hidden={view === "map"}>
+          {list.length ? list.slice(0, shown).flatMap((p, i) => { const tp = visit && city ? visitOf(p, city, visit) : undefined; const c = view === "duo" ? <CardDuo key={p.id} p={p} onOpen={() => open(p.id)} trip={tp} /> : <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={tp} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}
         </div>
         {view !== "map" && !!city && cities.length < 2 && !fav && profiles.length > 0 && !profiles.some((p) => cityList(p).includes(city)) && <EmptyCityNearby profiles={profiles} city={city} onOpen={open} />}

@@ -1479,3 +1479,31 @@ h1.pbn{margin:0}
 
 /* Mobile : le bouton « Près de moi » de la barre d'affichage est redondant (il est dans le menu) ; les vues passent à droite */
 @media (max-width:700px){.sh .nearbtn{display:none}.sh .vsw{margin-left:auto}}
+
+/* Vue 2 colonnes (mobile) : grande photo, infos essentielles dessous */
+.vsw .vduo{display:none}
+@media (max-width:700px){
+  .vsw .vduo{display:grid}
+  .grid.duo{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+}
+.c2{position:relative;border-radius:20px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh);cursor:pointer;min-width:0}
+.c2.vipc{border:2px solid var(--btn)}
+.c2.off .ph{filter:saturate(.7)}
+.c2 .ph{position:relative;aspect-ratio:3/4;display:block;background:var(--soft);overflow:hidden}
+.c2 .mos{display:block}
+.c2 .mos div{position:absolute;inset:0}
+.c2 .tl,.c2 .tr2,.c2 .bl{position:absolute;display:flex;gap:4px;align-items:center;z-index:3;flex-wrap:wrap}
+.c2 .tl{left:8px;top:8px;right:44px}.c2 .tr2{right:6px;top:6px}.c2 .bl{left:8px;bottom:8px;right:8px}
+.c2 .pill{display:inline-flex;align-items:center;gap:3px;font:700 10.5px var(--fb);padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--btn)}
+.c2 .pill.vip{background:var(--btn);color:var(--btnt)}
+.c2 .pill.on{background:#2fbf71;color:#fff}
+.c2 .pill i{width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block}
+.c2 .inf{padding:8px 10px 10px;display:grid;gap:2px;min-width:0}
+.c2 .nm{display:flex;align-items:center;gap:5px;font:700 16px var(--fd);min-width:0}
+.c2 .nm>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.c2 .vf2{flex:none;width:16px;height:16px;border-radius:50%;background:#2e9e5b;color:#fff;display:grid;place-items:center}
+.c2 .vf2 .ic{stroke:#fff}
+.c2 .ct{display:flex;align-items:center;gap:3px;font-size:12.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c2 .ct.on{color:#2e9e5b;font-weight:700}
+.c2 .pr{font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c2 .pr b{color:var(--btn)}
