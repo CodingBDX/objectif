@@ -1,4 +1,5 @@
 "use client";
+import MfaSetup from "@/components/MfaSetup";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import { useEffect, useRef, useState } from "react";
 import { Crumbs } from "@/components/Ld";
@@ -212,6 +213,7 @@ export default function MyProfile() {
           <BumpCard />
           <LoyaltyCard />
           <ReferralCard />
+          <MfaSetup />
           <SafetyCard />
         </details>}
         {!isNewP && <LodgingFinder />}

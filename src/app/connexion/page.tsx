@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
 import Turnstile from "@/components/Turnstile";
+import { MfaChallenge } from "@/components/MfaSetup";
 import { logSec } from "@/lib/secEvent";
 
 /** Force du mot de passe : 0 (trop court) à 4 (très solide). */
@@ -29,7 +30,7 @@ function Form() {
   const { tr } = useT();
   const sp = useSearchParams(); const [signup, setSignup] = useState(!!sp.get("inscription"));
   const nx = sp.get("next") === "/mon-association" ? "/mon-association" : "/mon-profil";
-  const [adult, setAdult] = useState(false); const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
+  const [mfa, setMfa] = useState(false); const [adult, setAdult] = useState(false); const [email, setEmail] = useState(""); const [pw, setPw] = useState("");
   const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false); const [cap, setCap] = useState(""); const [capN, setCapN] = useState(0);
   async function go(e: React.FormEvent) {
@@ -42,10 +43,11 @@ function Form() {
       setMsg(error ? { t: /email_jetable|Database error/i.test(error.message) ? tr("Les adresses e-mail temporaires ne sont pas acceptées. Utilise ta vraie adresse (Gmail, Outlook, iCloud…).") : error.message } : { t: tr("Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi."), ok: true });
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw, options: { captchaToken: cap || undefined } });
-      if (error) { setMsg({ t: tr("E-mail ou mot de passe incorrect.") }); logSec("connexion_echec", error.message.slice(0, 60)); } else location.href = nx;
+      if (error) { setMsg({ t: tr("E-mail ou mot de passe incorrect.") }); logSec("connexion_echec", error.message.slice(0, 60)); } else { const { data: a } = await sb.auth.mfa.getAuthenticatorAssuranceLevel(); if (a && a.nextLevel === "aal2" && a.currentLevel !== "aal2") { setMfa(true); } else location.href = nx; }
     }
     setBusy(false); setCap(""); setCapN((n) => n + 1);
   }
+  if (mfa) return <section className="gut"><div className="pfc" style={{ maxWidth: 520 }}><div className="panel regp"><MfaChallenge onOk={() => { location.href = nx; }} /></div></div></section>;
   return (
     <section className="gut">
       <div className="pbar"><Crumbs inline items={[[tr("Accueil"), "/"], [signup ? tr("Créer mon profil") : tr("Se connecter"), "#"]]} /></div>

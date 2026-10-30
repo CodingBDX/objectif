@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import CountUp from "@/components/CountUp";
 import VipPlansAdmin from "@/components/VipPlansAdmin";
+import MfaSetup, { MfaChallenge } from "@/components/MfaSetup";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
@@ -17,7 +18,7 @@ const BAR = ["#ff9ac8", "#ffc27a", "#ffe08a", "#b5e3a8", "#a8d0f7", "#d9b8f5", "
 
 export default function Admin() {
   const sb = supabaseBrowser();
-  const [state, setState] = useState<"load" | "no" | "ok">("load");
+  const [state, setState] = useState<"load" | "no" | "ok" | "mfa" | "enroll">("load");
   const [tab, setTab] = useState<Tab>("dash");
   const [reports, setReports] = useState<any[]>([]); const [profiles, setProfiles] = useState<any[]>([]); const [messages, setMessages] = useState<any[]>([]);
   const [verifs, setVerifs] = useState<any[]>([]); const [ai, setAi] = useState<Record<string, any>>({});
@@ -75,6 +76,9 @@ export default function Admin() {
     if (!user) { location.href = "/connexion"; return; }
     const { data } = await sb.from("admins").select("id").eq("id", user.id).maybeSingle();
     if (!data) { setState("no"); return; }
+    const { data: a } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (a && a.nextLevel === "aal2" && a.currentLevel !== "aal2") { setState("mfa"); return; }
+    if (a && a.currentLevel !== "aal2") { setState("enroll"); return; }
     setState("ok"); loadReports(); loadMessages(); loadCounts(); loadDaily(); loadExtra();
   })(); }, []);
   useEffect(() => { if (state === "ok") loadProfiles(); }, [state, loadProfiles]);
@@ -143,6 +147,8 @@ export default function Admin() {
   async function delClient(id: number) { await sb.from("client_reports").delete().eq("id", id); loadExtra(); }
 
   if (state === "load") return <section className="gut"><p className="note">Chargement…</p></section>;
+  if (state === "mfa") return <section className="gut"><div className="pfc" style={{ maxWidth: 480 }}><div className="panel regp"><MfaChallenge title="Administration : code de sécurité" onOk={() => location.reload()} /></div></div></section>;
+  if (state === "enroll") return <section className="gut"><div className="pfc" style={{ maxWidth: 480 }}><div className="panel regp" style={{ display: "grid", gap: 14 }}><h2 style={{ margin: 0 }}>🔐 Sécurise l’administration</h2><MfaSetup forced onDone={() => location.reload()} /><button type="button" className="btn ghost" onClick={() => { setState("ok"); loadReports(); loadMessages(); loadCounts(); loadDaily(); loadExtra(); }}>Continuer sans pour l’instant</button></div></div></section>;
   if (state === "no") return (
     <section className="gut"><div className="pfc" style={{ maxWidth: 560 }}><div className="panel regp"><h1 className="regh">Accès réservé</h1>
       <p className="note">Ce compte n’est pas administrateur. Pour te donner l’accès, ajoute ton compte dans la table « admins » (voir le fichier migration-admin.sql).</p>
