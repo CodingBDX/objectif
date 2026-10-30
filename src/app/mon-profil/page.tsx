@@ -1,5 +1,6 @@
 "use client";
 import MfaSetup from "@/components/MfaSetup";
+import { mediaUrl } from "@/lib/img";
 import GuideVideos from "@/components/GuideVideos";
 import LoyaltyCard from "@/components/LoyaltyCard";
 import { useEffect, useRef, useState } from "react";
@@ -330,7 +331,7 @@ export default function MyProfile() {
 </section><section className="dcard"><h3>{tr("Photos, vidéo et vérification")}</h3><div>
               <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Mes photos")} ({photos.length}/{maxP})</b>{tr(" · la première sert de couverture. ◀ ▶ pour déplacer, ✕ pour supprimer.")}{photos.length < 3 && <span style={{ color: "var(--btn)", fontWeight: 700 }}>{tr(" Il en faut au moins 3.")}</span>}</p>
               <div className="edph">{photos.map((src, i) => (
-                <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={src} referrerPolicy="no-referrer" alt={tr("Photo {n}", { n: i + 1 })} />
+                <div key={src} className={`eph${i === 0 ? " first" : ""}`}><img src={mediaUrl(src)} referrerPolicy="no-referrer" alt={tr("Photo {n}", { n: i + 1 })} />
                   {i === 0 && <span className="fst">{tr("En avant")}</span>}
                   <button type="button" className="rm" aria-label={tr("Supprimer la photo {n}", { n: i + 1 })} title={tr("Supprimer")} onClick={() => setPhotos(photos.filter((_, j) => j !== i))}>✕</button>
                   <span className="mv">{i > 0 ? <button type="button" aria-label={tr("Déplacer vers la gauche")} onClick={() => move(i, -1)}>◀</button> : <i />}{i < photos.length - 1 ? <button type="button" aria-label={tr("Déplacer vers la droite")} onClick={() => move(i, 1)}>▶</button> : <i />}</span>
@@ -346,7 +347,7 @@ export default function MyProfile() {
             {pMsg && <p className="note" role="alert" aria-live="polite" style={{ margin: 0, fontWeight: 700, color: pMsg.ok ? "inherit" : "var(--btn)" }}>{pMsg.t}</p>}
 <h4 className="subh">{tr("Vidéo")}</h4>{kind === "livecam" && <label className="f">{tr("Lien de ton live (obligatoire pour un profil livecam)")}<input type="url" placeholder="https://" value={vlink} onChange={(e) => setVlink(e.target.value)} required /></label>}
             <p className="note" style={{ margin: "0 0 6px" }}><b>{tr("Ma vidéo")} ({video ? 1 : 0}/1)</b>{tr(" · une seule vidéo de présentation, 20 Mo maximum. ✕ pour la supprimer.")}</p>
-            {video && <div className="edph"><div className="eph vid"><video src={video + "#t=0.1"} muted playsInline preload="metadata" aria-label={tr("Aperçu de ma vidéo")} />
+            {video && <div className="edph"><div className="eph vid"><video src={mediaUrl(video) + "#t=0.1"} muted playsInline preload="metadata" aria-label={tr("Aperçu de ma vidéo")} />
               <span className="fst">{tr("Vidéo")}</span>
               <button type="button" className="rm" aria-label={tr("Supprimer la vidéo")} title={tr("Supprimer")} onClick={() => { setVideo(null); setVMsg(null); }}>✕</button></div></div>}
             {!video && <label className={`dz${vdrag ? " drag" : ""}`} onDragOver={(e) => { e.preventDefault(); setVdrag(true); }} onDragLeave={() => setVdrag(false)} onDrop={(e) => { e.preventDefault(); setVdrag(false); if (!busy) addVideo(e.dataTransfer.files?.[0]); }}>

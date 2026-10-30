@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { mediaUrl } from "@/lib/img";
 import { useT } from "@/lib/i18n";
 import CityInput from "@/components/CityInput";
 import { cityCentre, km } from "@/lib/dist";
@@ -46,12 +47,12 @@ export default function LodgingSearch({ items, strip, initialCity = "" }: { item
       </section>
       {strip && list.length > 0 ? <div className="lstrip">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lslide" aria-label={l.title}>
-            <i>{l.photo ? <img src={l.photo} alt="" loading="lazy" /> : null}</i>
+            <i>{l.photo ? <img src={mediaUrl(l.photo)} alt="" loading="lazy" /> : null}</i>
             <b>{l.title}</b><small>{l.city}{l.day ? ` · ${l.day} €` : l.week ? ` · ${l.week} €` : l.month ? ` · ${l.month} €` : ""}</small></Link>))}</div> : null}
       {strip && list.length > 0 ? null : list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ici pour l’instant. Élargis la distance, ou propose le tien depuis Modifier le profil.")}</p> :
         <div className="lgrid">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lcard">
-            {l.photo ? <img src={l.photo} alt={l.title} width={640} height={420} loading="lazy" decoding="async" /> : <span className="lph" />}
+            {l.photo ? <img src={mediaUrl(l.photo)} alt={l.title} width={640} height={420} loading="lazy" decoding="async" /> : <span className="lph" />}
             <div className="lbody"><b>{l.title}</b><span className="note">📍 {l.city}{l.area ? ` · ${l.area}` : ""}</span>
               <span className="rates">{l.day ? <span>{tr("Jour")} <b>{l.day}</b></span> : null}{l.week ? <span>{tr("Semaine")} <b>{l.week}</b></span> : null}{l.month ? <span>{tr("Mois")} <b>{l.month}</b></span> : null}</span>
               <small className="note">{l.owner}</small></div></Link>))}</div>}

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { thumbUrl } from "@/lib/img";
+import { mediaUrl, thumbUrl } from "@/lib/img";
 import ViewerMark from "./ViewerMark";
 
 /** Si la miniature n'existe pas (anciennes photos), on retombe sur l'image d'origine. */
@@ -11,7 +11,7 @@ type Item = { v: boolean; src: string };
 export default function Slider({ imgs, vip, video, alt }: { imgs: string[]; vip: boolean; video?: string | null; alt?: string }) {
   const [i, setI] = useState(0); const [stop, setStop] = useState(false); const [lb, setLb] = useState(false); const [vbad, setVbad] = useState(false);
   const hov = useRef(false); const tx = useRef<number | null>(null);
-  const items: Item[] = [...(video ? [{ v: true, src: video }] : []), ...imgs.map((src) => ({ v: false, src }))]; const N = items.length;
+  const items: Item[] = [...(video ? [{ v: true, src: mediaUrl(video) }] : []), ...imgs.map((src) => ({ v: false, src: mediaUrl(src) }))]; const N = items.length;
   const go = (n: number, manual = false) => { setI((c) => (c + n + N) % N); if (manual) setStop(true); };
   useEffect(() => {
     if (N < 2 || stop || lb || (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion:reduce)").matches)) return;

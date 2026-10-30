@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { mediaUrl } from "@/lib/img";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
 import CityInput from "@/components/CityInput";
@@ -67,7 +68,7 @@ export default function LodgingEditor({ uid }: { uid: string }) {
         <label className="f">{tr("Quartier (affiché)")}<input maxLength={60} value={area} onChange={(e) => setArea(e.target.value)} /></label></div>
       <label className="f">{tr("Adresse du bien (privée, jamais affichée)")}<input required minLength={5} maxLength={200} value={addr} onChange={(e) => setAddr(e.target.value)} autoComplete="street-address" /></label>
       <div className="f"><span style={L}>{tr("Photos (3 maximum)")} {photos.length}/3</span>
-        <div className="tags">{photos.map((src, i) => <span key={src} style={{ position: "relative", display: "inline-block" }}><img src={src} alt="" width={96} height={96} style={{ objectFit: "cover", borderRadius: 12 }} />
+        <div className="tags">{photos.map((src, i) => <span key={src} style={{ position: "relative", display: "inline-block" }}><img src={mediaUrl(src)} alt="" width={96} height={96} style={{ objectFit: "cover", borderRadius: 12 }} />
           <button type="button" className="rrm" style={{ position: "absolute", top: -8, right: -8, width: 32, height: 32 }} aria-label={tr("Retirer la photo")} onClick={() => setPhotos(photos.filter((_, j) => j !== i))}>✕</button></span>)}</div>
         {photos.length < 3 && <input type="file" accept="image/*" multiple disabled={wait} aria-label={tr("Ajouter des photos")} onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} />}</div>
       <div className="f"><span style={L}>{tr("Prix (€)")}</span><div className="row3">

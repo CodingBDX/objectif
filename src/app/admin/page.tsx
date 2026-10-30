@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { mediaUrl } from "@/lib/img";
 import CountUp from "@/components/CountUp";
 import VipPlansAdmin from "@/components/VipPlansAdmin";
 import MfaSetup, { MfaChallenge } from "@/components/MfaSetup";
@@ -374,7 +375,7 @@ export default function Admin() {
               <div><b>{x.title}</b> · {x.city}{x.area ? ` (${x.area})` : ""} · <span className="note">{x.status === "pending" ? "⏳ en attente" : x.status === "approved" ? "✅ publié" : "❌ refusé"}</span></div>
               <div className="note">Propriétaire : <Link href={`/profil/${x.profile_id}`}>{x.owner?.name || "?"}</Link> · {x.owner?.vip ? "VIP" : "non VIP"} · {x.owner?.verified ? "vérifié" : "non vérifié"} · Adresse privée : {lAddr[x.profile_id] || "—"}</div>
               <div className="note">Jour {x.price_day ?? "—"} · Semaine {x.price_week ?? "—"} · Mois {x.price_month ?? "—"}</div>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{(x.photos || []).map((u: string) => <img key={u} src={u} alt="" width={80} height={80} style={{ objectFit: "cover", borderRadius: 8 }} />)}</div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>{(x.photos || []).map((u: string) => <img key={u} src={mediaUrl(u)} alt="" width={80} height={80} style={{ objectFit: "cover", borderRadius: 8 }} />)}</div>
               {x.description && <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{x.description}</p>}
               <div className="acts">
                 {x.status !== "approved" && <button className="btn" onClick={() => setLodg(x.profile_id, "approved")}>✓ Valider</button>}
