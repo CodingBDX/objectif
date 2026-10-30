@@ -1572,3 +1572,14 @@ h1.pbn{margin:0}
 .dedit .hf .d label{gap:10px}
 @media (max-width:520px){.dedit .hf .d{grid-template-columns:1fr 1fr}.dedit .hf .d label{grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){.dedit input[type=checkbox],.dedit input[type=checkbox]::after{transition:none}}
+
+/* Modifier mon profil : chaque interrupteur dans sa bulle, texte bien distinct */
+.dedit label.chk,.dedit label.ck,.dedit label.h24{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:14px 16px;box-shadow:var(--sh);margin-top:0;width:100%;cursor:pointer;justify-content:space-between;flex-direction:row-reverse;text-align:left;line-height:1.35;transition:border-color .25s,background .25s}
+.dedit label.chk>span,.dedit label.ck,.dedit label.h24>b{font-weight:600}
+.dedit label.chk>span b{color:var(--btn);font-weight:700}
+.dedit label.chk>span{flex:1;min-width:0;font-size:15px}
+.dedit label.chk:has(input:checked),.dedit label.ck:has(input:checked),.dedit label.h24:has(input:checked){border-color:var(--btn);background:var(--soft)}
+.dedit label.chk:has(input:disabled){opacity:.6;cursor:not-allowed}
+.dedit .hf .d>label{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:10px 14px;justify-content:space-between;flex-direction:row-reverse;grid-column:1/-1}
+.dedit .hf .d>label:has(input:checked){border-color:var(--btn);background:var(--soft)}
+.dedit .hf .d{grid-template-columns:1fr 1fr}
