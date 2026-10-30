@@ -270,6 +270,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     })();
     return () => { dead = true; };
   }, [arrCand, city]);
+  const nVis = useMemo(() => (city ? profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && !!visitOf(p, city, 30)).length : 0), [profiles, city, type]);
   const [adAt, setAdAt] = useState(-1); // pub VIP : place aleatoire parmi les profils standard (choisie apres le rendu serveur)
   useEffect(() => {
     const ids = list.slice(0, 12).map((x, i) => (x.vip ? -1 : i)).filter((i) => i >= 0);
