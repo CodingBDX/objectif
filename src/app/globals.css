@@ -1446,3 +1446,11 @@ h1.pbn{margin:0}
 .errbar button{flex:none;border:0;background:rgba(255,255,255,.25);color:inherit;width:30px;height:30px;border-radius:50%;font:700 14px var(--fb);cursor:pointer}
 @keyframes errin{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
 @media (prefers-reduced-motion:reduce){.errbar{animation:none}}
+
+/* Fiche profil mobile : fil d'Ariane, puis pseudo en grand, puis les pastilles (couronne, vérifié, VIP…) en dessous */
+@media (max-width:640px){
+  #pf .pbar,.pbar:has(.pbn){display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-items:start;justify-items:start}
+  .pbar:has(.pbn)>*{max-width:100%;min-width:0}
+  .pbar .pbn,h1.pbn{font:700 30px/1.15 var(--fd);white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pbar .pbadges{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+}
