@@ -1470,3 +1470,9 @@ h1.pbn{margin:0}
 .arrl .une.arr{margin:0;flex:0 0 86%;max-width:420px;scroll-snap-align:start;width:auto;border-style:dashed}
 .arrl.one .une.arr{flex:1 1 100%;max-width:none}
 @media (min-width:900px){.arrl .une.arr{flex-basis:380px}.arrl.one .une.arr{flex-basis:100%}}
+
+/* Déplacements : la liste de suggestions de ville ne doit pas être coupée par l'encart */
+.trow{overflow:visible;position:relative}
+.trow:focus-within{z-index:6}
+.trow .cityin{position:relative;min-width:0}
+.trow .citylist{z-index:7}
