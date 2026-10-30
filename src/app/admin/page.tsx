@@ -35,7 +35,7 @@ export default function Admin() {
     const { data } = await sb.from("reports").select("*, profiles(id,name,city,paused,vip,verified)").order("created_at", { ascending: false }).limit(300); setReports(data || []);
   }, []);
   const loadProfiles = useCallback(async () => {
-    let qq = sb.from("profiles").select("id,name,city,genre,vip,verified,paused,created_at,crown,crown_forced,points").order("created_at", { ascending: false }).limit(200);
+    let qq = sb.from("profiles").select("id,name,city,genre,vip,verified,paused,created_at,crown,crown_forced,points,street,zone,zone_map").order("created_at", { ascending: false }).limit(200);
     if (q.trim()) qq = qq.ilike("name", `%${q.trim()}%`);
     const { data } = await qq; setProfiles(data || []);
     const { data: ve } = await sb.from("vip_until").select("profile_id,until,paused_at"); setVipEnd(Object.fromEntries((ve || []).map((x: any) => [x.profile_id, x])));
@@ -78,6 +78,8 @@ export default function Admin() {
     const { error } = await sb.rpc("admin_set_profile", { p_id: p.id, p_vip: n.vip, p_verified: n.verified, p_paused: n.paused });
     if (error) setErr(error.message); else { loadProfiles(); loadReports(); loadCounts(); loadExtra(); }
   }
+  async function setZoneMap(p: any, on: boolean) { setErr(""); const { error } = await sb.rpc("admin_set_zone_map", { p_id: p.id, p_on: on }); if (error) setErr(error.message); else loadProfiles(); }
+  const zoneBtn = (p: any) => p.street ? <span className="ck" title="Carte de la zone de travail (rue) sur la page du profil">📍 {p.zone || "zone"} : <button type="button" className="btn ghost" onClick={() => setZoneMap(p, !p.zone_map)}>{p.zone_map ? "Masquer la carte" : "Carte masquée · réafficher"}</button></span> : null;
   const loadLodgs = useCallback(async () => {
     const { data } = await sb.from("lodgings").select("*").order("updated_at", { ascending: false }).limit(200); const l = data || [];
     const ids = l.map((x: any) => x.profile_id);
@@ -224,7 +226,7 @@ export default function Admin() {
               {profiles.slice(0, 8).map((p) => (
                 <div key={p.id} className="dprow">
                   <div style={{ flex: "1 1 200px", minWidth: 0 }}><Link href={`/profil/${p.id}`}><b>{p.name}</b></Link><div className="note">{CATS[p.genre]} · {p.city} · {fmt(p.created_at)}{p.paused && " · masqué"}</div></div>
-                  <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}{crownBtns(p)}
+                  <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}{crownBtns(p)}{zoneBtn(p)}
                   <label className="ck"><input type="checkbox" checked={p.verified} onChange={(e) => setProfile(p, { verified: e.target.checked })} /> Vérifié</label>
                   <label className="ck"><input type="checkbox" checked={p.paused} onChange={(e) => setProfile(p, { paused: e.target.checked })} /> Masqué</label>
                 </div>))}
@@ -257,7 +259,7 @@ export default function Admin() {
           {profiles.map((p) => (
             <div className="dcard" key={p.id} style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", padding: "10px 16px" }}>
               <div style={{ flex: "1 1 200px", minWidth: 0 }}><Link href={`/profil/${p.id}`}><b>{p.name}</b></Link><div className="note">{CATS[p.genre]} · {p.city} · {fmt(p.created_at)}{p.paused && " · masqué"}</div></div>
-              <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}{crownBtns(p)}
+              <label className="ck"><input type="checkbox" checked={p.vip} onChange={(e) => setProfile(p, { vip: e.target.checked })} /> VIP</label>{vipBtns(p)}{crownBtns(p)}{zoneBtn(p)}
               <label className="ck"><input type="checkbox" checked={p.verified} onChange={(e) => setProfile(p, { verified: e.target.checked })} /> Vérifié</label>
               <label className="ck"><input type="checkbox" checked={p.paused} onChange={(e) => setProfile(p, { paused: e.target.checked })} /> Masqué</label>
               {sure === "p" + p.id
