@@ -51,7 +51,7 @@ export default function VipPay({ vip }: { vip: boolean }) {
   if (o && o.status === "pending") return (
     <div className="vpay" role="alert"><b>👑 {tr("Paiement VIP : forfait {p}, {a} €", { p: tr(o.plan), a: o.amount })}</b>
       <span className="vtime">⏱ {tr("Temps restant")} <b>{hms(left)}</b>. {tr("Passé ce délai, la référence n’est plus valable.")}</span>
-      <span>{tr("Règle {a} € par Wero, PayPal ou virement, puis clique sur « J’ai payé ». Écris la référence dans le message du paiement :", { a: o.amount })} <code className="vref">{o.ref}</code></span>
+      <span>{tr("Règle {a} € par Wero, PayPal ou virement, puis clique sur « J’ai payé ». Si tu peux, écris la référence dans le message du paiement (conseillé pour le virement, facultatif pour Wero et PayPal, on retrouve ta commande avec ton « J’ai payé ») :", { a: o.amount })} <code className="vref">{o.ref}</code></span>
       <div className="vpay-m">
         <div><small>Wero</small><b>{WERO}</b><button type="button" className="btn ghost" onClick={copy}>{copied ? tr("Copié ✓") : tr("Copier le numéro")}</button></div>
         <div><small>PayPal</small><b>{PAYPAL_NAME}</b><a className="btn ghost" href={`${PAYPAL_ME}/${o.amount}EUR`} target="_blank" rel="noopener noreferrer">{tr("Payer avec PayPal")}</a></div>
