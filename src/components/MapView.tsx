@@ -69,7 +69,7 @@ export default function MapView({ cities, assos = [], lodgings = [], zones = [] 
         });
         // les profils s'écartent quand on zoome : le rayon des cercles grandit avec le zoom
         const draw = () => {
-          profLayer.clearLayers(); const sc = window.innerWidth < 700 ? 0.7 : 1; const f = Math.min(3.6, Math.max(0.9, 1 + (map.getZoom() - ZOOM_PROFILES) * 0.45)) * sc;
+          profLayer.clearLayers(); const sc0 = window.innerWidth < 700 ? 0.7 : 1; const zs = Math.min(2.4, Math.max(1, 1 + (map.getZoom() - ZOOM_PROFILES) * 0.3)); const sc = sc0 * zs; const f = Math.min(5, Math.max(0.9, 1 + (map.getZoom() - ZOOM_PROFILES) * 0.45) * zs) * sc0;
           data.forEach(({ c, k }) => {
             const shown = c.p.slice(0, MAXP); const pos = ring(shown.length, f);
             shown.forEach((p, i) => {
