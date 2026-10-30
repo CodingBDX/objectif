@@ -3,6 +3,52 @@ export type Guide = { slug: string; title: string; desc: string; emoji: string; 
 
 export const GUIDES: Guide[] = [
   {
+    slug: "ou-te-trouver-villes-distance-et-rue", emoji: "📍", date: "2026-10-30",
+    video: { src: "/videos/ou-te-trouver.mp4", poster: "/videos/ou-te-trouver.jpg", label: "Vidéo : ta ville, tes déplacements et le travail de rue (88 secondes, avec voix)", seconds: 88 },
+    title: "Où te trouver ? Ta ville, la distance, tes déplacements et le travail de rue",
+    desc: "Mode d'emploi de l'encart « Où te trouver ? » : ville principale, villes en plus, limite de distance, annonce d'arrivée, rencontres, quartier et carte de zone pour le travail de rue.",
+    body: `L'encart **« Où te trouver ? »** de Modifier mon profil décide **où les clients te voient**. Bien rempli, il te rend facile à trouver, crédible et en sécurité. Regarde la vidéo ci-dessus (88 secondes), puis retrouve le détail.
+
+## 1. Ta ville principale
+- Tape les **premières lettres** et choisis dans la liste.
+- Ajoute ton **arrondissement ou quartier** si tu veux (facultatif).
+- **Pour toi :** les clients qui cherchent ta ville te trouvent.
+
+## 2. Des villes en plus
+- Tu peux ajouter **3 villes en plus**, et **6 avec le VIP**.
+- Elles doivent rester proches de ta ville principale : **20 km maximum**, et **100 km en VIP**.
+- **Pour toi :** tu es visible dans plusieurs villes proches, sans multiplier les profils.
+
+## 3. Une ville trop loin est refusée
+- Si une ville est trop loin, le site la refuse. Cela garde des annonces **crédibles** : les clients savent que tu es vraiment là.
+- Tu travailles **partout en France ou à distance** ? Choisis plutôt la section **Profil livecam**.
+- **Pour toi :** des clients qui te font confiance.
+
+## 4. Tes déplacements
+- Ajoute la **ville**, ta **date d'arrivée** et ta **date de départ** dans le calendrier. Rien n'est obligatoire.
+- Si ton profil est **vérifié**, tu peux **annoncer ton arrivée** dans « Arrivent bientôt », **3 jours avant**.
+- Seule la **date d'arrivée** est montrée, **jamais ton départ**.
+- **Pour toi :** des demandes avant même d'arriver. Le détail est dans l'article sur le calendrier de passages.
+
+## 5. Tes rencontres
+- Coche **Je reçois**, **Je me déplace**, ou les deux.
+- **Pour toi :** tu choisis ce qui te convient.
+
+## 6. Le travail de rue
+- Coche **Je travaille dans la rue**, puis choisis ton **quartier**. C'est disponible pour **Paris, Lyon, Marseille, Bordeaux et Toulouse** pour l'instant.
+- Ajoute tes **créneaux habituels** si tu veux (facultatif).
+- **Pour toi :** les clients savent où te trouver.
+
+## 7. La carte de zone, pensée pour ta sécurité
+- Si tu le souhaites, un **cercle d'environ 700 m** s'affiche sur ton quartier.
+- **Jamais ta position exacte**, jamais un nom de rue, jamais de position en direct. Seul le nom du quartier est enregistré.
+- La carte est **réservée aux profils vérifiés**, et tu peux la **retirer à tout moment**.
+- Pour ta prévention, l'équipe peut désactiver la carte sur un profil : ce n'est pas une sanction, ton profil reste visible.
+
+## Le résultat
+Un profil **clair**, **crédible** et **facile à trouver**. Prends deux minutes pour compléter l'encart dans **Modifier mon profil** : c'est l'un des réglages qui change le plus la façon dont les clients te trouvent.`,
+  },
+  {
     slug: "profil-vip-mode-d-emploi", emoji: "👑", date: "2026-10-30",
     video: { src: "/videos/vip.mp4", poster: "/videos/vip.jpg", label: "Vidéo : le profil VIP, quand, comment et ce que ça t’apporte (77 secondes, avec voix)", seconds: 77 },
     title: "Profil VIP : quand le prendre, comment faire et ce que ça t'apporte",
