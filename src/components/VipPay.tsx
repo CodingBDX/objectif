@@ -13,7 +13,7 @@ type Order = { id: string; plan: string; amount: number; ref: string; status: "p
 /** Mon espace : choisir un forfait VIP, voir comment payer (Wero / PayPal), puis « J'ai payé » -> l'admin vérifie et valide. */
 export default function VipPay({ vip }: { vip: boolean }) {
   const { tr } = useT(); const sb = supabaseBrowser();
-  const [o, setO] = useState<Order | null>(null); const plans = useVipPlans(); const [plan, setPlan] = useState(""); const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [copied, setCopied] = useState(false); const [ready, setReady] = useState(false); const [bank, setBank] = useState<{ iban: string; bic: string; holder: string } | null>(null); const [copiedI, setCopiedI] = useState(false);
+  const [o, setO] = useState<Order | null>(null); const plans = useVipPlans(); const [plan, setPlan] = useState(""); const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [copied, setCopied] = useState(false); const [ready, setReady] = useState(false); const [bank, setBank] = useState<{ iban: string; bic: string; holder: string } | null>(null); const [copiedI, setCopiedI] = useState(false); const [okT, setOkT] = useState(false);
   const load = useCallback(async () => {
     const { data, error } = await sb.from("vip_orders").select("id,plan,amount,ref,status").in("status", ["pending", "declared", "refused"]).order("created_at", { ascending: false }).limit(1);
     if (!error) setO((data && data[0]) as Order | null); setReady(true);
@@ -46,7 +46,8 @@ export default function VipPay({ vip }: { vip: boolean }) {
         <div><small>PayPal</small><b>{PAYPAL_NAME}</b><a className="btn ghost" href={`${PAYPAL_ME}/${o.amount}EUR`} target="_blank" rel="noopener noreferrer">{tr("Payer avec PayPal")}</a></div>
         {bank && <div><small>{tr("Virement (instantané possible)")}</small>{bank.holder && <b>{bank.holder}</b>}<b style={{ wordBreak: "break-all" }}>{bank.iban.replace(/\s/g, "").replace(/(.{4})/g, "$1 ").trim()}</b>{bank.bic && <span>BIC : {bank.bic}</span>}<span>{tr("Motif du virement :")} <code className="vref">{o.ref}</code></span><button type="button" className="btn ghost" onClick={copyI}>{copiedI ? tr("Copié ✓") : tr("Copier l’IBAN")}</button></div>}
       </div>
-      <div className="vpay-a"><button type="button" className="btn" disabled={busy} onClick={() => call("vip_order_declare", { p_id: o.id }, () => notifyAdmin("paiement"))}>{tr("J’ai payé")}</button>
+      <label className="chk" style={{ fontSize: 14 }}><input type="checkbox" checked={okT} onChange={(e) => setOkT(e.target.checked)} /> <span>{tr("J’ai lu les conditions du VIP (CGU, article 6). Je demande l’activation immédiate et, dans la mesure permise par la loi, je renonce à mon droit de rétractation une fois le VIP activé.")} <a href="/cgu#vip" target="_blank" rel="noopener noreferrer">{tr("Lire")}</a></span></label>
+      <div className="vpay-a"><button type="button" className="btn" disabled={busy || !okT} onClick={() => call("vip_order_declare", { p_id: o.id }, () => notifyAdmin("paiement"))}>{tr("J’ai payé")}</button>
         <button type="button" className="btn ghost" disabled={busy} onClick={() => call("vip_order_cancel", { p_id: o.id })}>{tr("Annuler")}</button></div>
       {err && <small className="vpay-e" role="alert">{err}</small>}</div>);
 
