@@ -35,6 +35,7 @@ function Inner({ loggedIn, hasProfile, vip, name, userId, index, isAdmin, escort
           <Link className={`nl${sp.get("fav") ? " on" : ""}`} href="/?fav=1" aria-label={tr("Favoris")} title={tr("Favoris")}><Ic n="heart" /><span className="nlt">{tr("Favoris")}</span> <span className="cn">{favs.length}</span></Link>
           {lodg && <Link className={`nl${path?.startsWith("/logements") ? " on" : ""}`} href="/logements" title={tr("Logements")} aria-label={tr("Logements")}><span className="em" aria-hidden="true">🏠</span><span className="nlt">{tr("Logements")}</span></Link>}
           {escort && <Link className={`nl${path?.startsWith("/associations") ? " on" : ""}`} href="/associations" title={tr("Associations et soutien par ville")}><span className="em" aria-hidden="true">🤝</span><span className="nlt">{tr("Associations")}</span></Link>}
+          <Link className={`nl${path?.startsWith("/guides") ? " on" : ""}`} href="/guides" title={tr("Blog")} aria-label={tr("Blog")}><span className="em" aria-hidden="true">📰</span><span className="nlt">{tr("Blog")}</span></Link>
           <Link className="nl" href="/contact" aria-label={tr("Nous contacter")} title={tr("Nous contacter")}>
             <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M4 8l8 6 8-6" /></svg><span className="nlt">{tr("Contact")}</span>
           </Link>

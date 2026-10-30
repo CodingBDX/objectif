@@ -24,7 +24,7 @@ export default function SiteFooter({ escort, specs = [] }: { escort: boolean; sp
           </nav>
           <nav className="sf-col" aria-label="Pour les escortes">
             <h2>Pour les escortes</h2>
-            <Link href="/guides">Guides</Link><Link href="/statistiques">Statistiques</Link>
+            <Link href="/guides">Blog</Link><Link href="/statistiques">Statistiques</Link>
             {escort && <Link href="/associations">Associations</Link>}
             <Link href="/contact?s=vip">Devenir VIP</Link>
           </nav>
