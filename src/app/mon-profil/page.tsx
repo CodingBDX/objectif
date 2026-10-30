@@ -14,7 +14,7 @@ import SafetyCard from "@/components/SafetyCard";
 import VerifRequest from "@/components/VerifRequest";
 import LodgingFinder from "@/components/LodgingFinder";
 import { supabaseBrowser } from "@/lib/supabase/client";
-import { SPECIALTIES, Trip } from "@/lib/types";
+import { SPECIALTIES, Trip, PROFILE_COLS } from "@/lib/types";
 import { DAYL } from "@/lib/avail";
 import { geoNom } from "@/lib/cityname";
 import { quartiersOf } from "@/lib/quartiers";
@@ -63,7 +63,7 @@ export default function MyProfile() {
     setUid(user.id);
     const sl = await sb.from("specialties").select("name").order("position").order("name");
     const SL: string[] = !sl.error && sl.data?.length ? sl.data.map((r: { name: string }) => r.name) : SPECIALTIES; setSpecList(SL);
-    const { data } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+    const { data } = await sb.from("profiles").select(PROFILE_COLS).eq("id", user.id).maybeSingle();
     const { data: mem } = await sb.from("members").select("pseudo,phone_hash").eq("id", user.id).maybeSingle();
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); setHasPhone(!!mem.phone_hash); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");

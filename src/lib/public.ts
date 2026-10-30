@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
-import { Profile, SPECIALTIES } from "./types";
+import { Profile, SPECIALTIES, PROFILE_COLS } from "./types";
 import { proxyMedia } from "./img";
 
 /** Lectures publiques (sans cookies) mises en cache 5 min côté serveur (vidées tout de suite quand un profil change) : la navigation entre pages devient quasi instantanée. */
@@ -16,7 +16,7 @@ export const publicSpecialties = unstable_cache(async (): Promise<string[]> => {
 export const publicProfiles = unstable_cache(async (): Promise<Profile[]> => {
   const sb = anon();
   const [a, b, c, spec] = await Promise.all([
-    sb.from("profiles").select("*").eq("paused", false).order("created_at", { ascending: false }).limit(1000),
+    sb.from("profiles").select(PROFILE_COLS).eq("paused", false).order("created_at", { ascending: false }).limit(1000),
     sb.rpc("popular_views"),
     sb.rpc("popular_favs"),
     publicSpecialties()

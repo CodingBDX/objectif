@@ -37,3 +37,7 @@ export const HABIT: [string, string][] = [["", "Non précisé"], ["non", "Non"],
 
 export const CROWNS = [null, { n: "Bronze", c: "#b87333" }, { n: "Argent", c: "#a9b4c2" }, { n: "Or", c: "#f2b01e" }, { n: "Diamant", c: "#4fc3f7" }] as const;
 export const CROWN_AT = [0, 250, 700, 1500, 3000];
+
+/** Colonnes de profil lisibles par le site. Les colonnes de parrainage (ref_code, referred_by, referral_rewarded)
+ *  sont volontairement absentes : elles ne sont pas lisibles via l'API et passent par les fonctions my_ref_code / my_referrals. */
+export const PROFILE_COLS = "id,name,genre,city,specialties,bio,instagram,snapchat,tiktok,site,h24,hours,trips,photos,video,vip,verified,paused,created_at,more,vlink,tarif_30,tarif_60,tarif_visible,region,age,height_cm,weight_kg,ethnicity,languages,hair,eyes,bra,smoker,drinker,receives,travels,rates,pay_wero,pay_paypal,nationality,district,whatsapp,sms,friendly_url,url_slug,slogan,bumped_at,street,zone,zone_map,street_hours,crown,crown_forced,points,url_slug_at,zone_map_blocked,trip_public";

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { GPATH, isDemoId, MIN_INDEX, siteUrl, slug } from "@/lib/site";
 import { profilePath } from "@/lib/profilUrl";
 import { GUIDES } from "@/lib/guides";
+import { PROFILE_COLS } from "@/lib/types";
 
 type Row = { id: string; name: string; vip: boolean; city: string; more: string[]; genre: string; created_at: string; bumped_at?: string | null; friendly_url?: boolean; url_slug?: string | null };
 
@@ -12,7 +13,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const { data } = await sb.from("profiles").select("*").eq("paused", false).limit(5000);
+  const { data } = await sb.from("profiles").select(PROFILE_COLS).eq("paused", false).limit(5000);
   const ps = ((data || []) as Row[]).filter((p) => !isDemoId(p.id));
 
   /** Vraie date de dernière modification : la plus récente entre création et dernière remontée du profil. */

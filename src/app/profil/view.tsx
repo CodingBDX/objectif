@@ -4,7 +4,7 @@ import { parseProfileParam, prefixRange, profilePath, safeDecode } from "@/lib/p
 import Link from "next/link";
 import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase/server";
-import { cap, CATS, isNew, Profile, showTarif, rateList, RATE_OPTS } from "@/lib/types";
+import { cap, CATS, isNew, Profile, showTarif, rateList, RATE_OPTS, PROFILE_COLS } from "@/lib/types";
 import { publicSpecialties } from "@/lib/public";
 import { avail, DAYL, dShort, MS, nextOpen, nowP, todayP, tripsOf } from "@/lib/avail";
 import Ic from "@/components/Ic";
@@ -30,7 +30,7 @@ import Ld, { crumbs, Crumbs } from "@/components/Ld";
 export const dynamic = "force-dynamic";
 export type Ref = { param?: string; slug?: string };
 export const get = async (r: Ref) => {
-  const sb = supabaseServer(); let q = sb.from("profiles").select("*");
+  const sb = supabaseServer(); let q = sb.from("profiles").select(PROFILE_COLS);
   if (r.slug) q = q.eq("url_slug", r.slug.toLowerCase()).limit(1);
   else {
     const ref = parseProfileParam(r.param || ""); if (!ref.id && !ref.prefix) return null;
@@ -39,7 +39,7 @@ export const get = async (r: Ref) => {
   let [{ data }, spec] = await Promise.all([q, publicSpecialties()]);
   if (r.slug && !(data || []).length) { // ancienne adresse conservée après un changement de pseudo : on retrouve le profil (puis redirection vers la nouvelle)
     const { data: o } = await sb.from("profile_old_slugs").select("profile_id").eq("slug", r.slug.toLowerCase()).gt("created_at", new Date(Date.now() - 92 * 864e5).toISOString()).maybeSingle();
-    if (o?.profile_id) data = (await sb.from("profiles").select("*").eq("id", o.profile_id).limit(1)).data;
+    if (o?.profile_id) data = (await sb.from("profiles").select(PROFILE_COLS).eq("id", o.profile_id).limit(1)).data;
   }
   const rows = (data || []) as Profile[];
   const p = rows.find((x) => !r.param || parseProfileParam(r.param).id || x.id.startsWith(parseProfileParam(r.param).prefix!)) || null; // ancienne adresse « jolie » : on garde le premier identifiant qui commence pareil
