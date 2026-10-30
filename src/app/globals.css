@@ -1431,3 +1431,9 @@ h1.pbn{margin:0}
 /* La carte de zone ne doit jamais passer au-dessus de la barre de contact flottante (Leaflet utilise des z-index élevés) */
 .zmap,.zmapc,.leaflet-container{isolation:isolate;z-index:0}
 .zmap{position:relative}
+
+/* Carte de zone bloquée par l'équipe : message préventif et rassurant */
+.zblock{display:grid;gap:6px;padding:14px 16px;border-radius:20px;background:var(--soft);border:1px solid var(--line);border-left:5px solid var(--btn);color:var(--ink)}
+.zblock b{font:700 16px var(--fd)}
+.zblock span{font-size:14px;line-height:1.45;color:var(--mut)}
+.zblock a{font-weight:700;color:var(--btn)}
