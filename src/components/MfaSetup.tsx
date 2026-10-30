@@ -34,7 +34,7 @@ export default function MfaSetup({ forced = false, onDone }: { forced?: boolean;
   const { tr } = useT(); const sb = supabaseBrowser();
   const [factor, setFactor] = useState<string | null | undefined>(undefined); // undefined = chargement
   const [pend, setPend] = useState<Pending | null>(null); const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false); const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [off, setOff] = useState(false);
+  const [busy, setBusy] = useState(false); const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [off, setOff] = useState(false); const [acct, setAcct] = useState("");
   const load = useCallback(async () => {
     const { data, error } = await sb.auth.mfa.listFactors();
     if (error) { setOff(true); setFactor(null); return; }
@@ -46,7 +46,10 @@ export default function MfaSetup({ forced = false, onDone }: { forced?: boolean;
     setBusy(true); setMsg(null);
     const { data: all } = await sb.auth.mfa.listFactors();
     for (const f of (all?.all || []).filter((x) => x.status === "unverified")) await sb.auth.mfa.unenroll({ factorId: f.id });
-    const { data, error } = await sb.auth.mfa.enroll({ factorType: "totp", friendlyName: "Sex-Escorte " + Date.now().toString(36) });
+    const { data: u } = await sb.auth.getUser(); const mail = u?.user?.email || "mon-compte";
+    setAcct(mail);
+    const params = { factorType: "totp" as const, friendlyName: mail, issuer: "Sex-Escorte" };
+    const { data, error } = await sb.auth.mfa.enroll(params);
     setBusy(false);
     if (error || !data) { setOff(true); setMsg({ t: tr("La double authentification n’est pas disponible pour le moment.") + (error ? " (" + error.message + ")" : "") }); return; }
     setPend({ id: data.id, qr: data.totp.qr_code, secret: data.totp.secret });
@@ -80,7 +83,11 @@ export default function MfaSetup({ forced = false, onDone }: { forced?: boolean;
       {pend && <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={confirm}>
         <p className="note" style={{ margin: 0 }}><b>1.</b> {tr("Scanne ce QR code avec ton application d’authentification.")}</p>
         <img src={pend.qr} alt={tr("QR code de la double authentification")} width={180} height={180} style={{ background: "#fff", borderRadius: 16, padding: 8, border: "1px solid var(--line)", justifySelf: "center" }} />
-        <p className="note" style={{ margin: 0 }}>{tr("Ou saisis cette clé à la main :")} <code style={{ wordBreak: "break-all", userSelect: "all" }}>{pend.secret}</code></p>
+        <div className="note" style={{ margin: 0, display: "grid", gap: 4 }}><span>{tr("Pas de QR code ? Saisis à la main dans ton application :")}</span>
+          <span>• {tr("Site / émetteur")} : <b>Sex-Escorte</b></span>
+          <span>• {tr("Compte / utilisateur")} : <b style={{ wordBreak: "break-all" }}>{acct}</b></span>
+          <span>• {tr("Clé secrète")} : <code style={{ wordBreak: "break-all", userSelect: "all" }}>{pend.secret}</code></span>
+          <span>• {tr("Type : basé sur l’heure (TOTP)")}</span></div>
         <p className="note" style={{ margin: 0 }}><b>2.</b> {tr("Saisis le code à 6 chiffres affiché.")}</p>
         <input aria-label={tr("Code à 6 chiffres")} inputMode="numeric" autoComplete="one-time-code" maxLength={7} required value={code} onChange={(e) => setCode(e.target.value)} />
         <button className="btn" disabled={busy || code.replace(/\s/g, "").length < 6}>{busy ? "…" : tr("Confirmer")}</button>
