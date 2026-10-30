@@ -358,7 +358,7 @@ export default function MyProfile() {
             {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
             <button className="dbtn" type="submit" disabled={busy}>{busy ? tr("Patiente…") : isNewP ? tr("Publier mon profil") : tr("Enregistrer")}</button></section>
           </fieldset></form>}
-          {!isNewP && <details className="dcard actbox dzone" id="supprimer"><summary>{tr("🗑 Supprimer mon profil et mes données")}</summary><div style={{ padding: "16px 18px" }}>
+          {!isNewP && <section className="dcard dzone" id="supprimer"><h3>{tr("🗑 Supprimer mon profil et mes données")}</h3><div style={{ display: "grid", gap: 10 }}>
             <p className="note" style={{ margin: "0 0 10px" }}>{tr("Efface définitivement ton profil, tes photos et ta vidéo, tes commentaires, tes signalements de numéros et ton compte de connexion. C’est irréversible.")}</p>
             {!delAsk ? <button type="button" className="btn ghost" onClick={() => setDelAsk(true)}>{tr("Supprimer mon compte…")}</button> : <div style={{ display: "grid", gap: 8 }}>
               <label className="f">{tr("Pour confirmer, écris")} <b>SUPPRIMER</b><input value={delTxt} onChange={(e) => setDelTxt(e.target.value)} autoComplete="off" /></label>
@@ -366,7 +366,7 @@ export default function MyProfile() {
                 <button type="button" className="btn" disabled={delBusy || delTxt.trim().toUpperCase() !== "SUPPRIMER"} onClick={deleteAll}>{delBusy ? tr("Suppression…") : tr("Oui, tout supprimer")}</button>
                 <button type="button" className="btn ghost" disabled={delBusy} onClick={() => { setDelAsk(false); setDelTxt(""); }}>{tr("Annuler")}</button></div>
               {delMsg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700, margin: 0 }}>{delMsg}</p>}</div>}
-          </div></details>}
+          </div></section>}
         </div>
       </main>
     </div>

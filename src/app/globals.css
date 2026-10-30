@@ -1437,3 +1437,5 @@ h1.pbn{margin:0}
 .zblock b{font:700 16px var(--fd)}
 .zblock span{font-size:14px;line-height:1.45;color:var(--mut)}
 .zblock a{font-weight:700;color:var(--btn)}
+#logements.actbox>summary{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.dzone h3{color:var(--ink)}
