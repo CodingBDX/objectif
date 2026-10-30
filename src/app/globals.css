@@ -1618,3 +1618,4 @@ h1.pbn{margin:0}
 .vpay-m .vbank{grid-column:1/-1}
 .vpay-m .vbank .f{display:grid;gap:4px;font-size:14px}
 @media (max-width:560px){.vpay-m{grid-template-columns:1fr}}
+.vpay-m .vcoup{display:grid;gap:8px}.vpay-m .vcoup .f{display:grid;gap:4px;font-size:14px}

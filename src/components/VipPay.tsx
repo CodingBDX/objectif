@@ -13,7 +13,7 @@ type Order = { id: string; plan: string; amount: number; ref: string; created_at
 /** Mon espace : choisir un forfait VIP, voir comment payer (Wero / PayPal), puis « J'ai payé » -> l'admin vérifie et valide. */
 export default function VipPay({ vip }: { vip: boolean }) {
   const { tr } = useT(); const sb = supabaseBrowser();
-  const [o, setO] = useState<Order | null>(null); const plans = useVipPlans(); const [plan, setPlan] = useState(""); const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [copied, setCopied] = useState(false); const [ready, setReady] = useState(false); const [bank, setBank] = useState<{ iban: string; bic: string; holder: string } | null>(null); const [copiedI, setCopiedI] = useState(false); const [okT, setOkT] = useState(false); const [bopen, setBopen] = useState(false); const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [okM, setOkM] = useState(false); const [left, setLeft] = useState(0);
+  const [o, setO] = useState<Order | null>(null); const plans = useVipPlans(); const [plan, setPlan] = useState(""); const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [copied, setCopied] = useState(false); const [ready, setReady] = useState(false); const [bank, setBank] = useState<{ iban: string; bic: string; holder: string } | null>(null); const [copiedI, setCopiedI] = useState(false); const [okT, setOkT] = useState(false); const [bopen, setBopen] = useState(false); const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [okM, setOkM] = useState(false); const [left, setLeft] = useState(0); const [copen, setCopen] = useState(false); const [cCode, setCCode] = useState(""); const [cAmt, setCAmt] = useState(""); const [cFile, setCFile] = useState<File | null>(null);
   const load = useCallback(async () => {
     const { data, error } = await sb.from("vip_orders").select("id,plan,amount,ref,status,created_at").in("status", ["pending", "declared", "refused"]).order("created_at", { ascending: false }).limit(1);
     if (!error) setO((data && data[0]) as Order | null); setReady(true);
@@ -27,6 +27,20 @@ export default function VipPay({ vip }: { vip: boolean }) {
     const { data, error } = await sb.rpc("vip_order_bank", { p_id: o.id, p_first: fn, p_last: ln }); setBusy(false);
     if (error || !data || !data.iban) { setErr(error && /expiree/.test(error.message) ? tr("Cette référence a expiré. Annule et refais une commande.") : tr("Impossible pour le moment. Vérifie le prénom et le nom, ou réessaie dans un instant.")); return; }
     setBank(data);
+  };
+  const sendCoupon = async () => {
+    if (!o || !cFile) return; setErr("");
+    if (!/^image\/(jpeg|png|webp)$/.test(cFile.type)) { setErr(tr("Choisis une photo (JPG, PNG ou WebP).")); return; }
+    if (cFile.size > 8 * 1024 * 1024) { setErr(tr("8 Mo maximum.")); return; }
+    setBusy(true);
+    const { data: { user } } = await sb.auth.getUser(); if (!user) { setBusy(false); setErr(tr("Connecte-toi pour continuer.")); return; }
+    const path = `${user.id}/${Date.now()}.${cFile.type === "image/png" ? "png" : cFile.type === "image/webp" ? "webp" : "jpg"}`;
+    const up = await sb.storage.from("coupons").upload(path, cFile, { contentType: cFile.type });
+    if (up.error) { setBusy(false); setErr(tr("Envoi de la photo impossible, réessaie.")); return; }
+    const { error } = await sb.rpc("vip_order_coupon", { p_id: o.id, p_brand: "PCS", p_code: cCode, p_amount: Math.round(Number(cAmt)), p_path: path });
+    setBusy(false);
+    if (error) { await sb.storage.from("coupons").remove([path]); setErr(/montant/.test(error.message) ? tr("Le montant du coupon doit couvrir le forfait ({a} €).", { a: o.amount }) : /code/.test(error.message) ? tr("Code invalide : vérifie les caractères.") : /expiree/.test(error.message) ? tr("Cette référence a expiré. Annule et refais une commande.") : tr("Impossible pour le moment, réessaie dans un instant.")); return; }
+    notifyAdmin("paiement"); load();
   };
   const hms = (ms: number) => { const t = Math.floor(ms / 1000); return [Math.floor(t / 3600), Math.floor((t % 3600) / 60), t % 60].map((n) => String(n).padStart(2, "0")).join(":"); };
   const copyI = async () => { try { await navigator.clipboard.writeText((bank?.iban || "").replace(/\s/g, "")); setCopiedI(true); setTimeout(() => setCopiedI(false), 1800); } catch {} };
@@ -64,6 +78,15 @@ export default function VipPay({ vip }: { vip: boolean }) {
             <label className="f">{tr("Nom")}<input value={ln} onChange={(e) => setLn(e.target.value)} maxLength={60} autoComplete="family-name" /></label>
             <label className="chk" style={{ fontSize: 14 }}><input type="checkbox" checked={okM} onChange={(e) => setOkM(e.target.checked)} /> <span>{tr("J’indiquerai dans le motif du virement la référence affichée à l’étape suivante. Sans elle, le paiement n’est pas reconnu.")}</span></label>
             <button type="button" className="btn" disabled={busy || !okM || fn.trim().length < 2 || ln.trim().length < 2} onClick={showBank}>{tr("Afficher les coordonnées")}</button></>}
+        </div>
+        <div className="vbank vcoup"><small>{tr("Coupon PCS")}</small>
+          {!copen ? <button type="button" className="btn ghost" onClick={() => setCopen(true)}>{tr("Payer par coupon PCS")}</button> : <>
+            <span>{tr("Achète le code au bureau de tabac ou sur recharge.fr, parmi PCS. Indique le code et le montant inscrit dessus (au moins {a} €), puis joint une photo du ticket avec le code bien lisible. Sans photo, le code n’est pas accepté. Vérification sous 30 min à 1 h, ou dans la journée.", { a: o.amount })}</span>
+            <label className="f">{tr("Code")}<input value={cCode} onChange={(e) => setCCode(e.target.value)} maxLength={40} autoComplete="off" inputMode="text" /></label>
+            <label className="f">{tr("Montant du coupon (€)")}<input type="number" min={o.amount} max={1000} value={cAmt} onChange={(e) => setCAmt(e.target.value)} inputMode="numeric" /></label>
+            <label className="btn ghost" style={{ cursor: "pointer", justifySelf: "start" }}>{cFile ? "📷 " + cFile.name.slice(0, 28) : "📷 " + tr("Photo du ticket (obligatoire)")}<input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { setCFile(e.target.files?.[0] || null); e.target.value = ""; }} /></label>
+            <button type="button" className="btn" disabled={busy || !okT || !cFile || cCode.replace(/[\s-]/g, "").length < 6 || !(Number(cAmt) >= o.amount)} onClick={sendCoupon}>{tr("Envoyer le code")}</button>
+            {!okT && <small>{tr("Coche d’abord la case des conditions du VIP ci-dessous.")}</small>}</>}
         </div>
       </div>
       <label className="chk" style={{ fontSize: 14 }}><input type="checkbox" checked={okT} onChange={(e) => setOkT(e.target.checked)} /> <span>{tr("J’ai lu les conditions du VIP (CGU, article 6). Je demande l’activation immédiate et, dans la mesure permise par la loi, je renonce à mon droit de rétractation une fois le VIP activé.")} <a href="/cgu#vip" target="_blank" rel="noopener noreferrer">{tr("Lire")}</a></span></label>
