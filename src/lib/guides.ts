@@ -3,6 +3,64 @@ export type Guide = { slug: string; title: string; desc: string; emoji: string; 
 
 export const GUIDES: Guide[] = [
   {
+    slug: "profil-vip-mode-d-emploi", emoji: "👑", date: "2026-10-30",
+    video: { src: "/videos/vip.mp4", poster: "/videos/vip.jpg", label: "Vidéo : le profil VIP, quand, comment et ce que ça t’apporte (77 secondes, avec voix)", seconds: 77 },
+    title: "Profil VIP : quand le prendre, comment faire et ce que ça t'apporte",
+    desc: "Mode d'emploi du VIP : passer en premier dans les listes, 20 photos, tarifs détaillés, paiement par Wero ou PayPal, prolongation et VIP gratuit.",
+    body: `Le **profil VIP** te donne plus de visibilité et plus de place pour te présenter. Regarde la vidéo ci-dessus (77 secondes), puis retrouve le détail.
+
+## Ce que ça change dans les listes
+- Les profils VIP sont affichés **en premier** dans la page de ta ville, avec la couronne 👑 et le badge VIP.
+- Ton **slogan** s'affiche sous ton nom pour attirer l'œil.
+- **Bénéfice :** les clients te voient avant les autres.
+
+## Ce que ça change sur ton profil
+- **Jusqu'à 20 photos** (au lieu de 10).
+- **Tarifs détaillés** par durée (30 min, 1 h, 2 h, soirée, nuit).
+- **Réseaux sociaux** visibles (Instagram, Snapchat, TikTok…).
+- Plus de **villes proches** affichées.
+- **Bénéfice :** un profil complet qui donne confiance et déclenche plus de demandes.
+
+## Des outils en plus
+- Une **adresse personnalisée** (par exemple /fille/lyon/ton-nom), plus facile à partager et meilleure pour le référencement. Tu peux la désactiver pour rester plus discrète.
+- Une **remontée** dans la liste plus fréquente qu'avec un profil standard.
+- Tes **statistiques** : vues, clics sur ton contact, favoris.
+- **Bénéfice :** tu vois ce qui marche et tu ajustes.
+
+## Quand le prendre ?
+- Pour un **déplacement** : tes clients te trouvent dès ton arrivée.
+- Pour un **week-end chargé** : tu veux plus de demandes sur une courte période.
+- Pour **lancer ton profil** : tu te démarques dès le début.
+Tu choisis la durée qui te convient (par exemple 2 jours, 5 jours ou 1 mois) : tu ne paies que quand tu en as besoin. Les tarifs sont affichés dans Modifier mon profil.
+
+## Comment faire ?
+- Ouvre **Modifier mon profil** et choisis ton **forfait**.
+- Paie par **Wero ou PayPal** en suivant les indications affichées.
+- Clique sur **« J'ai payé »**.
+- Dès que le paiement est vérifié, ton **VIP est activé**.
+
+## Prolonger, mettre en pause
+- Si tu prolonges, les jours s'**ajoutent à la fin** de ton VIP en cours : aucun jour perdu.
+- Si ton profil est **en pause**, le décompte **s'arrête**.
+
+## Du VIP gratuit
+- **1 mois offert** pour chaque amie que tu parraines et dont le profil est vérifié (6 mois maximum).
+- **7 jours de VIP** contre **400 points** (voir l'article « Points et couronnes »).
+
+## À la fin du VIP
+Ton profil repasse **tout seul en profil gratuit**, sans démarche ni frais. Tes informations VIP sont conservées si tu reviens plus tard.
+
+## Questions fréquentes
+**Est-ce un abonnement ?**
+Non : tu paies une durée précise, sans renouvellement automatique.
+
+**Comment est vérifié mon paiement ?**
+Tu cliques sur « J'ai payé » : le paiement est vérifié à la main, puis ton VIP est activé.
+
+**Puis-je cacher mon adresse personnalisée ?**
+Oui, tu peux la désactiver dans Modifier mon profil.`
+  },
+  {
     slug: "points-et-couronnes-mode-d-emploi", emoji: "⭐", date: "2026-10-30",
     video: { src: "/videos/points.mp4", poster: "/videos/points.jpg", label: "Vidéo : le système de points et ce que ça t’apporte (57 secondes, avec voix)", seconds: 57 },
     title: "Points et couronnes : gagne des avantages sur Sex-Escorte",
