@@ -3,6 +3,93 @@ export type Guide = { slug: string; title: string; desc: string; emoji: string; 
 
 export const GUIDES: Guide[] = [
   {
+    slug: "points-et-couronnes-mode-d-emploi", emoji: "⭐", date: "2026-10-30",
+    video: { src: "/videos/points.mp4", poster: "/videos/points.jpg", label: "Vidéo : le système de points et de couronnes (51 secondes, avec voix)", seconds: 51 },
+    title: "Points et couronnes : gagne des avantages sur Sex-Escorte",
+    desc: "Comment gagner des points, monter de couronne (Bronze, Argent, Or, Diamant) et les échanger contre une remontée ou des jours de VIP.",
+    body: `Plus ton profil est complet et actif, plus tu gagnes de **points**. Ils débloquent des **couronnes** visibles sur ton profil et s'échangent contre des avantages. Tout se passe dans la carte **⭐ Mes points** de Modifier mon profil.
+
+Regarde la vidéo ci-dessus (51 secondes), puis retrouve le détail.
+
+## Comment gagner des points
+- **+50** : profil complet (3 photos et une présentation d'au moins 150 caractères), une seule fois.
+- **+100** : profil vérifié, une seule fois.
+- **+150** : pour chaque amie que tu parraines, une fois son profil vérifié (6 amies maximum).
+- **+1** : par jour de connexion.
+- **+1** : par jour de VIP.
+
+## Le parrainage, en plus
+Chaque amie qui crée son profil avec ton lien et dont le profil est vérifié te donne aussi **1 mois de VIP offert** (6 mois au maximum). C'est une récompense à part, en plus des 150 points.
+
+## Les couronnes
+Ton niveau dépend du total de points **gagnés** :
+- 🥉 **Bronze** à 250 points
+- 🥈 **Argent** à 700 points
+- 🥇 **Or** à 1 500 points
+- 💎 **Diamant** à 3 000 points
+
+La couronne s'affiche sur ton profil, à côté de tes badges. **Ton niveau ne baisse jamais**, même quand tu dépenses tes points.
+
+## Dépenser ses points
+- **Remonter maintenant** : 60 points. Ton profil passe en tête de liste tout de suite.
+- **7 jours de VIP** : 400 points.
+
+Le solde « à dépenser » baisse quand tu échanges, mais le total gagné (et donc ta couronne) reste le même.
+
+## Pour monter vite
+- Complète ton profil et fais-le **vérifier** : tu démarres à 150 points.
+- **Parraine** tes amies : c'est la voie la plus rapide, 150 points chacune plus un mois de VIP.
+- Connecte-toi régulièrement : le point du jour est petit, mais il s'additionne.
+
+## Questions fréquentes
+**Mes points expirent-ils ?**
+Non : les points gagnés restent acquis. Seul ton solde à dépenser baisse quand tu échanges.
+
+**Puis-je perdre ma couronne ?**
+Non, ton niveau ne baisse jamais.
+
+**Où voir mes points ?**
+Dans Modifier mon profil, carte « ⭐ Mes points » : solde, niveau, progression et boutons d'échange.`
+  },
+  {
+    slug: "trouver-un-profil-categories-villes-filtres", emoji: "🔎", date: "2026-10-30",
+    video: { src: "/videos/trouver-un-profil.mp4", poster: "/videos/trouver-un-profil.jpg", label: "Vidéo : trouver un profil (45 secondes, avec voix)", seconds: 45 },
+    title: "Trouver un profil : catégories, villes, filtres, carte et favoris",
+    desc: "Mode d'emploi de l'annuaire : choisir une catégorie et une ville, affiner avec les filtres, utiliser la carte et suivre ses favoris.",
+    body: `L'annuaire Sex-Escorte se parcourt en quelques gestes. Voici comment retrouver le bon profil rapidement.
+
+Regarde la vidéo ci-dessus (45 secondes), puis retrouve le détail.
+
+## 1. Choisir une catégorie
+Filles, hommes, trans ou livecam : chaque catégorie a sa **propre page**. Tu peux aussi voir tous les profils ensemble depuis l'accueil.
+
+## 2. Choisir une ville
+- Tape le nom d'une ville dans la recherche : une **suggestion** se propose.
+- Ou utilise **« Près de moi »** pour voir les profils autour de toi.
+- Chaque ville a **sa page**, avec les profils de la ville, ceux qui **arrivent bientôt** et les profils **à la une**.
+
+## 3. Affiner avec les filtres
+Tu peux filtrer par **spécialités**, **tarif maximum**, **durée**, **âge**, **taille**, **langue parlée**, et plus encore. Des interrupteurs te permettent de ne garder que :
+- les profils **vérifiés** ;
+- les profils **disponibles maintenant** ;
+- les profils **avec vidéo de présentation** ;
+- ceux qui **reçoivent** ou qui **se déplacent**.
+
+Un bouton « Tout effacer » remet les filtres à zéro.
+
+## 4. Utiliser la carte
+La **carte** montre où se trouvent les profils. Pratique pour repérer une zone ou voir qui est proche de toi.
+
+## 5. Garder ses favoris
+Un clic sur le **cœur** ajoute un profil à tes favoris. Tu les retrouves ensuite dans l'onglet **Favoris**. Sur la page d'un profil, tu peux aussi choisir d'être **prévenu par e-mail** quand il redevient disponible.
+
+## Pour les escortes : être bien trouvée
+- Renseigne ta **ville** et tes **villes de passage** : c'est ce qui te fait apparaître sur chaque page de ville.
+- Coche **Je reçois** et **Je me déplace** selon ta situation.
+- Ajoute tes **spécialités**, tes **tarifs** et tes **horaires** : plus ton profil est complet, plus il ressort dans les filtres.
+- Utilise le **calendrier de passages** pour apparaître avant ton arrivée dans une autre ville.`
+  },
+  {
     slug: "calendrier-de-passages-mode-d-emploi", emoji: "📅", date: "2026-10-30",
     video: { src: "/videos/calendrier.mp4", poster: "/videos/calendrier.jpg", label: "Vidéo : comment fonctionne le calendrier de passages (46 secondes, avec voix)", seconds: 46 },
     title: "Le calendrier de passages : annonce tes dates et sois attendue",
