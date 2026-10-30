@@ -7,7 +7,7 @@ import { notifyAdmin } from "@/lib/notifyAdmin";
 import Ic from "@/components/Ic";
 
 const WERO = "+33695358137"; const PAYPAL_NAME = "Angèle Charier";
-const PAYPAL_URL = process.env.NEXT_PUBLIC_PAYPAL_URL || "https://www.paypal.com/myaccount/transfer/homepage/pay";
+const PAYPAL_ME = "https://www.paypal.me/angeleyessika";
 type Order = { id: string; plan: string; amount: number; ref: string; status: "pending" | "declared" | "validated" | "refused" | "cancelled" };
 
 /** Mon espace : choisir un forfait VIP, voir comment payer (Wero / PayPal), puis « J'ai payé » -> l'admin vérifie et valide. */
@@ -36,7 +36,7 @@ export default function VipPay({ vip }: { vip: boolean }) {
       <span>{tr("Règle {a} € par Wero ou PayPal, puis clique sur « J’ai payé ». Écris la référence dans le message du paiement :", { a: o.amount })} <code className="vref">{o.ref}</code></span>
       <div className="vpay-m">
         <div><small>Wero</small><b>{WERO}</b><button type="button" className="btn ghost" onClick={copy}>{copied ? tr("Copié ✓") : tr("Copier le numéro")}</button></div>
-        <div><small>PayPal</small><b>{PAYPAL_NAME}</b><a className="btn ghost" href={PAYPAL_URL} target="_blank" rel="noopener noreferrer">{tr("Payer avec PayPal")}</a></div>
+        <div><small>PayPal</small><b>{PAYPAL_NAME}</b><a className="btn ghost" href={`${PAYPAL_ME}/${o.amount}EUR`} target="_blank" rel="noopener noreferrer">{tr("Payer avec PayPal")}</a></div>
       </div>
       <div className="vpay-a"><button type="button" className="btn" disabled={busy} onClick={() => call("vip_order_declare", { p_id: o.id }, () => notifyAdmin("paiement"))}>{tr("J’ai payé")}</button>
         <button type="button" className="btn ghost" disabled={busy} onClick={() => call("vip_order_cancel", { p_id: o.id })}>{tr("Annuler")}</button></div>
