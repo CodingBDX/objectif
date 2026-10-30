@@ -14,7 +14,7 @@ export default function GuideVideos() {
       <p className="arrh"><span>🎬 {tr("Comprendre le site en vidéo")}</span><Link href="/guides">{tr("Tout le blog →")}</Link></p>
       <div className="arrl">
         {items.map((g) => { const v = g.video!; return (
-          <figure key={g.slug} className="gvc">
+          <figure key={g.slug} className={`gvc${on === g.slug ? " on" : ""}`}>
             {on === g.slug
               ? <video src={v.src} poster={v.poster} controls autoPlay playsInline preload="auto" onEnded={() => setOn("")} />
               : <button type="button" className="gvp" onClick={() => setOn(g.slug)} aria-label={tr("Lire la vidéo : {t}", { t: g.title })}>
