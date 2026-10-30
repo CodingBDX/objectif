@@ -2,8 +2,6 @@
 export function SkeletonCards({ n = 9 }: { n?: number }) {
   return (
     <div className="gut" role="status" aria-busy="true" aria-label="Chargement des profils">
-      <div className="sk sk-h" style={{ width: "62%", maxWidth: 420 }} />
-      <div className="sk sk-l" style={{ width: "86%", maxWidth: 640 }} />
       <div className="grid skg" aria-hidden="true">
         {Array.from({ length: n }, (_, i) => (
           <div className="card skc" key={i} style={{ animationDelay: `${(i % 6) * 90}ms` }}>
