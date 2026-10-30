@@ -272,7 +272,9 @@ export default function MyProfile() {
               {trips.map((t, i) => <div className="trow" key={i}>
                 <CityInput placeholder={tr("Ville visitée")} value={t.city} onChange={(v) => setTrip(i, "city", v)} label={tr("Ville du déplacement {n}", { n: i + 1 })} />
                 <label className="tdate"><small>{tr("Du")}</small><input type="date" value={t.from} onChange={(e) => setTrip(i, "from", e.target.value)} aria-label={tr("Du (déplacement {n})", { n: i + 1 })} /></label>
-                <label className="tdate"><small>{tr("Au")}</small><input type="date" value={t.to} min={t.from || undefined} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={tr("Au (déplacement {n})", { n: i + 1 })} /></label></div>)}
+                <label className="tdate"><small>{tr("Au")}</small><input type="date" value={t.to} min={t.from || undefined} onChange={(e) => setTrip(i, "to", e.target.value)} aria-label={tr("Au (déplacement {n})", { n: i + 1 })} /></label>
+                {trips.length > 1 && <button type="button" className="tdel" aria-label={tr("Supprimer le déplacement {n}", { n: i + 1 })} title={tr("Supprimer")} onClick={() => setTrips(trips.filter((_, j) => j !== i))}>✕</button>}</div>)}
+              {trips.length < 12 && <button type="button" className="btn ghost tadd" onClick={() => setTrips([...trips, { city: "", from: "", to: "" }])}>＋ {tr("Ajouter un déplacement")}</button>}
               <span className="note">{tr("Indique la ville, la date d’arrivée et celle de départ. Rien d’obligatoire.")}</span>
               <label className="chk"><input type="checkbox" checked={tripPub} onChange={(e) => { setTripPub(e.target.checked); setTpTouch(true); }} /> <span>{tr("Annoncer mon arrivée dans « Arrivent bientôt » (3 jours avant, date d’arrivée seulement : jamais la date de départ). Réservé aux profils vérifiés.")}</span></label></div>
 </>}<h4 className="subh" id="descr">{tr("Description")}</h4>

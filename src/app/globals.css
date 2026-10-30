@@ -1511,3 +1511,8 @@ h1.pbn{margin:0}
 .tcd .tin b{font:700 17px var(--fd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcd .tin em{font-style:normal;font-size:13px;color:var(--mut)}
 .tcd .tnow{font:700 11px var(--fb);color:var(--btn);text-transform:uppercase;letter-spacing:.04em}
+
+/* Déplacements : bouton + et suppression d'une ligne */
+.trow{position:relative}
+.tdel{position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--btn);font:700 12px var(--fb);cursor:pointer;display:grid;place-items:center;box-shadow:var(--sh);padding:0;z-index:2}
+.tadd{justify-self:start;min-height:44px}
