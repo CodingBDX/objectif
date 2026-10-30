@@ -1486,24 +1486,28 @@ h1.pbn{margin:0}
   .vsw .vduo{display:grid}
   .grid.duo{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 }
-.c2{position:relative;border-radius:20px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:var(--sh);cursor:pointer;min-width:0}
-.c2.vipc{border:2px solid var(--btn)}
-.c2.off .ph{filter:saturate(.7)}
-.c2 .ph{position:relative;aspect-ratio:3/4;display:block;background:var(--soft);overflow:hidden}
-.c2 .mos{display:block}
-.c2 .mos div{position:absolute;inset:0}
-.c2 .tl,.c2 .tr2,.c2 .bl{position:absolute;display:flex;gap:4px;align-items:center;z-index:3;flex-wrap:wrap}
-.c2 .tl{left:8px;top:8px;right:44px}.c2 .tr2{right:6px;top:6px}.c2 .bl{left:8px;bottom:8px;right:8px}
-.c2 .pill{display:inline-flex;align-items:center;gap:3px;font:700 10.5px var(--fb);padding:3px 7px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--btn)}
-.c2 .pill.vip{background:var(--btn);color:var(--btnt)}
-.c2 .pill.on{background:#2fbf71;color:#fff}
-.c2 .pill i{width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block}
-.c2 .inf{padding:8px 10px 10px;display:grid;gap:2px;min-width:0}
-.c2 .nm{display:flex;align-items:center;gap:5px;font:700 16px var(--fd);min-width:0}
-.c2 .nm>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.c2 .vf2{flex:none;width:16px;height:16px;border-radius:50%;background:#2e9e5b;color:#fff;display:grid;place-items:center}
-.c2 .vf2 .ic{stroke:#fff}
-.c2 .ct{display:flex;align-items:center;gap:3px;font-size:12.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.c2 .ct.on{color:#2e9e5b;font-weight:700}
-.c2 .pr{font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.c2 .pr b{color:var(--btn)}
+.card.duo2{padding:6px 6px 10px;border-radius:22px}
+.card.duo2:hover{transform:none}
+.card.duo2 .cover{aspect-ratio:3/4;border-radius:17px}
+.card.duo2 .mos{display:block}
+.card.duo2 .mos div{position:absolute;inset:0}
+.card.duo2 .in{padding:8px 4px 0;gap:3px}
+.card.duo2 .ln h2{font-size:16px}
+.card.duo2 .meta{font-size:12.5px}
+.card.duo2 .avb,.card.duo2 .vipb,.card.duo2 .nwb{font-size:11px;padding:2px 8px 2px 6px}
+.card.duo2 .nwb{top:36px}
+
+/* Prochains passages (fiche profil) : slide horizontal comme « Mis en avant » */
+.tsl{display:grid;gap:8px;min-width:0;margin:0 0 6px}
+.tsl .pres{display:flex;align-items:center;gap:6px;margin:0}
+.tsl-l{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:6px 2px 12px;margin-inline:-2px}
+.tsl-l::-webkit-scrollbar{display:none}
+.tcd{flex:0 0 auto;min-width:210px;max-width:86%;scroll-snap-align:start;display:flex;align-items:center;gap:12px;padding:10px 16px 10px 10px;border-radius:24px;background:linear-gradient(145deg,var(--card),var(--soft));border:1px solid var(--line);box-shadow:var(--sh);color:var(--ink);text-decoration:none}
+.tcd.now{border:2px solid var(--btn)}
+.tcd .tcal{flex:none;width:54px;height:58px;border-radius:16px;background:var(--btn);color:var(--btnt);display:grid;place-items:center;align-content:center;line-height:1}
+.tcd .tcal b{font:700 11px var(--fb);letter-spacing:.06em;text-transform:uppercase}
+.tcd .tcal span{font:700 24px var(--fd)}
+.tcd .tin{display:grid;gap:2px;min-width:0}
+.tcd .tin b{font:700 17px var(--fd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcd .tin em{font-style:normal;font-size:13px;color:var(--mut)}
+.tcd .tnow{font:700 11px var(--fb);color:var(--btn);text-transform:uppercase;letter-spacing:.04em}

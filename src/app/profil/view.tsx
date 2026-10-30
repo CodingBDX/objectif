@@ -1,3 +1,4 @@
+import TripsSlide from "@/components/TripsSlide";
 import { notFound, redirect } from "next/navigation";
 import { parseProfileParam, prefixRange, profilePath, safeDecode } from "@/lib/profilUrl";
 import Link from "next/link";
@@ -133,6 +134,7 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
                 {p.zone_map && !p.zone_map_blocked && p.verified && quartierOf(p.city, p.zone) && <ZoneMap lat={quartierOf(p.city, p.zone)!.lat} lon={quartierOf(p.city, p.zone)!.lon} label={p.zone} />}
                 <p className="znote"><Tr k="Zone approximative : la position exacte n’est jamais affichée." /></p></section>}
               {p.specialties.length > 0 && <div className="mspec"><h2 className="pres"><Tr k="Spécialités" /></h2><Collapse n={4} className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</Collapse></div>}
+              {trips.length > 0 && <TripsSlide trips={trips.map((x) => ({ city: x.city, from: x.from, to: x.to }))} />}
               {p.bio && <h2 className="pres"><Tr k="Présentation" /></h2>}
               <div className="bio"><RichText text={p.bio} /></div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
@@ -145,11 +147,6 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
               <Link className={`bubble base${p.district ? " hasd" : ""}`} href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★{p.district && <small className="bdist">{p.district}</small>}</Link>
               {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}
             <section className="bsec dsk"><h3 className="ph"><Ic n="tag" s={18} /><Tr k="Spécialités" /></h3><div className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</div></section>
-            {trips.length > 0 && <div className="panel"><h3 className="ph"><Ic n="pin" s={18} /><Tr k="Prochains passages" /></h3>
-              {trips.map((x, i) => { const now = x.from <= td; const [, m, d] = x.from.split("-");
-                return <div className="trip" key={i}><div className="tcal"><b>{MS[+m - 1]}</b><span>{+d}</span></div>
-                  <div className="tinf"><Link href={`/ville/${slug(x.city)}`}>{x.city}</Link>{now && <span className="tnow"><Tr k="En ce moment" /></span>}
-                    <em>{x.to !== x.from ? <Tr k="du {a} au {b}" vars={{ a: dShort(x.from), b: dShort(x.to) }} /> : <Tr k="le {a}" vars={{ a: dShort(x.from) }} />}</em></div></div>; })}</div>}
                         {a && (p.h24 || Object.values(p.hours || {}).some((h) => h && h[0] && h[1])) && <div className="panel"><h3 className="ph"><Ic n="clock" s={18} /><Tr k="Disponibilités" /></h3>
               {a ? (<>
                 {a.on ? <div className="meta avl on"><Ic n="clock" s={15} />{a.h24 ? <Tr k="Disponible 24h/24, 7j/7" /> : <Tr k="Disponible jusqu’à {u}" vars={{ u: a.until || "" }} />}</div>

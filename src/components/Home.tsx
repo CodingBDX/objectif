@@ -83,18 +83,21 @@ function CardDuo({ p, onOpen, trip }: { p: Profile; onOpen: () => void; trip?: {
   const { tr } = useT();
   const a = avail(p); const live = p.genre === "livecam";
   return (
-    <article className={`c2${p.vip ? " vipc" : ""}${a && !a.on ? " off" : ""}`} tabIndex={0} aria-label={tr("Voir le profil de {n}", { n: p.name })} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
-      <div className="ph">
+    <article className={`card duo2${p.vip ? " isvip" : ""}${live ? " live" : ""}${a && !a.on ? " off" : ""}`} tabIndex={0} aria-label={tr("Voir le profil de {n}", { n: p.name })} onClick={onOpen} onKeyDown={(e) => e.key === "Enter" && onOpen()}>
+      <div className="cover">
+        <div className="tr">{p.vip && <span className="vipb"><Ic n="crown" s={14} />VIP</span>}</div>
+        {isNew(p) && <span className="nwb"><Ic n="spark" s={14} />{tr("New")}</span>}
         <div className="mos"><Tile u={p.photos[0] || ""} alt={`${p.name}${live ? "" : ", " + p.city}`} /></div>
-        <span className="tl">{p.vip && <span className="pill vip"><Ic n="crown" s={12} />VIP</span>}{isNew(p) && <span className="pill"><Ic n="spark" s={12} />{tr("New")}</span>}</span>
-        <span className="tr2"><Heart id={p.id} /></span>
-        <span className="bl">{a && a.on && <span className="pill on"><i />{live ? tr("En direct") : tr("Dispo")}</span>}{p.video && <span className="pill"><Ic n="video" s={12} />{tr("vidéo")}</span>}</span>
+        {a && a.on && <span className={`avb${live ? " live" : ""}`}><i /><Ic n="clock" s={13} />{live ? tr("En direct") : tr("Dispo")}</span>}
+        {p.video && <span className="vid-ic"><Ic n="video" s={14} />{tr("vidéo")}</span>}
       </div>
-      <div className="inf">
-        <div className="nm"><span>{p.name}</span><CrownBadge level={p.crown} size={18} />{p.verified && <span className="vf2" role="img" aria-label={tr("Profil vérifié")}><Ic n="check" s={10} /></span>}</div>
-        <div className="ct"><Ic n="pin" s={12} /> {live ? tr("En ligne") : p.city}{p.street ? " · " + tr("Rue") : ""}</div>
-        {trip ? <div className="ct on">{trip.to !== trip.from ? tr("Passe du {a} au {b}", { a: dShort(trip.from), b: dShort(trip.to) }) : tr("Passe le {a}", { a: dShort(trip.from) })}</div>
-          : showTarif(p) && (p.tarif_30 || p.tarif_60) ? <div className="pr">{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
+      <div className="in">
+        <div className="ln"><h2>{p.name}</h2><CrownBadge level={p.crown} size={20} />
+          {p.verified && <span className="vf" role="img" aria-label={tr("Profil vérifié")}><Ic n="check" s={12} /></span>}
+          <Heart id={p.id} /></div>
+        <div className="meta"><Ic n="pin" s={15} />{live ? tr("En ligne") : p.city}{p.street ? " · " + tr("Rue") : ""}</div>
+        {trip ? <div className="meta avl on"><Ic n="pin" s={15} />{trip.to !== trip.from ? tr("Passe du {a} au {b}", { a: dShort(trip.from), b: dShort(trip.to) }) : tr("Passe le {a}", { a: dShort(trip.from) })}</div>
+          : showTarif(p) && (p.tarif_30 || p.tarif_60) ? <div className="meta"><Ic n="rose" s={15} />{p.tarif_30 ? <>30 min <b>{p.tarif_30}</b></> : null}{p.tarif_30 && p.tarif_60 ? " · " : ""}{p.tarif_60 ? <>1 h <b>{p.tarif_60}</b></> : null}</div> : null}
       </div>
     </article>
   );
@@ -369,7 +372,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
             <button type="button" aria-pressed={view === "list"} title={tr("Affichage en liste")} aria-label={tr("Liste")} onClick={() => chView("list")}>
               <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="18" height="6" rx="2" /></svg></button>
             <button type="button" className="vduo" aria-pressed={view === "duo"} title={tr("Affichage en 2 colonnes")} aria-label={tr("2 colonnes")} onClick={() => chView("duo")}>
-              <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" /><rect x="13" y="3" width="8" height="8" rx="2" /><rect x="3" y="13" width="8" height="8" rx="2" /><rect x="13" y="13" width="8" height="8" rx="2" /></svg></button>
+              <svg className="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="3" width="7" height="18" rx="2" /><rect x="13.5" y="3" width="7" height="18" rx="2" /></svg></button>
             <button type="button" aria-pressed={view === "map"} title={tr("Affichage sur la carte")} aria-label={tr("Carte")} onClick={() => chView("map")}><Ic n="pin" /></button>
           </div>
         </div>
