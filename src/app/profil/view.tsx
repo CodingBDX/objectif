@@ -111,10 +111,10 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
       <div className="pfc">
         <div className="pgrid">
           <div className="pmain">
+            <Slider imgs={p.photos} vip={p.vip} video={p.video} alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} />
             {p.vip && p.slogan && <p className="pslogan">{p.slogan}</p>}
             {!live && <section className="mvil" aria-label="Villes"><h2><Ic n="pin" s={20} /><Tr k="Villes" /></h2><div className="mvs"><Link className={`bubble base${p.district ? " hasd" : ""}`} href={`/ville/${slug(p.city)}`} title="Ville de base">{p.city} ★{p.district && <small className="bdist">{p.district}</small>}</Link>
                 {(p.more || []).filter((c) => c !== p.city).map((c) => <Link key={c} className="bubble" href={`/ville/${slug(c)}`}>{c}</Link>)}</div></section>}
-            <Slider imgs={p.photos} vip={p.vip} video={p.video} alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} />
             {live && p.vlink && /^https?:\/\//.test(p.vlink) && <p style={{ margin: "0 0 22px" }}><a className="btn" href={p.vlink} target="_blank" rel="noopener noreferrer"><Tr k="▶ Rejoindre le live" /></a></p>}
             <div className="panel pi">
               <div className="pst" role="list" aria-label="Informations du profil">
