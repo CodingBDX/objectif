@@ -21,7 +21,7 @@ export function MfaChallenge({ onOk, title }: { onOk: () => void; title?: string
   return (
     <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={go}>
       <h2 style={{ margin: 0 }}>🔐 {title || tr("Code de sécurité")}</h2>
-      <p className="note" style={{ margin: 0 }}>{tr("Ouvre ton application (Google Authenticator, Authy…) et saisis le code à 6 chiffres.")}</p>
+      <p className="note" style={{ margin: 0 }}>{tr("Ouvre ton application d’authentification et saisis le code à 6 chiffres. Sur iPhone : l’app « Mots de passe » d’Apple (iOS 18 ou plus), ou Google Authenticator, Authy, 1Password…")}</p>
       <label className="f">{tr("Code à 6 chiffres")}<input inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,7}" maxLength={7} required autoFocus value={code} onChange={(e) => setCode(e.target.value)} /></label>
       {err && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>{err}</p>}
       <button className="btn" disabled={busy || code.replace(/\s/g, "").length < 6}>{busy ? "…" : tr("Valider")}</button>
@@ -77,11 +77,12 @@ export default function MfaSetup({ forced = false, onDone }: { forced?: boolean;
         {!forced && <button type="button" className="btn ghost" disabled={busy} onClick={disable}>{tr("Désactiver")}</button>}
       </>}
       {!off && !factor && !pend && <>
-        <p className="note" style={{ margin: 0 }}>{forced ? tr("Obligatoire pour l’administration : ajoute une application d’authentification (Google Authenticator, Authy, 1Password…).") : tr("Même si quelqu’un trouve ton mot de passe, il ne pourra pas entrer sans le code de ton téléphone. Facultatif, mais recommandé.")}</p>
+        <p className="note" style={{ margin: 0 }}>{forced ? tr("Obligatoire pour l’administration : ajoute une application d’authentification. Sur iPhone, l’app « Mots de passe » d’Apple (iOS 18 ou plus) suffit, sans rien installer ; sinon Google Authenticator, Authy, 1Password…") : tr("Même si quelqu’un trouve ton mot de passe, il ne pourra pas entrer sans le code de ton téléphone. Facultatif, mais recommandé.")}</p>
         <button type="button" className="btn" disabled={busy} onClick={start}>{busy ? "…" : tr("Activer la double authentification")}</button>
       </>}
       {pend && <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={confirm}>
         <p className="note" style={{ margin: 0 }}><b>1.</b> {tr("Sur ordinateur : scanne ce QR code avec ton application. Sur téléphone : appuie sur le bouton ci-dessous, tout se remplit tout seul.")}</p>
+        <p className="note" style={{ margin: 0 }}>{tr("iPhone : le bouton ouvre l’app « Mots de passe » d’Apple (iOS 18 ou plus) et ajoute le code. Sinon, copie la clé secrète plus bas et colle-la dans l’app de ton choix.")}</p>
         <a className="btn" href={pend.uri} style={{ textDecoration: "none", justifySelf: "center" }}>📱 {tr("Ouvrir dans mon application")}</a>
         <img src={pend.qr} alt={tr("QR code de la double authentification")} width={180} height={180} style={{ background: "#fff", borderRadius: 16, padding: 8, border: "1px solid var(--line)", justifySelf: "center" }} />
         <div className="note" style={{ margin: 0, display: "grid", gap: 4 }}><span>{tr("Pas de QR code ? Saisis à la main dans ton application :")}</span>
