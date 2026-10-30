@@ -6,7 +6,7 @@ import { useVipPlans } from "@/lib/vipPlans";
 import { notifyAdmin } from "@/lib/notifyAdmin";
 import Ic from "@/components/Ic";
 
-const WERO = "+33695358137"; const PAYPAL_NAME = "Angèle Charier";
+const WERO = "+33695358137"; const PAYPAL_NAME = "Angèle";
 const PAYPAL_ME = "https://www.paypal.me/angeleyessika";
 type Order = { id: string; plan: string; amount: number; ref: string; created_at: string; status: "pending" | "declared" | "validated" | "refused" | "cancelled" };
 
