@@ -1439,3 +1439,10 @@ h1.pbn{margin:0}
 .zblock a{font-weight:700;color:var(--btn)}
 #logements.actbox>summary{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
 .dzone h3{color:var(--ink)}
+
+/* Bandeau d'erreur sous la barre de menu (Modifier profil) */
+.errbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top,0px));z-index:19;width:min(calc(100vw - 24px),760px);display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:18px;background:var(--btn);color:var(--btnt);box-shadow:0 10px 26px rgba(214,51,132,.35);animation:errin .25s ease-out}
+.errbar b{flex:1;min-width:0;font:700 14.5px/1.35 var(--fb);overflow-wrap:anywhere}
+.errbar button{flex:none;border:0;background:rgba(255,255,255,.25);color:inherit;width:30px;height:30px;border-radius:50%;font:700 14px var(--fb);cursor:pointer}
+@keyframes errin{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){.errbar{animation:none}}

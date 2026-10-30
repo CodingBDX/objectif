@@ -48,7 +48,7 @@ export default function MyProfile() {
   const [h24, setH24] = useState(false); const [hours, setHours] = useState<Hours>({}); const [trips, setTrips] = useState<Trip[]>([{ city: "", from: "", to: "" }, { city: "", from: "", to: "" }, { city: "", from: "", to: "" }]);
   const [rates, setRates] = useState<{ d: string; p: string }[]>([]); const [tshow, setTshow] = useState(true); const [t30, setT30] = useState(""); const [t60, setT60] = useState(""); const [prog, setProg] = useState(-1); const [drag, setDrag] = useState(false); const [vip, setVip] = useState(false); const [verif, setVerif] = useState(false); const [paused, setPaused] = useState(false); const [ok18, setOk18] = useState(false);
   const [kind, setKind] = useState(""); const [isMember, setIsMember] = useState(false); const [pseudo, setPseudo] = useState(""); const [mphone, setMphone] = useState(""); const [hasPhone, setHasPhone] = useState(true); const [vlink, setVlink] = useState("");
-  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [farMsg, setFarMsg] = useState(""); const [wero, setWero] = useState(""); const [paypal, setPaypal] = useState("");
+  const [msg, setMsg] = useState<{ t: string; ok?: boolean } | null>(null); const invShown = useRef(false); const [farMsg, setFarMsg] = useState(""); const [wero, setWero] = useState(""); const [paypal, setPaypal] = useState("");
   const [delAsk, setDelAsk] = useState(false); const [delTxt, setDelTxt] = useState(""); const [delBusy, setDelBusy] = useState(false); const [delMsg, setDelMsg] = useState("");
   const [pMsg, setPMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [vMsg, setVMsg] = useState<{ t: string; ok?: boolean } | null>(null); const [busy, setBusy] = useState(false);
 
@@ -203,6 +203,7 @@ export default function MyProfile() {
       </aside>
       <main className="dmain dedit">
         <div className="pbar"><Crumbs inline items={[[tr("Accueil"), "/"], [isNewP ? tr("Créer mon profil") : tr("Mon espace"), "#"]]} /></div>
+        {msg && !msg.ok && <div className="errbar" role="alert"><span aria-hidden="true">⚠️</span><b>{msg.t}</b><button type="button" aria-label={tr("Fermer")} onClick={() => setMsg(null)}>✕</button></div>}
         <div className="dtop"><h1>{isNewP ? tr("Créer mon profil") : tr("Mon espace")}</h1></div>
         {!isNewP && <details className="dcard actbox"><summary>{tr("📊 Mon activité")}<small>{tr("Stats · Remonter · Points · Parrainage · Sécurité")}</small></summary>
           <StatsPanel />
@@ -244,7 +245,7 @@ export default function MyProfile() {
               {msg && <p className="note" role="alert" style={{ color: "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
               <button className="btn" type="submit" disabled={busy}>{tr("Créer mon profil membre")}</button>
             </fieldset></form>)}
-          {(kind === "createur" || kind === "livecam") && <form onSubmit={save} onInvalidCapture={(e) => (e.target as HTMLElement).closest(".dcard")?.classList.add("open")}><fieldset className="fs dform acc" onClick={toggleCard} onKeyDown={keyCard}>
+          {(kind === "createur" || kind === "livecam") && <form onSubmit={save} onInvalidCapture={(e) => { const el = e.target as HTMLElement; el.closest(".dcard")?.classList.add("open"); if (invShown.current) return; invShown.current = true; setTimeout(() => { invShown.current = false; }, 0); const lab = (el.closest("label")?.textContent || el.getAttribute("aria-label") || el.getAttribute("placeholder") || "").replace(/\s+/g, " ").trim().slice(0, 90); setMsg({ t: lab ? tr("Il manque une information obligatoire : {c}", { c: lab }) : tr("Il manque une information obligatoire : vérifie les champs marqués obligatoires.") }); }}><fieldset className="fs dform acc" onClick={toggleCard} onKeyDown={keyCard}>
             {kind === "livecam" && <p className="note">{tr("Pas de ville pour un profil livecam : ton profil apparaît uniquement dans la section Livecam.")}</p>}
             {kind === "livecam" && <p className="note">{tr("Profil livecam : tu n’as pas d’autre catégorie. Indique le lien de ton live ci-dessous et tes horaires. Les lives doivent rester professionnels et non sexuels (aucune nudité).")}</p>}
 <section className="dcard open"><h3>{tr("Moi")}</h3><h4 className="subh first">{tr("Qui es-tu ?")}</h4><div className="row2">
@@ -355,7 +356,7 @@ export default function MyProfile() {
                   <input type="time" disabled={h24 || !h} value={h ? h[1] : "19:00"} onChange={(e) => h && setHours({ ...hours, [String(i)]: [h[0], e.target.value] as [string, string] })} /></div>; })}
             </div>
 </section><section className="dcard"><label className="chk"><input type="checkbox" required checked={ok18} onChange={(e) => setOk18(e.target.checked)} /> <span>{tr("Je suis majeur·e, je détiens les droits sur ces contenus et ils sont professionnels (aucun contenu à caractère sexuel).")}</span></label>
-            {msg && <p className="note" role="alert" style={{ color: msg.ok ? "inherit" : "var(--btn)", fontWeight: 700 }}>{msg.t}</p>}
+            {msg?.ok && <p className="note" role="status" style={{ fontWeight: 700 }}>{msg.t}</p>}
             <button className="dbtn" type="submit" disabled={busy}>{busy ? tr("Patiente…") : isNewP ? tr("Publier mon profil") : tr("Enregistrer")}</button></section>
           </fieldset></form>}
           {!isNewP && <section className="dcard dzone" id="supprimer"><h3>{tr("🗑 Supprimer mon profil et mes données")}</h3><div style={{ display: "grid", gap: 10 }}>
