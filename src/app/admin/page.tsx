@@ -35,7 +35,7 @@ export default function Admin() {
     const { data } = await sb.from("reports").select("*, profiles(id,name,city,paused,vip,verified)").order("created_at", { ascending: false }).limit(300); setReports(data || []);
   }, []);
   const loadProfiles = useCallback(async () => {
-    let qq = sb.from("profiles").select("id,name,city,genre,vip,verified,paused,created_at,crown,crown_forced,points,street,zone,zone_map").order("created_at", { ascending: false }).limit(200);
+    let qq = sb.from("profiles").select("id,name,city,genre,vip,verified,paused,created_at,crown,crown_forced,points,street,zone,zone_map,zone_map_blocked").order("created_at", { ascending: false }).limit(200);
     if (q.trim()) qq = qq.ilike("name", `%${q.trim()}%`);
     const { data } = await qq; setProfiles(data || []);
     const { data: ve } = await sb.from("vip_until").select("profile_id,until,paused_at"); setVipEnd(Object.fromEntries((ve || []).map((x: any) => [x.profile_id, x])));
@@ -78,8 +78,8 @@ export default function Admin() {
     const { error } = await sb.rpc("admin_set_profile", { p_id: p.id, p_vip: n.vip, p_verified: n.verified, p_paused: n.paused });
     if (error) setErr(error.message); else { loadProfiles(); loadReports(); loadCounts(); loadExtra(); }
   }
-  async function setZoneMap(p: any, on: boolean) { setErr(""); const { error } = await sb.rpc("admin_set_zone_map", { p_id: p.id, p_on: on }); if (error) setErr(error.message); else loadProfiles(); }
-  const zoneBtn = (p: any) => p.street ? <span className="ck" title="Carte de la zone de travail (rue) sur la page du profil">📍 {p.zone || "zone"} : <button type="button" className="btn ghost" onClick={() => setZoneMap(p, !p.zone_map)}>{p.zone_map ? "Masquer la carte" : "Carte masquée · réafficher"}</button></span> : null;
+  async function blockZoneMap(p: any, blocked: boolean) { setErr(""); const { error } = await sb.rpc("admin_block_zone_map", { p_id: p.id, p_blocked: blocked }); if (error) setErr(error.message); else loadProfiles(); }
+  const zoneBtn = (p: any) => p.street ? <span className="ck" title="Carte de la zone de travail (rue) sur la page du profil">📍 {p.zone || "zone"}{p.zone_map ? " · carte demandée" : " · sans carte"} : <button type="button" className="btn ghost" onClick={() => blockZoneMap(p, !p.zone_map_blocked)}>{p.zone_map_blocked ? "Carte bloquée · débloquer" : "Bloquer la carte"}</button></span> : null;
   const loadLodgs = useCallback(async () => {
     const { data } = await sb.from("lodgings").select("*").order("updated_at", { ascending: false }).limit(200); const l = data || [];
     const ids = l.map((x: any) => x.profile_id);

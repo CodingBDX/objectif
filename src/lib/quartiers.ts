@@ -31,10 +31,10 @@ export const quartierOf = (city: string, name: string | null | undefined): Quart
 
 export type MapZone = { q: string; city: string; lat: number; lon: number; n: number; p: { id: string; name: string }[] };
 /** Zones à afficher sur la grande carte : profils de rue vérifiés qui ont activé la carte, regroupés par quartier (jamais de point exact). */
-export function buildZones(ps: { id: string; name: string; city: string; street?: boolean; zone?: string | null; zone_map?: boolean; verified?: boolean }[]): MapZone[] {
+export function buildZones(ps: { id: string; name: string; city: string; street?: boolean; zone?: string | null; zone_map?: boolean; zone_map_blocked?: boolean; verified?: boolean }[]): MapZone[] {
   const by: Record<string, MapZone> = {};
   ps.forEach((p) => {
-    if (!p.street || !p.zone_map || !p.verified) return; const q = quartierOf(p.city, p.zone); if (!q) return;
+    if (!p.street || !p.zone_map || p.zone_map_blocked || !p.verified) return; const q = quartierOf(p.city, p.zone); if (!q) return;
     const z = (by[p.city + "|" + q.n] ||= { q: q.n, city: p.city, lat: q.lat, lon: q.lon, n: 0, p: [] }); z.n++; if (z.p.length < 12) z.p.push({ id: p.id, name: p.name });
   });
   return Object.values(by);
