@@ -343,7 +343,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         </div>
         <div className="mchips">{ITEMS.map(([k, v]) => <button key={k} className="chip" aria-pressed={type === k} onClick={() => setType(k)}>{tr(v)}</button>)}</div>
         <div className="sh"><h1><Ic n="star" s={22} />{h1.startsWith("Escortes à ") ? tr("Escortes à {c}", { c: h1.slice(11) }) : tr(h1)}</h1><span className="cnt0" aria-live="polite">{list.length} {tr(list.length > 1 ? "profils" : "profil")}</span>
-          <button type="button" className="btn ghost" onClick={() => locate()} disabled={geoBusy} style={{ marginLeft: "auto" }}>📍 {geoBusy ? tr("Localisation…") : tr("Près de moi")}</button>
+          <button type="button" className="btn ghost nearbtn" onClick={() => locate()} disabled={geoBusy} style={{ marginLeft: "auto" }}>📍 {geoBusy ? tr("Localisation…") : tr("Près de moi")}</button>
           <div className="vsw" role="group" aria-label={tr("Affichage")}>
             <button type="button" aria-pressed={view === "cards"} title={tr("Affichage en cartes")} aria-label={tr("Cartes")} onClick={() => chView("cards")}><Ic n="grid" /></button>
             <button type="button" aria-pressed={view === "list"} title={tr("Affichage en liste")} aria-label={tr("Liste")} onClick={() => chView("list")}>

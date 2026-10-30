@@ -1476,3 +1476,6 @@ h1.pbn{margin:0}
 .trow:focus-within{z-index:6}
 .trow .cityin{position:relative;min-width:0}
 .trow .citylist{z-index:7}
+
+/* Mobile : le bouton « Près de moi » de la barre d'affichage est redondant (il est dans le menu) ; les vues passent à droite */
+@media (max-width:700px){.sh .nearbtn{display:none}.sh .vsw{margin-left:auto}}
