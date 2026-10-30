@@ -335,19 +335,19 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         <div className="panel">
           <div>{ITEMS.map(([k, v, i]) => <Link key={k} className={`si${type === k && !fav ? " on" : ""}`} href={k === "tous" ? (city ? `/ville/${slug(city)}` : "/") : city ? `/genre/${GPATH[k]}/${slug(city)}` : `/genre/${GPATH[k]}`}><Ic n={i} />{tr(v)}<span className="n">{cnt(k)}</span></Link>)}</div>
           <hr className="sep" />
-          <h2><Ic n="tag" s={20} />Spécialités</h2>
+          <p className="ph"><Ic n="tag" s={20} />Spécialités</p>
           <div>{tags.map(([t, n]) => <button key={t} className={`si${tag === t ? " on" : ""}`} onClick={() => setTag(tag === t ? "" : t)}>{cap(t)}<span className="n">{n}</span></button>)}</div>
         </div>
       </aside>
 
       <main style={{ minWidth: 0 }}>
         {!searchMode && hl.length > 0 && <section className="mhl" aria-label={tr("Mis en avant")}>
-          <h2><Ic n="star" s={20} />{tr("Mis en avant")}</h2>
+          <p className="ph"><Ic n="star" s={20} />{tr("Mis en avant")}</p>
           <div className="mhs" ref={slides}>{hl.map((p) => <button key={p.id} className="mslide" onClick={() => open(p.id)} aria-label={tr("Voir le profil de {n}", { n: p.name })}>
             <i className={p.vip ? "vip" : ""}>{p.photos[0] && <img src={thumbUrl(p.photos[0])} referrerPolicy="no-referrer" alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} decoding="async" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}{p.vip && <em><Ic n="crown" s={14} /></em>}</i>
             <b>{p.name}</b><small>{lab(p) ? lab(p) + " · " : ""}{p.city}</small></button>)}</div>
         </section>}
-        {!searchMode && <section className={`panel top${isHome ? " topx" : ""}${topAll ? " all" : ""}`} aria-labelledby="topH"><h2 id="topH"><Ic n="star" s={20} />Top <span className="t10">{isHome ? 18 : 9}</span><span className="t6">{isHome ? 12 : 6}</span><span className="t3">3</span> {region || "France"}</h2>
+        {!searchMode && <section className={`panel top${isHome ? " topx" : ""}${topAll ? " all" : ""}`} aria-labelledby="topH"><p className="ph" id="topH"><Ic n="star" s={20} />Top <span className="tnum" data-l={isHome ? 18 : 9} data-m={isHome ? 12 : 6} data-s={3} aria-hidden="true" /> {region || "France"}</p>
           <ol>{top.map(([c, n], i) => <li key={c}><Link className={city === c ? "on" : ""} href={city === c ? (type === "tous" ? "/" : `/genre/${GPATH[type]}`) : type === "tous" ? `/ville/${slug(c)}` : `/genre/${GPATH[type]}/${slug(c)}`}><span className="rk">{i + 1}</span>{c}<span className="n">{n} profil{n > 1 ? "s" : ""}</span></Link></li>)}</ol>{(isHome && (canNear || top.length > 6)) && <div className="topbtns">{isHome && top.length > 6 && <button type="button" className="btn ghost topmore" aria-expanded={topAll} onClick={() => setTopAll(!topAll)}>{topAll ? tr("Voir moins de villes") : tr("Voir toutes les villes ({n})", { n: top.length })}</button>}{isHome && canNear && <button type="button" className="btn topnear" onClick={() => { locate(); document.getElementById("topH")?.scrollIntoView({ block: "nearest" }); }} disabled={geoBusy}>📍 {geoBusy ? tr("Localisation…") : tr("Villes près de moi")}</button>}</div>}<button type="button" ref={msRef} className="btn msbtn" onClick={() => setSheet("open")}><Ic n="search" s={22} />{tr("Rechercher")}</button></section>}
         {stick && !sheet && <button type="button" className="msfloat" style={{ top: `calc(env(safe-area-inset-top, 0px) + ${navH + 8}px)` }} onClick={() => setSheet("open")} aria-label={tr("Rechercher")}><Ic n="search" s={20} />{tr("Rechercher")}</button>}
         {sheet && <div className={`sheetbg${sheet === "closing" ? " out" : ""}`} onClick={closeSheet} />}
