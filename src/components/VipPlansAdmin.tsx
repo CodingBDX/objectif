@@ -33,6 +33,12 @@ export default function VipPlansAdmin() {
     if (error) { setOk(false); setMsg("Erreur : " + error.message); return; }
     setRows((x) => x.filter((_, j) => j !== i)); await loadPlans(true);
   }
+  const [bk, setBk] = useState({ vip_iban: "", vip_bic: "", vip_holder: "" }); const [bkMsg, setBkMsg] = useState("");
+  useEffect(() => { (async () => { const { data } = await sb.from("site_settings").select("key,value").in("key", ["vip_iban", "vip_bic", "vip_holder"]); if (data) setBk((b) => { const n = { ...b }; (data as { key: keyof typeof b; value: string }[]).forEach((r) => { n[r.key] = r.value; }); return n; }); })(); }, [sb]);
+  async function saveBank() {
+    setBkMsg(""); const { error } = await sb.from("site_settings").upsert(Object.entries(bk).map(([key, value]) => ({ key, value: value.trim() })));
+    setBkMsg(error ? "Erreur : " + error.message + " (lance supabase/migration-vip-virement.sql)" : "Coordonnées du virement enregistrées ✓");
+  }
   return (
     <section className="card" style={{ padding: 14, display: "grid", gap: 10 }}>
       <h3 style={{ margin: 0 }}>Tarifs VIP</h3>
@@ -51,6 +57,13 @@ export default function VipPlansAdmin() {
         <button type="button" className="btn" disabled={busy} onClick={save}>{busy ? "…" : "Enregistrer les tarifs"}</button>
       </div>
       {msg && <p className="note" role="status" style={{ margin: 0, fontWeight: 700, color: ok ? "inherit" : "var(--btn)" }}>{msg}</p>}
+      <h3 style={{ margin: "10px 0 0" }}>🏦 Coordonnées du virement</h3>
+      <p className="note" style={{ margin: 0 }}>Affichées aux escortes qui choisissent un forfait (avec une référence unique par commande). Laisse l’IBAN vide pour masquer le virement.</p>
+      <input aria-label="Titulaire du compte" placeholder="Titulaire du compte" value={bk.vip_holder} onChange={(e) => setBk({ ...bk, vip_holder: e.target.value })} />
+      <input aria-label="IBAN" placeholder="IBAN" value={bk.vip_iban} onChange={(e) => setBk({ ...bk, vip_iban: e.target.value })} />
+      <input aria-label="BIC" placeholder="BIC" value={bk.vip_bic} onChange={(e) => setBk({ ...bk, vip_bic: e.target.value })} />
+      <div><button type="button" className="btn" onClick={saveBank}>Enregistrer les coordonnées</button></div>
+      {bkMsg && <p className="note" role="status" style={{ margin: 0, fontWeight: 700 }}>{bkMsg}</p>}
     </section>
   );
 }
