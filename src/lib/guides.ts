@@ -1,7 +1,63 @@
 /** Guides pratiques pour les escortes (contenu éditorial). Format : « ## titre », « - liste », **gras**. */
-export type Guide = { slug: string; title: string; desc: string; emoji: string; date: string; body: string };
+export type Guide = { slug: string; title: string; desc: string; emoji: string; date: string; body: string; video?: { src: string; poster: string; label: string; seconds: number } };
 
 export const GUIDES: Guide[] = [
+  {
+    slug: "calendrier-de-passages-mode-d-emploi", emoji: "📅", date: "2026-10-30",
+    video: { src: "/videos/calendrier.mp4", poster: "/videos/calendrier.jpg", label: "Vidéo : comment fonctionne le calendrier de passages (46 secondes, avec voix)", seconds: 46 },
+    title: "Le calendrier de passages : annonce tes dates et sois attendue",
+    desc: "Mode d'emploi du calendrier Sex-Escorte : ajouter tes déplacements, choisir ce qui est public et apparaître dans « Arrivent bientôt » avant ton arrivée.",
+    body: `Tu voyages, tu passes quelques jours dans une autre ville ? Le **calendrier de passages** permet aux clients de savoir **où tu seras et quand**, avant même ton arrivée. Résultat : des demandes à l'avance et un planning déjà rempli à ton arrivée.
+
+Regarde la vidéo ci-dessus (46 secondes), puis retrouve le détail étape par étape.
+
+## En trois gestes
+- **Ajoute** une ville et des dates dans Modifier mon profil.
+- **Choisis** ce qui est public avec un simple interrupteur.
+- **Laisse le site faire** : ton passage apparaît au bon moment, au bon endroit.
+
+## 1. Ajouter un passage
+- Ouvre **Modifier mon profil**, rubrique **Prochains déplacements**.
+- Tape le nom de la ville : une **suggestion** se propose, il te suffit de la choisir.
+- Renseigne la date d'**arrivée** et de **départ**.
+- Tu pars dans plusieurs villes ? Le bouton **＋** ajoute **autant de dates que tu veux**. Tu peux aussi en supprimer une à tout moment.
+
+## 2. Choisir ce qui est public
+Un **interrupteur** te laisse décider si ton arrivée est annoncée dans la rubrique **« Arrivent bientôt »**. Il est éteint ? Personne ne voit tes dates sur cette rubrique. Il est allumé ? Les clients de la ville peuvent te trouver.
+
+C'est **toi** qui décides, ville par ville et date par date : rien n'est publié sans ton accord.
+
+## 3. Ce que voient les clients
+- Sur ton profil, un slide **« Prochains passages »** s'affiche **au-dessus de ta présentation**, avec tes villes et tes dates.
+- Dans l'annuaire d'une ville, juste sous **« À la une »**, l'encart **« Arrivent bientôt »** présente les profils qui arrivent **dans les 3 prochains jours**.
+- Les clients des **villes voisines** (jusqu'à **50 km**) le voient aussi : c'est utile pour une agglomération.
+- Un filtre **« Arrive bientôt (1 mois) »** leur permet de repérer à l'avance les passages du mois et de planifier.
+
+## Pourquoi l'utiliser ?
+- **Plus de visibilité** : tu es trouvée avant d'arriver, pas seulement une fois sur place.
+- **Un planning déjà rempli** : les clients te contactent pour réserver un créneau.
+- **Moins de questions répétées** : tes dates sont claires sur ton profil.
+- **Aucune obligation** : tu gardes la main sur ce qui est affiché.
+
+## Nos conseils
+- **Mets à jour** tes dates dès qu'elles changent : une date dépassée disparaît toute seule.
+- Précise dans ta **présentation** ta ville de passage, tes horaires et ton mode de contact.
+- Pense à ta **sécurité** en déplacement : voir le guide « Préparer un déplacement ou une tournée ».
+- Ajoute plusieurs dates à l'avance : un client qui planifie cherche souvent **un mois avant**.
+
+## Questions fréquentes
+**Puis-je cacher mes dates ?**
+Oui. Éteins l'interrupteur : tes dates ne sont plus annoncées dans « Arrivent bientôt ». Tu peux le rallumer quand tu veux.
+
+**À partir de quand mon arrivée est-elle annoncée ?**
+Dans l'encart « Arrivent bientôt », elle apparaît **3 jours avant** ton arrivée. Le filtre « Arrive bientôt » permet, lui, de voir les passages du **mois** à venir.
+
+**Combien de villes puis-je ajouter ?**
+Autant que tu veux, avec le bouton **＋**.
+
+**Est-ce payant ?**
+Non : le calendrier est inclus dans ton profil.`
+  },
   {
     slug: "creer-un-profil-qui-attire", emoji: "📸", date: "2026-10-29",
     title: "Créer un profil qui attire : photos, texte et tarifs",

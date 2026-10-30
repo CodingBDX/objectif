@@ -1593,3 +1593,8 @@ h1.pbn{margin:0}
 .msearch label.ck,.dpanel label.ck{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:11px 14px;margin-top:8px;width:100%;cursor:pointer;justify-content:space-between;flex-direction:row-reverse;font-weight:600;line-height:1.3;box-shadow:var(--sh);transition:border-color .25s,background .25s}
 .msearch label.ck:has(input:checked),.dpanel label.ck:has(input:checked){border-color:var(--btn);background:var(--soft)}
 @media (prefers-reduced-motion:reduce){.msearch input[type=checkbox],.dpanel input[type=checkbox],.msearch input[type=checkbox]::after,.dpanel input[type=checkbox]::after{transition:none}}
+
+/* Article avec vidéo */
+.gvid{margin:18px auto 22px;max-width:340px;display:grid;gap:10px;justify-items:center}
+.gvid video{width:100%;aspect-ratio:9/16;background:var(--soft);border:3px solid var(--line);border-radius:30px;box-shadow:var(--sh);display:block}
+.gvid figcaption{font-size:14px;color:var(--mut);text-align:center;font-weight:600}
