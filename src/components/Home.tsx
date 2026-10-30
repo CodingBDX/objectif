@@ -53,6 +53,30 @@ function UneBanner({ p, onOpen }: { p: Profile; onOpen: () => void }) {
     </button>
   );
 }
+const ARR_DAYS = 3;
+function ArrivalsBanner({ items, city, onOpen }: { items: { p: Profile; from: string }[]; city: string; onOpen: (id: string) => void }) {
+  const { tr } = useT(); const box = useRef<HTMLDivElement>(null);
+  const when = (iso: string) => { const d = Math.round((new Date(iso + "T12:00:00Z").getTime() - new Date(todayP() + "T12:00:00Z").getTime()) / 864e5); return d <= 1 ? tr("Arrive demain") : tr("Arrive dans {n} jours", { n: d }); };
+  useEffect(() => { // plusieurs arrivées : le slide défile seul jusqu'au premier toucher (comme « Mis en avant »)
+    const el = box.current; if (!el || items.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let stop = false; const halt = () => { stop = true; }; el.addEventListener("pointerdown", halt); el.addEventListener("touchstart", halt, { passive: true });
+    const t = setInterval(() => { if (stop) return; const w = el.clientWidth * 0.86; el.scrollTo({ left: el.scrollLeft + w >= el.scrollWidth - el.clientWidth - 4 ? 0 : el.scrollLeft + w, behavior: "smooth" }); }, 3500);
+    return () => { clearInterval(t); el.removeEventListener("pointerdown", halt); el.removeEventListener("touchstart", halt); };
+  }, [items.length]);
+  return (
+    <section className="arrs" aria-label={tr("Arrivent bientôt à {c}", { c: city })}>
+      <h2 className="arrh"><Ic n="clock" s={16} /> {tr("Arrivent bientôt à {c}", { c: city })}</h2>
+      <div className={`arrl${items.length === 1 ? " one" : ""}`} ref={box}>
+        {items.map(({ p, from }) => (
+          <button key={p.id} type="button" className="une arr" onClick={() => onOpen(p.id)} aria-label={tr("Voir le profil de {n}", { n: p.name })}>
+            <i>{p.photos[0] && <img src={thumbUrl(p.photos[0])} referrerPolicy="no-referrer" alt="" decoding="async" loading="lazy" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}</i>
+            <span><small><Ic n="clock" s={14} /> {when(from)}</small><b>{p.name}</b><em>{dShort(from)}</em></span>
+            <u aria-hidden="true">→</u>
+          </button>))}
+      </div>
+    </section>
+  );
+}
 /** Remontée de moins de 24 h : passe devant ; ensuite les profils sont classés par points (fidélité), puis par date. */
 const bumpedNow = (p: Profile) => (p.bumped_at && Date.now() - new Date(p.bumped_at).getTime() < 864e5 ? 1 : 0);
 function Card({ p, onOpen, delay, trip }: { p: Profile; onOpen: () => void; delay?: number; trip?: { from: string; to: string } }) {
@@ -206,6 +230,12 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     const day = Math.floor((Date.now() + 3600000) / 86400000); let h = 0; for (const c of `${type}|${tag}|${cities.join(",")}`) h = (h * 31 + c.charCodeAt(0)) >>> 0;
     setUne(pool[(day + h) % pool.length]);
   }, [profiles, type, tag, cities, searchMode, fav]); // eslint-disable-line react-hooks/exhaustive-deps
+  const arrivals = useMemo(() => { // profils vérifiés qui annoncent leur arrivée dans la ville dans les 3 prochains jours
+    if (!city || searchMode || fav) return [] as { p: Profile; from: string }[];
+    const t = todayP(), lim = isoIn(ARR_DAYS); const out: { p: Profile; from: string }[] = [];
+    profiles.forEach((p) => { if (!p.trip_public || !p.verified || (type === "tous" ? p.genre === "livecam" : p.genre !== type) || inCities(p)) return; const x = tripsOf(p).find((v) => slug(v.city) === slug(city) && v.from > t && v.from <= lim); if (x) out.push({ p, from: x.from }); });
+    return out.sort((a, b) => a.from.localeCompare(b.from));
+  }, [profiles, city, type, searchMode, fav, cities]); // eslint-disable-line react-hooks/exhaustive-deps
   const [adAt, setAdAt] = useState(-1); // pub VIP : place aleatoire parmi les profils standard (choisie apres le rendu serveur)
   useEffect(() => {
     const ids = list.slice(0, 12).map((x, i) => (x.vip ? -1 : i)).filter((i) => i >= 0);
@@ -338,6 +368,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {cities.length > 1 && <p className="note multic">📍 {cities.join(" · ")} <Link href={searchMode ? "/recherche" : "/"}>{tr("Tout effacer")}</Link></p>}
         {view !== "map" && <div className="nowbar">{(nNow > 0 || now) && <button type="button" className={`nowchip${now ? " on" : ""}`} aria-pressed={now} onClick={() => setNow(!now)}><i aria-hidden="true" />{now ? tr("Disponibles maintenant · afficher tous les profils") : tr("Disponibles maintenant")}<b>{nNow}</b></button>}<button type="button" className={`nowchip qf${vid ? " on" : ""}`} aria-pressed={vid} onClick={() => setVid(!vid)}><Ic n="video" s={16} />{tr("Avec vidéo de présentation")}</button><button type="button" className={`nowchip qf${df.recv ? " on" : ""}`} aria-pressed={!!df.recv} onClick={() => setDf({ ...df, recv: !df.recv })}><Ic n="home" s={16} />{tr("Reçoit")}</button><button type="button" className={`nowchip qf${df.trav ? " on" : ""}`} aria-pressed={!!df.trav} onClick={() => setDf({ ...df, trav: !df.trav })}><Ic n="car" s={16} />{tr("Se déplace")}</button>{(rue || profiles.some((x) => x.street)) && <button type="button" className={`nowchip qf${rue ? " on" : ""}`} aria-pressed={rue} onClick={() => setRue(!rue)}><Ic n="pin" s={16} />{tr("Escorte de rue")}</button>}<button type="button" className={`nowchip qf${ver ? " on" : ""}`} aria-pressed={ver} onClick={() => setVer(!ver)}><Ic n="check" s={16} />{tr("Profils vérifiés uniquement")}</button></div>}
         {une && view !== "map" && <UneBanner p={une} onOpen={() => open(une.id)} />}
+        {arrivals.length > 0 && view !== "map" && <ArrivalsBanner items={arrivals} city={city} onOpen={open} />}
         <div className={`grid${view === "list" ? " lst" : ""}`} hidden={view === "map"}>
           {list.length ? list.slice(0, shown).flatMap((p, i) => { const c = <Card key={p.id} p={p} onOpen={() => open(p.id)} delay={(i % PAGE) * 45} trip={visit && city ? visitOf(p, city, visit) : undefined} />; return i === adAt ? [c, <VipAd key="vipad" />] : [c]; })
             : <div className="empty">{fav ? tr("Aucun favori pour le moment. Touchez le cœur d’un profil pour le garder ici.") : profiles.length ? (city && !profiles.some((p) => cityList(p).includes(city)) ? tr("Aucun profil à {c} pour le moment. Sois le premier : crée ton profil !", { c: city }) : <NoResult onClear={clear} />) : tr("Aucun profil pour le moment. Sois le premier : clique sur « Créer mon profil ».")}</div>}

@@ -1461,3 +1461,12 @@ h1.pbn{margin:0}
 .slide.on{transform:none}
 .slide>img{object-fit:contain;object-position:center;background:#111}
 @media (max-width:700px){.stage{aspect-ratio:4/5}}
+
+/* « Arrivent bientôt » : même style que « À la une », en slide quand il y en a plusieurs */
+.arrs{margin:0 0 14px;display:grid;gap:8px;min-width:0}
+.arrh{margin:0;display:flex;align-items:center;gap:6px;font:700 14px var(--fd);color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.arrl{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 2px 8px;margin-inline:-2px}
+.arrl::-webkit-scrollbar{display:none}
+.arrl .une.arr{margin:0;flex:0 0 86%;max-width:420px;scroll-snap-align:start;width:auto;border-style:dashed}
+.arrl.one .une.arr{flex:1 1 100%;max-width:none}
+@media (min-width:900px){.arrl .une.arr{flex-basis:380px}.arrl.one .une.arr{flex-basis:100%}}
