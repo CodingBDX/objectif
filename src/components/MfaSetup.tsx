@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
 
-type Pending = { id: string; qr: string; secret: string };
+type Pending = { id: string; qr: string; secret: string; uri: string };
 
 /** Code à 6 chiffres demandé après le mot de passe (compte protégé). */
 export function MfaChallenge({ onOk, title }: { onOk: () => void; title?: string }) {
@@ -52,7 +52,7 @@ export default function MfaSetup({ forced = false, onDone }: { forced?: boolean;
     const { data, error } = await sb.auth.mfa.enroll(params);
     setBusy(false);
     if (error || !data) { setOff(true); setMsg({ t: tr("La double authentification n’est pas disponible pour le moment.") + (error ? " (" + error.message + ")" : "") }); return; }
-    setPend({ id: data.id, qr: data.totp.qr_code, secret: data.totp.secret });
+    setPend({ id: data.id, qr: data.totp.qr_code, secret: data.totp.secret, uri: data.totp.uri });
   }
   async function confirm(e: FormEvent) {
     e.preventDefault(); if (!pend) return; setBusy(true); setMsg(null);
@@ -81,12 +81,13 @@ export default function MfaSetup({ forced = false, onDone }: { forced?: boolean;
         <button type="button" className="btn" disabled={busy} onClick={start}>{busy ? "…" : tr("Activer la double authentification")}</button>
       </>}
       {pend && <form className="fs" style={{ border: 0, padding: 0 }} onSubmit={confirm}>
-        <p className="note" style={{ margin: 0 }}><b>1.</b> {tr("Scanne ce QR code avec ton application d’authentification.")}</p>
+        <p className="note" style={{ margin: 0 }}><b>1.</b> {tr("Sur ordinateur : scanne ce QR code avec ton application. Sur téléphone : appuie sur le bouton ci-dessous, tout se remplit tout seul.")}</p>
+        <a className="btn" href={pend.uri} style={{ textDecoration: "none", justifySelf: "center" }}>📱 {tr("Ouvrir dans mon application")}</a>
         <img src={pend.qr} alt={tr("QR code de la double authentification")} width={180} height={180} style={{ background: "#fff", borderRadius: 16, padding: 8, border: "1px solid var(--line)", justifySelf: "center" }} />
         <div className="note" style={{ margin: 0, display: "grid", gap: 4 }}><span>{tr("Pas de QR code ? Saisis à la main dans ton application :")}</span>
           <span>• {tr("Site / émetteur")} : <b>Sex-Escorte</b></span>
           <span>• {tr("Compte / utilisateur")} : <b style={{ wordBreak: "break-all" }}>{acct}</b></span>
-          <span>• {tr("Clé secrète")} : <code style={{ wordBreak: "break-all", userSelect: "all" }}>{pend.secret}</code></span>
+          <span>• {tr("Clé secrète")} : <code style={{ wordBreak: "break-all", userSelect: "all" }}>{pend.secret}</code> <button type="button" className="btn ghost" style={{ minHeight: 34, padding: "4px 12px", fontSize: 13 }} onClick={async () => { try { await navigator.clipboard.writeText(pend.secret); setMsg({ t: tr("Clé copiée ✓"), ok: true }); } catch { setMsg({ t: tr("Sélectionne la clé et copie-la à la main.") }); } }}>{tr("Copier")}</button></span>
           <span>• {tr("Type : basé sur l’heure (TOTP)")}</span></div>
         <p className="note" style={{ margin: 0 }}><b>2.</b> {tr("Saisis le code à 6 chiffres affiché.")}</p>
         <input aria-label={tr("Code à 6 chiffres")} inputMode="numeric" autoComplete="one-time-code" maxLength={7} required value={code} onChange={(e) => setCode(e.target.value)} />
