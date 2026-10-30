@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
   const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-  const { data } = await sb.from("profiles").select("id,name,vip,city,more,genre,created_at,bumped_at,friendly_url,url_slug").eq("paused", false).limit(5000);
+  const { data } = await sb.from("profiles").select("*").eq("paused", false).limit(5000);
   const ps = ((data || []) as Row[]).filter((p) => !isDemoId(p.id));
 
   /** Vraie date de dernière modification : la plus récente entre création et dernière remontée du profil. */
