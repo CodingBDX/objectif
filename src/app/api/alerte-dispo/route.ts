@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  *  Envoie UN e-mail groupé aux visiteurs qui ont activé l'alerte quand un de leurs favoris devient disponible.
  *  Une même alerte n'est jamais renvoyée le même jour ; 6 profils maximum par personne et par jour ; les profils 24h/24 sont ignorés. */
 const MAX_PER_DAY = 6;
-export const unsubToken = (uid: string) => createHmac("sha256", process.env.CRON_SECRET || "").update("dispo:" + uid).digest("hex").slice(0, 32);
+const unsubToken = (uid: string) => createHmac("sha256", process.env.CRON_SECRET || "").update("dispo:" + uid).digest("hex").slice(0, 32);
 
 export async function POST(req: Request) {
   const secret = process.env.CRON_SECRET; const url = process.env.NEXT_PUBLIC_SUPABASE_URL; const sk = process.env.SUPABASE_SERVICE_ROLE_KEY; const rk = process.env.RESEND_API_KEY;
