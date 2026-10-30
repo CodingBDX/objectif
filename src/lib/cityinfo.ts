@@ -1,4 +1,4 @@
-import { cap, cityList, Profile } from "./types";
+import { cityList, Profile } from "./types";
 import { km } from "./geo";
 import { extraCity } from "./extraCities";
 import { geoNom } from "./cityname";
@@ -27,11 +27,9 @@ export async function cityIntro(city: string, profiles: Profile[]): Promise<stri
   const ps = profiles.filter((p) => cityList(p).includes(city)); const n = ps.length;
   const gc: Record<string, number> = {}; ps.forEach((p) => { gc[p.genre] = (gc[p.genre] || 0) + 1; });
   const genres = Object.entries(gc).sort((a, b) => b[1] - a[1]).map(([g, k]) => `${k} ${(GP[g] || [g, g])[k > 1 ? 1 : 0]}`);
-  const sc: Record<string, number> = {}; ps.forEach((p) => p.specialties.forEach((s) => { const k = s.toLowerCase(); sc[k] = (sc[k] || 0) + 1; }));
-  const specs = Object.entries(sc).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr")).slice(0, 5).map(([s]) => cap(s));
   const near = await nearbyCommunes(city, 3);
   return `${n} profil${n > 1 ? "s" : ""} à ${city}` + (genres.length ? ` (${list(genres)})` : "") + ", avec leurs disponibilités et leurs prochains passages."
-    + (specs.length ? ` Spécialités les plus présentes : ${list(specs)}.` : "") + (near.length ? ` Villes proches : ${list(near)}.` : "");
+    + (near.length ? ` Villes proches : ${list(near)}.` : "");
 }
 
 /** Région de chaque ville : lue d'abord dans les profils (colonne `region`, instantané). L'API officielle (cache 7 jours, 1,2 s max) ne sert que pour les villes sans région enregistrée. */

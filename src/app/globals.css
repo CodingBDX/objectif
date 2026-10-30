@@ -126,7 +126,7 @@ select{background:var(--card);border:1px solid var(--line);border-radius:999px;p
 .vipb .ic{fill:currentColor;stroke-width:1.4}
 .card.live,.card.live.isvip{background:var(--livebg);border-color:var(--live);box-shadow:0 8px 26px rgba(154,92,200,.32)}
 .card.live .tag{background:rgba(154,92,200,.2);color:var(--livetx)}
-.card.live .avl.on,.card.live .fav,.card.live .ln h2{color:var(--livetx)}
+.card.live .avl.on,.card.live .fav,.card.live .ln :is(h2,h3){color:var(--livetx)}
 .card.live .meta svg{color:var(--live)}
 .card.live .cover{background:var(--livebg)}
 .badge.live{background:var(--live);color:var(--livet)}
@@ -182,7 +182,7 @@ select{background:var(--card);border:1px solid var(--line);border-radius:999px;p
 .vid-ic{position:absolute;left:8px;bottom:8px;display:flex;align-items:center;gap:4px;background:var(--btn);color:var(--btnt);border-radius:999px;padding:2px 10px;font:700 12px var(--fb)}
 .in{padding:12px 8px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
 .ln{display:flex;align-items:center;gap:5px}
-.ln h2{margin:0;font:600 16px var(--fd);flex:1;min-width:0;line-height:1.15;overflow-wrap:anywhere}
+.ln :is(h2,h3){margin:0;font:600 16px var(--fd);flex:1;min-width:0;line-height:1.15;overflow-wrap:anywhere}
 .fav{border:0;background:transparent;color:var(--pink);min-width:44px;height:44px;margin:-8px 0 -8px 0;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 6px;flex:none;font:700 13px var(--fb)}
 .fav:hover{background:var(--soft)}
 .fav svg{fill:none;stroke:currentColor;stroke-width:2}
@@ -565,7 +565,7 @@ body{overflow-x:clip}
 .card.isvip:not(.live):not(.off){background:#ffe0ee;border:1.5px solid var(--pink);box-shadow:0 8px 26px rgba(238,79,151,.34)}
 .card.isvip:not(.live):not(.off) .cover{background:#ffe0ee}
 .card.isvip:not(.live):not(.off) .tag{background:rgba(238,79,151,.2);color:#a3175f}
-.card.isvip:not(.live):not(.off) .ln h2,.card.isvip:not(.live):not(.off) .avl.on{color:#a3175f}
+.card.isvip:not(.live):not(.off) .ln :is(h2,h3),.card.isvip:not(.live):not(.off) .avl.on{color:#a3175f}
 .card.isvip:not(.live):not(.off) .meta svg{color:var(--pink)}
 .card.isvip:not(.live):not(.off):hover{box-shadow:0 12px 32px rgba(238,79,151,.5)}
 
@@ -1494,7 +1494,7 @@ h1.pbn{margin:0}
 .card.duo2 .mos{display:block}
 .card.duo2 .mos div{position:absolute;inset:0}
 .card.duo2 .in{padding:8px 4px 0;gap:3px}
-.card.duo2 .ln h2{font-size:16px}
+.card.duo2 .ln :is(h2,h3){font-size:16px}
 .card.duo2 .meta{font-size:12.5px}
 .card.duo2 .avb,.card.duo2 .vipb,.card.duo2 .nwb{font-size:11px;padding:2px 8px 2px 6px}
 .card.duo2 .nwb{top:36px}
