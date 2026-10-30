@@ -170,7 +170,7 @@ export default function Admin() {
     setVerifs((l) => l.filter((y) => y.profile_id !== x.profile_id)); loadProfiles(); refreshListings();
   }
   const nav = (t: Tab, label: string, badge = 0) => <a href={`#${t}`} className={tab === t ? "on" : ""} aria-current={tab === t ? "page" : undefined} onClick={(e) => { e.preventDefault(); setTab(t); }}>{label}{badge > 0 && <b style={{ marginLeft: "auto", background: "var(--pink)", color: "#fff", borderRadius: 999, padding: "1px 8px", fontSize: 12 }}>{badge}</b>}</a>;
-  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", membres: "Membres", verifs: "Demandes de vérification", lodgings: "Logements" };
+  const title: Record<Tab, string> = { dash: "Tableau de bord", profiles: "Profils", reports: "Signalements", messages: "Messages", specs: "Spécialités", clients: "Clients signalés", assos: "Associations", journal: "Journal des actions", secu: "Sécurité", membres: "Membres", verifs: "Demandes de vérification", lodgings: "Logements", mails: "E-mails bloqués" };
 
   return (
     <div className="dash gut">
