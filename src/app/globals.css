@@ -1612,3 +1612,9 @@ h1.pbn{margin:0}
 .une.asso{text-decoration:none;border-style:solid}
 .une.asso i{display:grid;place-items:center;font-size:28px;font-style:normal}
 .une.asso em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.vpay .vtime{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 12px;border-radius:14px;background:var(--livebg,var(--soft));color:var(--ink)}
+.vpay .vtime b{font:700 15px ui-monospace,monospace;color:var(--btn)}
+.vpay-m .vbank{grid-column:1/-1}
+.vpay-m .vbank .f{display:grid;gap:4px;font-size:14px}
+@media (max-width:560px){.vpay-m{grid-template-columns:1fr}}

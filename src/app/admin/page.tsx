@@ -303,7 +303,7 @@ export default function Admin() {
           {orders.map((o) => (
             <div className="dcard" key={o.id} style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", padding: "10px 16px" }}>
               <div style={{ flex: "1 1 220px", minWidth: 0 }}><Link href={`/profil/${o.profile_id}`}><b>{o.profiles?.name || "Profil"}</b></Link>
-                <div className="note">{o.plan} · <b>{o.amount} €</b> · réf. <code>{o.ref}</code> · {ago(o.declared_at || o.created_at)}</div></div>
+                <div className="note">{o.plan} · <b>{o.amount} €</b> · réf. <code>{o.ref}</code>{o.payer_last && <> · virement de <b>{o.payer_first} {o.payer_last}</b></>} · {ago(o.declared_at || o.created_at)}</div></div>
               {o.status === "declared" ? <><button type="button" className="btn" onClick={() => decide(o.id, true)}>✓ Argent reçu : valider</button><button type="button" className="btn ghost" onClick={() => decide(o.id, false)}>Refuser</button></>
                 : <span className="gchip">{({ pending: "en attente de paiement", validated: "validé", refused: "refusé", cancelled: "annulé" } as Record<string, string>)[o.status] || o.status}</span>}
             </div>))}
