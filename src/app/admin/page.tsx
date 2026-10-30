@@ -6,7 +6,7 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
 
-type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu" | "membres";
+type Tab = "dash" | "profiles" | "reports" | "messages" | "specs" | "clients" | "assos" | "journal" | "lodgings" | "verifs" | "secu" | "membres" | "mails";
 const fmt = (t: string) => new Date(t).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const ago = (t: string) => { const m = Math.max(1, Math.round((Date.now() - new Date(t).getTime()) / 60000)); return m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.round(m / 60)} h` : `il y a ${Math.round(m / 1440)} j`; };
 const iso = (d: Date) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
@@ -26,6 +26,9 @@ export default function Admin() {
   const [daily, setDaily] = useState<{ day: string; views: number; calls: number }[]>([]); const [dailyErr, setDailyErr] = useState(false);
   const [cnt, setCnt] = useState<{ total: number; vip: number; paused: number; month: number; g: Record<string, number> }>({ total: 0, vip: 0, paused: 0, month: 0, g: {} });
   const [specs, setSpecs] = useState<string[]>([]); const [specDb, setSpecDb] = useState(true); const [specEd, setSpecEd] = useState<Record<string, string>>({}); const [specNew, setSpecNew] = useState(""); const [specUse, setSpecUse] = useState<Record<string, number>>({}); const [specOk, setSpecOk] = useState("");
+  const [doms, setDoms] = useState<string[]>([]); const [domNew, setDomNew] = useState(""); const [domErr, setDomErr] = useState(""); const [domQ, setDomQ] = useState("");
+  const loadDoms = useCallback(async () => { const { data, error } = await sb.from("disposable_domains").select("domain").order("domain").limit(5000); if (error) { setDomErr("Lance d’abord migration-email-jetables.sql dans Supabase."); return; } setDomErr(""); setDoms((data || []).map((x: any) => x.domain)); }, []);
+  useEffect(() => { if (state === "ok" && tab === "mails") loadDoms(); }, [state, tab, loadDoms]);
   const [rej, setRej] = useState<Record<string, string>>({}); const [q, setQ] = useState(""); const [onlyNew, setOnlyNew] = useState(true); const [sure, setSure] = useState(""); const [err, setErr] = useState("");
 
   const loadReports = useCallback(async () => {
@@ -174,7 +177,7 @@ export default function Admin() {
         <div className="dhi">Administration</div>
         <nav>
           {nav("dash", "📊 Tableau de bord")}{nav("profiles", "👤 Profils")}{nav("reports", "🚩 Signalements", nNew)}{nav("messages", "✉️ Messages", nMsg)}{nav("specs", "🏷 Spécialités")}
-          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("membres", "👥 Membres")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
+          {nav("assos", "🤝 Associations", assos.filter((a) => a.status === "pending").length)}{nav("clients", "🛡️ Clients signalés")}{nav("journal", "📜 Journal")}{nav("membres", "👥 Membres")}{nav("mails", "📧 E-mails bloqués")}{nav("secu", "🔒 Sécurité", secEv.filter((x) => Date.now() - new Date(x.created_at).getTime() < 864e5).length)}{nav("verifs", "✅ Vérifications", verifs.length)}{nav("lodgings", "🏠 Logements", lodgs.filter((x) => x.status === "pending").length)}
           <Link href="/">📖 Annuaire</Link>
         </nav>
         <div className="dvip"><div className="crown">🔔</div><b>À traiter</b>
@@ -274,6 +277,20 @@ export default function Admin() {
             </div>))}
         </div>)}
 
+        {tab === "mails" && (<div style={{ display: "grid", gap: 10 }}>
+          <p className="note" style={{ margin: 0 }}>Les inscriptions avec ces domaines d’e-mail (jetables) sont refusées, sous-domaines compris. {doms.length} domaine{doms.length > 1 ? "s" : ""} bloqué{doms.length > 1 ? "s" : ""}.</p>
+          {domErr && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>{domErr}</p>}
+          <form className="dcard" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", padding: "10px 16px" }}
+            onSubmit={async (e) => { e.preventDefault(); const d = domNew.trim().toLowerCase().replace(/^.*@/, "").replace(/^https?:\/\//, "").replace(/\/.*$/, ""); if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)) { setDomErr("Domaine invalide (ex. mailinator.com)."); return; } const { error } = await sb.from("disposable_domains").upsert({ domain: d }); if (error) setDomErr(error.message); else { setDomNew(""); loadDoms(); } }}>
+            <input style={{ flex: "1 1 220px" }} placeholder="Domaine à bloquer, ex. mailinator.com" value={domNew} onChange={(e) => setDomNew(e.target.value)} aria-label="Domaine à bloquer" />
+            <button className="btn" type="submit">Bloquer</button>
+          </form>
+          <input placeholder="Rechercher un domaine…" value={domQ} onChange={(e) => setDomQ(e.target.value)} aria-label="Rechercher un domaine" />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {doms.filter((d) => d.includes(domQ.trim().toLowerCase())).map((d) => <span key={d} className="gchip" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>{d}
+              <button type="button" aria-label={`Débloquer ${d}`} title="Débloquer" style={{ border: 0, background: "none", cursor: "pointer", color: "inherit", font: "inherit", padding: 0 }} onClick={async () => { await sb.from("disposable_domains").delete().eq("domain", d); loadDoms(); }}>✕</button></span>)}
+          </div>
+        </div>)}
         {tab === "specs" && (<div style={{ display: "grid", gap: 10 }}>
           {!specDb && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>Lance d’abord <code>migration-specialites-admin.sql</code> dans Supabase pour pouvoir modifier la liste.</p>}
           <p className="note" style={{ margin: 0 }}>Renommer change le mot partout, y compris sur les profils qui l’avaient choisi. Supprimer le retire aussi des profils. L’ordre ici est celui de la page « Mon profil ». {specs.length} spécialité{specs.length > 1 ? "s" : ""}.</p>

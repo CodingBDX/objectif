@@ -1,6 +1,9 @@
 -- ===== Bloquer les e-mails jetables a l'inscription ===== a lancer UNE fois (relancable)
 create table if not exists public.disposable_domains (domain text primary key);
-alter table public.disposable_domains enable row level security;  -- personne n'y accede depuis le site, seul le declencheur la lit
+alter table public.disposable_domains enable row level security;  -- seul l'admin la gere depuis /admin, le declencheur la lit
+drop policy if exists "admin gere les domaines" on public.disposable_domains;
+create policy "admin gere les domaines" on public.disposable_domains for all to authenticated using (public.is_admin()) with check (public.is_admin());
+grant select, insert, update, delete on public.disposable_domains to authenticated;
 
 insert into public.disposable_domains(domain) values
   ('10minutemail.com'),
@@ -240,4 +243,4 @@ drop trigger if exists block_disposable_email on auth.users;
 create trigger block_disposable_email before insert on auth.users
 for each row execute function public.block_disposable_email();
 
--- pour bloquer un domaine de plus plus tard :  insert into public.disposable_domains values ('exemple.com');
+-- pour bloquer / debloquer un domaine : onglet « E-mails bloques » de /admin
