@@ -3,6 +3,50 @@ export type Guide = { slug: string; title: string; desc: string; emoji: string; 
 
 export const GUIDES: Guide[] = [
   {
+    slug: "securite-et-profil-numero-masque-filigrane-verifie", emoji: "🛡️", date: "2026-10-30",
+    video: { src: "/videos/securite-et-profil.mp4", poster: "/videos/securite-et-profil.jpg", label: "Vidéo : ta présentation, ta sécurité et tes disponibilités (102 secondes, avec voix)", seconds: 102 },
+    title: "Ta sécurité sur Sex-Escorte : numéro masqué, filigrane, profil vérifié et suppression",
+    desc: "Ce que le site fait pour te protéger : numéro masqué, filigrane sur tes photos et vidéos, profil vérifié, disponibilités, profil grisé hors horaires et suppression définitive de ton compte.",
+    body: `Un profil, c'est une vitrine, mais c'est aussi ta **sécurité**. Regarde la vidéo ci-dessus (102 secondes), puis retrouve le détail de ce que fait le site pour toi.
+
+## 1. Ta présentation
+- Écris **au moins 150 caractères** : elle aide **Google** à bien référencer ton profil, et elle rassure les clients.
+- **Pour toi :** une vitrine qui se voit et qui inspire confiance.
+
+## 2. Ton numéro est masqué
+- Ton numéro n'est **jamais écrit dans la page**. Il ne s'affiche que quand quelqu'un le **demande**.
+- Il y a une **limite de demandes par visiteur**, contre les robots et les collecteurs de numéros.
+- **Pour toi :** ton numéro reste à l'abri.
+
+## 3. Photos et vidéos protégées
+- Tes photos reçoivent automatiquement le **filigrane Sex-Escorte**, et les données cachées, comme la **position GPS**, sont **effacées**.
+- Photos et vidéos portent aussi un **filigrane propre à chaque visiteur** (un code et la date) : si une capture d'écran circule, on peut remonter à son origine.
+- **Pour toi :** un vol d'image se retrouve.
+
+## 4. Le profil vérifié, important
+- Tu envoies une **photo de toi avec un papier daté**. **Seule l'équipe la voit**, elle n'est jamais publiée, et elle est **supprimée dès qu'on a répondu**.
+- Le **badge vérifié** rassure les clients. La **carte de zone** et l'**annonce d'arrivée** sont **réservées aux profils vérifiés**.
+- **Pour toi :** plus de confiance, plus de demandes.
+
+## 5. Tes disponibilités
+- Indique **24h/24, 7j/7**, ou les **jours et les heures** qui te conviennent. C'est obligatoire.
+- Les clients voient si tu es **disponible maintenant**, et jusqu'à quelle heure.
+- **Pour toi :** les clients savent quand t'écrire.
+
+## 6. Hors horaires, ton profil devient gris
+- En dehors de tes heures, ta carte devient **grise** et indique **Indisponible**, avec l'heure de reprise.
+- Sur ta fiche, le numéro n'est **plus proposé** et le profil affiche **« Elle dort »** avec l'heure de retour : **pas d'appel** quand tu te reposes.
+- **Pour toi :** tu n'es dérangée que quand tu le veux.
+
+## 7. Supprimer ton profil pour de bon
+- Dans **Modifier mon profil**, en bas : « Supprimer mon profil et mes données ». Tu confirmes en écrivant **SUPPRIMER**.
+- Sont **effacés définitivement** : ton profil, tes photos et ta vidéo, tes commentaires, tes signalements de numéros et ton compte de connexion. C'est **irréversible**.
+- **Pour toi :** tu pars vraiment, sans trace sur le site.
+
+## À retenir
+Un profil **protégé**, **vérifié**, qui **respecte ton rythme**. Prends quelques minutes pour vérifier ta présentation, tes disponibilités et ta vérification dans **Modifier mon profil**.`,
+  },
+  {
     slug: "ou-te-trouver-villes-distance-et-rue", emoji: "📍", date: "2026-10-30",
     video: { src: "/videos/ou-te-trouver.mp4", poster: "/videos/ou-te-trouver.jpg", label: "Vidéo : ta ville, tes déplacements et le travail de rue (88 secondes, avec voix)", seconds: 88 },
     title: "Où te trouver ? Ta ville, la distance, tes déplacements et le travail de rue",
