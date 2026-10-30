@@ -228,7 +228,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     if (saved?.city && allCities.includes(saved.city)) setNear(saved.city);
     (async () => { try { const st = await (navigator as any).permissions?.query({ name: "geolocation" }); if (st?.state === "granted") locate(true); } catch {} })();
   }, [canNear, allCities.length]); const fav = !!sp.get("fav");
-  useEffect(() => { try { const sv = localStorage.getItem("objectif_vue"); if (sv === "list" || sv === "duo") setView(sv); } catch {} }, []);
+  useEffect(() => { try { const sv = localStorage.getItem("objectif_vue"); if (sv === "list" || (sv === "duo" && window.innerWidth <= 700)) setView(sv); } catch {} }, []);
   useEffect(() => { setShown(PAGE); }, [type, tag, q, sort, vid, ver, now, rue, tar, dur, visit, city, fav, df]);
   const chView = (v: "cards" | "list" | "duo" | "map") => { setView(v); if (v !== "map") { try { localStorage.setItem("objectif_vue", v); } catch {} } };
 
