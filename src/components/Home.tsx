@@ -18,6 +18,7 @@ import { useT, Tr } from "@/lib/i18n";
 import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("./MapView"), { ssr: false, loading: () => <p className="note"><Tr k="Chargement de la carte…" /></p> });
 import { useFavs } from "@/lib/favs";
+import { tooFar, cityCentre } from "@/lib/dist";
 import { avail, tripsOf, todayP, dShort } from "@/lib/avail";
 import { CIC, cap, cityList, isNew, lab, Profile, showTarif, LANGS, ETHNIES, HAIRS, EYES, BRAS } from "@/lib/types";
 const DF0 = { amin: "", amax: "", hmin: "", hmax: "", wmin: "", wmax: "", eth: "", lang: "", hair: "", eyes: "", bra: "", smk: "", drk: "", recv: false, trav: false };
@@ -53,8 +54,8 @@ function UneBanner({ p, onOpen }: { p: Profile; onOpen: () => void }) {
     </button>
   );
 }
-const ARR_DAYS = 3;
-function ArrivalsBanner({ items, city, onOpen }: { items: { p: Profile; from: string }[]; city: string; onOpen: (id: string) => void }) {
+const ARR_DAYS = 3; const ARR_KM = 50;
+function ArrivalsBanner({ items, city, onOpen }: { items: { p: Profile; from: string; at: string }[]; city: string; onOpen: (id: string) => void }) {
   const { tr } = useT(); const box = useRef<HTMLDivElement>(null);
   const when = (iso: string) => { const d = Math.round((new Date(iso + "T12:00:00Z").getTime() - new Date(todayP() + "T12:00:00Z").getTime()) / 864e5); return d <= 1 ? tr("Arrive demain") : tr("Arrive dans {n} jours", { n: d }); };
   useEffect(() => { // plusieurs arrivées : le slide défile seul jusqu'au premier toucher (comme « Mis en avant »)
@@ -65,12 +66,12 @@ function ArrivalsBanner({ items, city, onOpen }: { items: { p: Profile; from: st
   }, [items.length]);
   return (
     <section className="arrs" aria-label={tr("Arrivent bientôt à {c}", { c: city })}>
-      <h2 className="arrh"><Ic n="clock" s={16} /> {tr("Arrivent bientôt à {c}", { c: city })}</h2>
+      <h2 className="arrh"><Ic n="clock" s={16} /> {items.some((x) => slug(x.at) !== slug(city)) ? tr("Arrivent bientôt à {c} et alentour", { c: city }) : tr("Arrivent bientôt à {c}", { c: city })}</h2>
       <div className={`arrl${items.length === 1 ? " one" : ""}`} ref={box}>
-        {items.map(({ p, from }) => (
+        {items.map(({ p, from, at }) => (
           <button key={p.id} type="button" className="une arr" onClick={() => onOpen(p.id)} aria-label={tr("Voir le profil de {n}", { n: p.name })}>
             <i>{p.photos[0] && <img src={thumbUrl(p.photos[0])} referrerPolicy="no-referrer" alt="" decoding="async" loading="lazy" onError={(e) => { const el = e.currentTarget; if (!el.dataset.fb) { el.dataset.fb = "1"; el.src = p.photos[0]; } }} />}</i>
-            <span><small><Ic n="clock" s={14} /> {when(from)}</small><b>{p.name}</b><em>{dShort(from)}</em></span>
+            <span><small><Ic n="clock" s={14} /> {when(from)}</small><b>{p.name}</b><em>{slug(at) !== slug(city) ? `${at} · ` : ""}{dShort(from)}</em></span>
             <u aria-hidden="true">→</u>
           </button>))}
       </div>
@@ -253,13 +254,22 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
     const day = Math.floor((Date.now() + 3600000) / 86400000); let h = 0; for (const c of `${type}|${tag}|${cities.join(",")}`) h = (h * 31 + c.charCodeAt(0)) >>> 0;
     setUne(pool[(day + h) % pool.length]);
   }, [profiles, type, tag, cities, searchMode, fav]); // eslint-disable-line react-hooks/exhaustive-deps
-  const arrivals = useMemo(() => { // profils vérifiés qui annoncent leur arrivée dans la ville dans les 3 prochains jours
-    if (!city || searchMode || fav) return [] as { p: Profile; from: string }[];
-    const t = todayP(), lim = isoIn(ARR_DAYS); const out: { p: Profile; from: string }[] = [];
-    profiles.forEach((p) => { if (!p.trip_public || !p.verified || (type === "tous" ? p.genre === "livecam" : p.genre !== type) || inCities(p)) return; const x = tripsOf(p).find((v) => slug(v.city) === slug(city) && v.from > t && v.from <= lim); if (x) out.push({ p, from: x.from }); });
-    return out.sort((a, b) => a.from.localeCompare(b.from));
+  const arrCand = useMemo(() => { // profils vérifiés qui annoncent une arrivée dans les 3 prochains jours (toutes villes)
+    if (!city || searchMode || fav) return [] as { p: Profile; from: string; at: string }[];
+    const t = todayP(), lim = isoIn(ARR_DAYS); const out: { p: Profile; from: string; at: string }[] = [];
+    profiles.forEach((p) => { if (!p.trip_public || !p.verified || (type === "tous" ? p.genre === "livecam" : p.genre !== type) || inCities(p)) return; const x = tripsOf(p).filter((v) => v.from > t && v.from <= lim).sort((m, n) => m.from.localeCompare(n.from))[0]; if (x) out.push({ p, from: x.from, at: x.city }); });
+    return out;
   }, [profiles, city, type, searchMode, fav, cities]); // eslint-disable-line react-hooks/exhaustive-deps
-  const nVis = useMemo(() => (city ? profiles.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && !!visitOf(p, city, 30)).length : 0), [profiles, city, type]);
+  const [arrivals, setArrivals] = useState<{ p: Profile; from: string; at: string }[]>([]);
+  useEffect(() => { // seulement la ville choisie et les villes à moins de 50 km
+    let dead = false;
+    (async () => {
+      const out: { p: Profile; from: string; at: string }[] = [];
+      for (const c of arrCand) { if (slug(c.at) === slug(city) || !(await tooFar(city, c.at, ARR_KM)) && !!(await cityCentre(c.at)) && !!(await cityCentre(city))) out.push(c); }
+      if (!dead) setArrivals(out.sort((x, y) => x.from.localeCompare(y.from)));
+    })();
+    return () => { dead = true; };
+  }, [arrCand, city]);
   const [adAt, setAdAt] = useState(-1); // pub VIP : place aleatoire parmi les profils standard (choisie apres le rendu serveur)
   useEffect(() => {
     const ids = list.slice(0, 12).map((x, i) => (x.vip ? -1 : i)).filter((i) => i >= 0);
