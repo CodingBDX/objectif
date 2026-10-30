@@ -53,7 +53,7 @@ Dans Modifier mon profil, carte « ⭐ Mes points » : solde, niveau, progressio
   },
   {
     slug: "trouver-un-profil-categories-villes-filtres", emoji: "🔎", date: "2026-10-30",
-    video: { src: "/videos/trouver-un-profil.mp4", poster: "/videos/trouver-un-profil.jpg", label: "Vidéo : trouver un profil (45 secondes, avec voix)", seconds: 45 },
+    video: { src: "/videos/trouver-un-profil.mp4", poster: "/videos/trouver-un-profil.jpg", label: "Vidéo : comment les clients te trouvent et ce que ça t’apporte (50 secondes, avec voix)", seconds: 50 },
     title: "Trouver un profil : catégories, villes, filtres, carte et favoris",
     desc: "Mode d'emploi de l'annuaire : choisir une catégorie et une ville, affiner avec les filtres, utiliser la carte et suivre ses favoris.",
     body: `L'annuaire Sex-Escorte se parcourt en quelques gestes. Voici comment retrouver le bon profil rapidement.
