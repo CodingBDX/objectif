@@ -1583,3 +1583,13 @@ h1.pbn{margin:0}
 .dedit .hf .d>label{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:10px 14px;justify-content:space-between;flex-direction:row-reverse;grid-column:1/-1}
 .dedit .hf .d>label:has(input:checked){border-color:var(--btn);background:var(--soft)}
 .dedit .hf .d{grid-template-columns:1fr 1fr}
+
+/* Filtres de recherche : mêmes interrupteurs + bulles que Modifier mon profil */
+.msearch input[type=checkbox],.dpanel input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;position:relative;width:52px;height:30px;margin:0;border-radius:999px;background:var(--offbg,#f3e2ec);border:2px solid var(--line);cursor:pointer;transition:background .25s,border-color .25s}
+.msearch input[type=checkbox]::after,.dpanel input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(92,26,67,.3);transition:transform .25s}
+.msearch input[type=checkbox]:checked,.dpanel input[type=checkbox]:checked{background:var(--btn);border-color:var(--btn)}
+.msearch input[type=checkbox]:checked::after,.dpanel input[type=checkbox]:checked::after{transform:translateX(22px)}
+.msearch input[type=checkbox]:focus-visible,.dpanel input[type=checkbox]:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.msearch label.ck,.dpanel label.ck{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:11px 14px;margin-top:8px;width:100%;cursor:pointer;justify-content:space-between;flex-direction:row-reverse;font-weight:600;line-height:1.3;box-shadow:var(--sh);transition:border-color .25s,background .25s}
+.msearch label.ck:has(input:checked),.dpanel label.ck:has(input:checked){border-color:var(--btn);background:var(--soft)}
+@media (prefers-reduced-motion:reduce){.msearch input[type=checkbox],.dpanel input[type=checkbox],.msearch input[type=checkbox]::after,.dpanel input[type=checkbox]::after{transition:none}}
