@@ -1648,3 +1648,21 @@ h1.pbn{margin:0}
 .gvc figcaption{font-size:11px}
 .gvc figcaption b{font-size:12px}
 }
+/* Squelettes de chargement (cartes et profil) */
+.sk{position:relative;overflow:hidden;background:var(--soft);border-radius:14px}
+.sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(100deg,transparent 20%,rgba(255,255,255,.65) 50%,transparent 80%);animation:skm 1.4s ease-in-out infinite}
+@keyframes skm{to{transform:translateX(100%)}}
+.sk-h{height:34px;margin:18px 0 12px;border-radius:12px}
+.sk-t{height:22px;width:60%;border-radius:10px}
+.sk-l{height:14px;margin:10px 0;border-radius:8px}
+.sk-p{display:inline-block;width:64px;height:26px;border-radius:999px}
+.sk-btn{height:54px;width:60%;border-radius:999px;margin:14px 0}
+.skc{pointer-events:none;animation:skin .5s both}
+@keyframes skin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.skc .cover{border-radius:20px}
+.skb{padding:12px 8px 0;display:grid;gap:4px}
+.skpf{display:grid;gap:18px;padding:18px 0;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.skpf-img{aspect-ratio:3/4;border-radius:28px;max-height:70vh}
+.skpf-info{display:grid;align-content:start;gap:4px}
+@media (max-width:700px){.skpf{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.sk::after{animation:none}.skc{animation:none}}
