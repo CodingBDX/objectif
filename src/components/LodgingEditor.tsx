@@ -46,10 +46,10 @@ export default function LodgingEditor({ uid }: { uid: string }) {
     const row = { title: title.trim(), description: desc.trim(), city, area: area.trim() || null, lat: c ? c[1] : null, lon: c ? c[0] : null, photos: photos.slice(0, 3), price_day: num(pd), price_week: num(pw), price_month: num(pm),
       busy: busy.filter((b) => b.from).map((b) => ({ from: b.from, to: b.to || b.from })).slice(0, 24) };
     const { error } = has ? await sb.from("lodgings").update(row).eq("profile_id", uid) : await sb.from("lodgings").insert({ profile_id: uid, ...row });
-    if (error) { setWait(false); setMsg({ t: tr("Enregistrement impossible : ") + error.message }); return; }
+    if (error) { setWait(false); setMsg({ t: tr("Enregistrement impossible. Vérifie ta connexion et réessaie dans un instant.") }); return; }
     const { error: e2 } = await sb.from("lodging_private").upsert({ profile_id: uid, address: addr.trim() });
     setWait(false);
-    if (e2) { setMsg({ t: tr("Adresse non enregistrée : ") + e2.message }); return; }
+    if (e2) { setMsg({ t: tr("Le logement est enregistré, mais pas l’adresse. Réessaie dans un instant.") }); return; }
     setHas(true); setStatus("pending"); setMsg({ t: tr("✔ Enregistré. Ton logement sera visible après validation."), ok: true });
   }
   async function del() { setWait(true); await sb.from("lodgings").delete().eq("profile_id", uid); setWait(false); setHas(false); setStatus(""); setTitle(""); setDesc(""); setCity(""); setArea(""); setAddr(""); setPhotos([]); setPd(""); setPw(""); setPm(""); setBusy([]); setMsg({ t: tr("Logement supprimé."), ok: true }); }

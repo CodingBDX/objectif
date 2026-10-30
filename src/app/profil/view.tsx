@@ -103,13 +103,14 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
           <div className="pmain">
             <Slider imgs={p.photos} vip={p.vip} video={p.video} alt={p.genre === "livecam" ? p.name : `${p.name}, ${CATS[p.genre] || "profil"} à ${p.city}`} />
             <div className="pbar phead"><h1 className="pbn">{p.name} <CrownBadge level={p.crown} size={28} /></h1>
-              <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}{p.verified && <span className="vf" role="img" aria-label="Profil vérifié" title="Profil vérifié"><Ic n="check" s={12} /></span>}
-                {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> <Tr k="Nouveau" /></span>}
-                {p.vip && <span className="vipb" style={{ position: "static" }}><Ic n="crown" s={14} />VIP</span>}</span>
+              <span className="pbadges">{live && <span className="liveb"><i />LIVE</span>}{p.verified && <span className="vfp"><Ic n="check" s={14} /><Tr k="Profil vérifié" /></span>}
+                {p.vip && <span className="vipp"><Ic n="crown" s={14} />VIP</span>}
+                {isNew(p) && <span className="gchip"><Ic n="spark" s={13} /> <Tr k="Nouveau" /></span>}</span>
+              {a && !asleep && <p className={`pdisp${a.on ? " on" : ""}`}><i aria-hidden="true" />{a.on ? (a.h24 ? <Tr k="Disponible 24h/24, 7j/7" /> : <Tr k="Disponible jusqu’à {u}" vars={{ u: a.until || "" }} />) : <><Tr k="Indisponible" />{a.next ? <Tr k=" · reprend {n}" vars={{ n: a.next }} /> : null}</>}</p>}
               <div className="pcontact">
                 {!mine && <span className="pfav"><Heart id={p.id} /></span>}
                 {mine && <PauseBtn id={p.id} paused={p.paused} icon className="soc pz" />}
-                {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k={p.genre === "homme" ? "Il dort" : "Elle dort"} /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
+                {asleep && <span className="pph zz"><Ic n="clock" s={18} /><b><Tr k="En pause" /></b>{back && <small><Tr k="(retour le {d} à {h})" vars={{ d: dShort(back.iso), h: back.time }} /></small>}</span>}
                 {!asleep && <PhoneReveal id={p.id} path={want} live={live} mine={mine} name={p.name} wa={!!p.whatsapp} sms={!!p.sms} />}
                 {Object.keys(SOC).map((k) => { const h = handle((p as any)[k]); if ((!p.vip && !live) || !h || !okHandle(h)) return null; const [i, n, u] = SOC[k];
                   if (k === "snapchat") return <SnapLink key={k} id={p.id} skip={mine} href={u(h)} name={p.name} path={want}><Ic n={i} s={22} /></SnapLink>;
@@ -122,24 +123,24 @@ export async function ProfileView({ r, path }: { r: Ref; path: string }) {
             <div className="panel pi">
               <div className="pst" role="list" aria-label="Informations du profil">
                 <div role="listitem"><i aria-hidden="true">📅</i><b><TDate iso={p.created_at} /></b><span><Tr k="Inscription" /></span></div>
-                {<div role="listitem"><i aria-hidden="true">🕒</i><b>{seen ? <Tr k={seen.k} vars={seen.v} /> : <Tr k="Pas encore connectée" />}</b><span><Tr k="Dernière connexion" /></span></div>}
-                {st && <div role="listitem"><i aria-hidden="true">👁</i><b>{fmtN(st.views_total)}</b><span><Tr k="Vues au total" /></span></div>}
-                {st && <div role="listitem"><i aria-hidden="true">🔥</i><b>{fmtN(st.views_today)}</b><span><Tr k="Vues aujourd’hui" /></span></div>}
+                {<div role="listitem"><i aria-hidden="true">🕒</i><b>{seen ? <Tr k={seen.k} vars={seen.v} /> : <Tr k="Pas de connexion récente" />}</b><span><Tr k="Dernière connexion" /></span></div>}
+                {st && (mine || st.views_total >= 100) && <div role="listitem"><i aria-hidden="true">👁</i><b>{fmtN(st.views_total)}</b><span><Tr k="Vues au total" /></span></div>}
+                {st && (mine || st.views_total >= 100) && <div role="listitem"><i aria-hidden="true">🔥</i><b>{fmtN(st.views_today)}</b><span><Tr k="Vues aujourd’hui" /></span></div>}
               </div>
               {showTarif(p) && <div className="rates" aria-label="Tarifs">{rateList(p).map((r) => <span key={r.d}><Ic n="rose" s={18} /><Tr k={RATE_OPTS.find((o) => o[0] === r.d)![1]} /> <b>{r.p}</b></span>)}</div>}
               {live && (p.pay_wero || p.pay_paypal) && <div className="rates pay" aria-label="Paiement">
-                {p.pay_wero && <span><Ic n="rose" s={18} />Wero <b>{p.pay_wero}</b><CopyBtn text={p.pay_wero} label="Copier" className="" /></span>}
-                {p.pay_paypal && (/^https:\/\/(www\.)?paypal\.me\/[\w./-]+$/i.test(p.pay_paypal) ? <span><Ic n="rose" s={18} />PayPal <a className="nb" href={p.pay_paypal} target="_blank" rel="noopener noreferrer">{p.pay_paypal.replace(/^https:\/\/(www\.)?/i, "")}</a></span> : <span><Ic n="rose" s={18} />PayPal <b>{p.pay_paypal}</b><CopyBtn text={p.pay_paypal} label="Copier" className="" /></span>)}</div>}
-              {(p.genre || p.receives || p.travels || p.age || p.hair || p.eyes || p.bra || p.smoker || p.drinker || p.height_cm || p.weight_kg || p.ethnicity || p.nationality || (p.languages || []).length > 0) && <><h2 className="pres"><Tr k="Description" /></h2>
-                <Collapse n={4} as="ul" className="dscr">{p.genre ? <li><span><Tr k="👤 Genre" /></span><b><Tr k={CATS[p.genre]} /></b></li> : null}{p.receives ? <li><span><Tr k="🏠 Rencontre" /></span><b><Tr k="Reçoit" /></b></li> : null}{p.travels ? <li><span><Tr k="🚗 Rencontre" /></span><b><Tr k="Se déplace" /></b></li> : null}{p.age ? <li><span><Tr k="🎂 Âge" /></span><b>{p.age} <Tr k="ans" /></b></li> : null}{p.height_cm ? <li><span><Tr k="📏 Taille" /></span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span><Tr k="⚖️ Poids" /></span><b>{p.weight_kg} kg</b></li> : null}{p.hair ? <li><span><Tr k="💇 Cheveux" /></span><b><Tr k={p.hair!} /></b></li> : null}{p.eyes ? <li><span><Tr k="👁 Yeux" /></span><b><Tr k={p.eyes!} /></b></li> : null}{p.bra ? <li><span><Tr k="👙 Bonnet" /></span><b>{p.bra}</b></li> : null}{p.smoker ? <li><span><Tr k="🚬 Fume" /></span><b><Tr k={HL[p.smoker]} /></b></li> : null}{p.drinker ? <li><span><Tr k="🍷 Boit" /></span><b><Tr k={HL[p.drinker]} /></b></li> : null}{p.ethnicity ? <li><span><Tr k="🌍 Ethnie" /></span><b><Tr k={p.ethnicity!} /></b></li> : null}{p.nationality ? <li><span><Tr k="🏳️ Nationalité" /></span><b>{p.nationality}</b></li> : null}{(p.languages || []).length > 0 ? <li><span><Tr k="🗣 Langues" /></span><b>{p.languages!.map((l, i) => <span key={l}>{i > 0 ? ", " : ""}<Tr k={l} /></span>)}</b></li> : null}</Collapse></>}
+                {p.pay_wero && <span><Ic n="tag" s={18} />Wero <b>{p.pay_wero}</b><CopyBtn text={p.pay_wero} label="Copier" className="" /></span>}
+                {p.pay_paypal && (/^https:\/\/(www\.)?paypal\.me\/[\w./-]+$/i.test(p.pay_paypal) ? <span><Ic n="tag" s={18} />PayPal <a className="nb" href={p.pay_paypal} target="_blank" rel="noopener noreferrer">{p.pay_paypal.replace(/^https:\/\/(www\.)?/i, "")}</a></span> : <span><Ic n="tag" s={18} />PayPal <b>{p.pay_paypal}</b><CopyBtn text={p.pay_paypal} label="Copier" className="" /></span>)}</div>}
+  
+              {p.bio && <h2 className="pres"><Tr k="Présentation" /></h2>}
+              <div className="bio"><RichText text={p.bio} /></div>            {(p.genre || p.receives || p.travels || p.age || p.hair || p.eyes || p.bra || p.smoker || p.drinker || p.height_cm || p.weight_kg || p.ethnicity || p.nationality || (p.languages || []).length > 0) && <><h2 className="pres"><Tr k="Description" /></h2>
+                <Collapse n={4} as="ul" className="dscr">{p.genre ? <li><span><Tr k="Genre" /></span><b><Tr k={CATS[p.genre]} /></b></li> : null}{p.receives ? <li><span><Tr k="Rencontre" /></span><b><Tr k="Reçoit" /></b></li> : null}{p.travels ? <li><span><Tr k="Rencontre" /></span><b><Tr k="Se déplace" /></b></li> : null}{p.age ? <li><span><Tr k="Âge" /></span><b>{p.age} <Tr k="ans" /></b></li> : null}{p.height_cm ? <li><span><Tr k="Taille" /></span><b>{p.height_cm} cm</b></li> : null}{p.weight_kg ? <li><span><Tr k="Poids" /></span><b>{p.weight_kg} kg</b></li> : null}{p.hair ? <li><span><Tr k="Cheveux" /></span><b><Tr k={p.hair!} /></b></li> : null}{p.eyes ? <li><span><Tr k="Yeux" /></span><b><Tr k={p.eyes!} /></b></li> : null}{p.bra ? <li><span><Tr k="Bonnet" /></span><b>{p.bra}</b></li> : null}{p.smoker ? <li><span><Tr k="Fume" /></span><b><Tr k={HL[p.smoker]} /></b></li> : null}{p.drinker ? <li><span><Tr k="Boit" /></span><b><Tr k={HL[p.drinker]} /></b></li> : null}{p.ethnicity ? <li><span><Tr k="Ethnie" /></span><b><Tr k={p.ethnicity!} /></b></li> : null}{p.nationality ? <li><span><Tr k="Nationalité" /></span><b>{p.nationality}</b></li> : null}{(p.languages || []).length > 0 ? <li><span><Tr k="Langues" /></span><b>{p.languages!.map((l, i) => <span key={l}>{i > 0 ? ", " : ""}<Tr k={l} /></span>)}</b></li> : null}</Collapse></>}
               {p.street && p.zone && <section className="zbox" aria-label="Zone"><h2 className="pres"><Tr k="Zone" /></h2>
-                <div className="zhd"><b>📍 {p.zone}</b>{p.street_hours && <span>🕒 {p.street_hours}</span>}</div>
+                <div className="zhd"><b><Ic n="pin" s={16} /> {p.zone}</b>{p.street_hours && <span><Ic n="clock" s={16} /> {p.street_hours}</span>}</div>
                 {p.zone_map && !p.zone_map_blocked && p.verified && quartierOf(p.city, p.zone) && <ZoneMap lat={quartierOf(p.city, p.zone)!.lat} lon={quartierOf(p.city, p.zone)!.lon} label={p.zone} />}
                 <p className="znote"><Tr k="Zone approximative : la position exacte n’est jamais affichée." /></p></section>}
               {p.specialties.length > 0 && <div className="mspec"><h2 className="pres"><Tr k="Spécialités" /></h2><Collapse n={4} className="bub">{p.specialties.map((t) => <span key={t} className="bubble">{cap(t)}</span>)}</Collapse></div>}
               {trips.length > 0 && <TripsSlide trips={trips.map((x) => ({ city: x.city, from: x.from, to: x.to }))} />}
-              {p.bio && <h2 className="pres"><Tr k="Présentation" /></h2>}
-              <div className="bio"><RichText text={p.bio} /></div>
               <div className="acts"><CopyBtn text="" label="🔗 Copier le lien du profil" />
                 {!mine && <ReportBtn profileId={p.id} />}
                 {p.site && /^https?:\/\//.test(p.site) && <a className="btn ghost" href={p.site} target="_blank" rel="noopener noreferrer"><Tr k="Site web" /></a>}</div>

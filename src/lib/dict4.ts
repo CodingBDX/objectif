@@ -232,4 +232,23 @@ export const DICT4: Record<string, [string, string, string]> = {
   "Aucun profil à afficher sur la carte. Élargis la zone ou retire un filtre.": ["No profiles to show on the map. Widen the area or remove a filter.", "Ningún perfil que mostrar en el mapa. Amplía la zona o quita un filtro.", "Nenhum perfil para mostrar no mapa. Alarga a zona ou retira um filtro."],
   "Aucun profil près de toi pour l’instant. Essaie une ville du Top 10.": ["No profiles near you yet. Try a city from the Top 10.", "Aún no hay perfiles cerca de ti. Prueba una ciudad del Top 10.", "Ainda não há perfis perto de ti. Experimenta uma cidade do Top 10."],
   "Aucun logement ici pour l’instant. Élargis la distance, ou propose le tien depuis Modifier le profil.": ["No places here yet. Widen the distance, or offer yours from Edit profile.", "Aún no hay alojamientos aquí. Amplía la distancia, u ofrece el tuyo desde Editar perfil.", "Ainda não há alojamentos aqui. Alarga a distância, ou propõe o teu em Editar perfil."],
+  // Fiche profil : libellés sans émoji, formules neutres
+  "En pause": ["On break", "En pausa", "Em pausa"],
+  "Pas de connexion récente": ["No recent login", "Sin conexión reciente", "Sem ligação recente"],
+  "Genre": ["Gender", "Género", "Género"],
+  "Rencontre": ["Meeting", "Encuentro", "Encontro"],
+  "Taille": ["Height", "Altura", "Altura"],
+  "Poids": ["Weight", "Peso", "Peso"],
+  "Cheveux": ["Hair", "Pelo", "Cabelo"],
+  "Yeux": ["Eyes", "Ojos", "Olhos"],
+  "Bonnet": ["Cup size", "Copa", "Copa"],
+  "Boit": ["Drinks", "Bebe", "Bebe"],
+  "Nationalité": ["Nationality", "Nacionalidad", "Nacionalidade"],
+  "Langues": ["Languages", "Idiomas", "Línguas"],
+  // Logements : erreurs traduites, navigation
+  "Tous les logements": ["All listings", "Todos los alojamientos", "Todos os alojamentos"],
+  "5 alertes maximum : désactive-en une.": ["5 alerts maximum: turn one off.", "5 alertas como máximo: desactiva una.", "5 alertas no máximo: desativa uma."],
+  "Impossible de modifier l’alerte. Réessaie dans un instant.": ["Couldn’t change the alert. Try again in a moment.", "No se pudo cambiar la alerta. Inténtalo de nuevo en un momento.", "Não foi possível alterar o alerta. Tenta de novo daqui a pouco."],
+  "Enregistrement impossible. Vérifie ta connexion et réessaie dans un instant.": ["Couldn’t save. Check your connection and try again in a moment.", "No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.", "Não foi possível guardar. Verifica a ligação e tenta de novo."],
+  "Le logement est enregistré, mais pas l’adresse. Réessaie dans un instant.": ["The place is saved, but not the address. Try again in a moment.", "El alojamiento está guardado, pero no la dirección. Inténtalo de nuevo.", "O alojamento está guardado, mas não a morada. Tenta de novo."],
 };

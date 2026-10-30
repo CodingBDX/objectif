@@ -1,4 +1,5 @@
 import { supabaseServer } from "./supabase/server";
+import { ownerVisible } from "./lodging";
 
 /** Logements visibles par tout le monde : approuvés ET propriétaire VIP, vérifié et non en pause.
  *  Filtré ici en plus des règles Supabase (un compte admin ou propriétaire voit tout via RLS). */
@@ -10,7 +11,7 @@ export async function publicLodgings(cols: string, withGeo = false) {
   const rows = ((data || []) as unknown as any[]);
   const ids = rows.map((l) => l.profile_id);
   const { data: owners } = ids.length ? await sb.from("profiles").select("id,name,vip,verified,paused").in("id", ids) : { data: [] as any[] };
-  const ok = new Map((owners || []).filter((o: any) => o.vip && o.verified && !o.paused).map((o: any) => [o.id, o.name as string]));
+  const ok = new Map((owners || []).filter((o: any) => ownerVisible(o)).map((o: any) => [o.id, o.name as string]));
   return rows.filter((l) => ok.has(l.profile_id)).map((l) => ({ ...l, owner: ok.get(l.profile_id) as string }));
 }
 

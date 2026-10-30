@@ -8,6 +8,7 @@ import { cityCentre, km } from "@/lib/dist";
 import { slug } from "@/lib/site";
 import { WARNING } from "@/lib/lodging";
 import { sbLazy } from "@/lib/supabase/lazy";
+import Ic from "@/components/Ic";
 
 export type LItem = { id: string; title: string; city: string; area: string | null; lat: number | null; lon: number | null; photo: string; day: number | null; week: number | null; month: number | null; owner: string };
 const RADII = [0, 10, 25, 50, 100, 200, 100000];
@@ -19,7 +20,7 @@ export default function LodgingSearch({ items, strip, initialCity = "" }: { item
   const alertOn = !!city && alerts.includes(city.toLowerCase());
   async function toggleAlert(on: boolean) {
     setAMsg(""); const sb = await sbLazy(); const { error } = await sb.rpc("set_lodging_alert", { p_city: city, p_on: on });
-    if (error) { setAMsg(error.message); return; }
+    if (error) { setAMsg(/5 alertes/.test(error.message) ? tr("5 alertes maximum : désactive-en une.") : tr("Impossible de modifier l’alerte. Réessaie dans un instant.")); return; }
     setAlerts((a) => on ? [...a, city.toLowerCase()] : a.filter((x) => x !== city.toLowerCase()));
     setAMsg(on ? tr("✔ Alerte activée : tu seras prévenu·e par e-mail.") : tr("Alerte désactivée."));
   }
@@ -36,7 +37,7 @@ export default function LodgingSearch({ items, strip, initialCity = "" }: { item
   return (
     <>
       <section className="dcard" style={{ display: "grid", gap: 12 }}>
-        <p className="note" role="note" style={{ margin: 0 }}>⚠️ {tr(WARNING)}</p>
+        <p className="note" role="note" style={{ margin: 0 }}><span aria-hidden="true">⚠️ </span>{tr(WARNING)}</p>
         <div className="row2">
           <div className="f"><span style={{ fontSize: 14, fontWeight: 700, color: "var(--mut)" }}>{tr("Ville")}</span>
             <CityInput value={city} onChange={(v) => { setCity(v); if (!v) setC0(null); }} onPick={pick} label={tr("Ville")} placeholder={tr("Ex. Lyon")} /></div>
@@ -48,13 +49,13 @@ export default function LodgingSearch({ items, strip, initialCity = "" }: { item
       {strip && list.length > 0 ? <div className="lstrip">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lslide" aria-label={l.title}>
             <i>{l.photo ? <img src={mediaUrl(l.photo)} alt="" loading="lazy" /> : null}</i>
-            <b>{l.title}</b><small>{l.city}{l.day ? ` · ${l.day} €` : l.week ? ` · ${l.week} €` : l.month ? ` · ${l.month} €` : ""}</small></Link>))}</div> : null}
+            <b>{l.title}</b><small>{l.city}{(l.day || l.week || l.month) ? <> · <Ic n="rose" s={12} /> {l.day || l.week || l.month}</> : null}</small></Link>))}</div> : null}
       {strip && list.length > 0 ? null : list.length === 0 ? <p className="note" role="status">{tr("Aucun logement ici pour l’instant. Élargis la distance, ou propose le tien depuis Modifier le profil.")}</p> :
         <div className="lgrid">{list.map((l) => (
           <Link key={l.id} href={`/logements/${l.id}`} className="lcard">
-            {l.photo ? <img src={mediaUrl(l.photo)} alt={l.title} width={640} height={420} loading="lazy" decoding="async" /> : <span className="lph" />}
-            <div className="lbody"><b>{l.title}</b><span className="note">📍 {l.city}{l.area ? ` · ${l.area}` : ""}</span>
-              <span className="rates">{l.day ? <span>{tr("Jour")} <b>{l.day}</b></span> : null}{l.week ? <span>{tr("Semaine")} <b>{l.week}</b></span> : null}{l.month ? <span>{tr("Mois")} <b>{l.month}</b></span> : null}</span>
+            {l.photo ? <img src={mediaUrl(l.photo)} alt="" width={640} height={420} loading="lazy" decoding="async" /> : <span className="lph" />}
+            <div className="lbody"><b>{l.title}</b><span className="note"><Ic n="pin" s={14} /> {l.city}{l.area ? ` · ${l.area}` : ""}</span>
+              <span className="rates">{l.day ? <span><Ic n="rose" s={16} />{tr("Jour")} <b>{l.day}</b></span> : null}{l.week ? <span><Ic n="rose" s={16} />{tr("Semaine")} <b>{l.week}</b></span> : null}{l.month ? <span><Ic n="rose" s={16} />{tr("Mois")} <b>{l.month}</b></span> : null}</span>
               <small className="note">{l.owner}</small></div></Link>))}</div>}
     </>
   );
