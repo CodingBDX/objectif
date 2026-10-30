@@ -4,12 +4,12 @@ export type Guide = { slug: string; title: string; desc: string; emoji: string; 
 export const GUIDES: Guide[] = [
   {
     slug: "points-et-couronnes-mode-d-emploi", emoji: "⭐", date: "2026-10-30",
-    video: { src: "/videos/points.mp4", poster: "/videos/points.jpg", label: "Vidéo : le système de points et de couronnes (51 secondes, avec voix)", seconds: 51 },
+    video: { src: "/videos/points.mp4", poster: "/videos/points.jpg", label: "Vidéo : le système de points et ce que ça t’apporte (57 secondes, avec voix)", seconds: 57 },
     title: "Points et couronnes : gagne des avantages sur Sex-Escorte",
     desc: "Comment gagner des points, monter de couronne (Bronze, Argent, Or, Diamant) et les échanger contre une remontée ou des jours de VIP.",
     body: `Plus ton profil est complet et actif, plus tu gagnes de **points**. Ils débloquent des **couronnes** visibles sur ton profil et s'échangent contre des avantages. Tout se passe dans la carte **⭐ Mes points** de Modifier mon profil.
 
-Regarde la vidéo ci-dessus (51 secondes), puis retrouve le détail.
+Regarde la vidéo ci-dessus (57 secondes), puis retrouve le détail.
 
 ## Comment gagner des points
 - **+50** : profil complet (3 photos et une présentation d'au moins 150 caractères), une seule fois.
@@ -35,6 +35,12 @@ La couronne s'affiche sur ton profil, à côté de tes badges. **Ton niveau ne b
 - **7 jours de VIP** : 400 points.
 
 Le solde « à dépenser » baisse quand tu échanges, mais le total gagné (et donc ta couronne) reste le même.
+
+## Ce que ça t'apporte
+- **Plus de confiance** : un profil complet, vérifié et couronné rassure les clients.
+- **Plus de visibilité** : tu peux remonter en tête de liste avec tes points.
+- **Du VIP offert** : par le parrainage (1 mois par amie vérifiée) ou en échangeant 400 points contre 7 jours.
+- **Aucun risque** : ton niveau ne baisse jamais.
 
 ## Pour monter vite
 - Complète ton profil et fais-le **vérifier** : tu démarres à 150 points.
