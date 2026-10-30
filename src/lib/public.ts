@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
 import { Profile, SPECIALTIES } from "./types";
+import { proxyMedia } from "./img";
 
 /** Lectures publiques (sans cookies) mises en cache 5 min côté serveur (vidées tout de suite quand un profil change) : la navigation entre pages devient quasi instantanée. */
 const anon = () => createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -24,7 +25,7 @@ export const publicProfiles = unstable_cache(async (): Promise<Profile[]> => {
   const rows = (b.data || []) as { profile_id: string; views: number }[];
   const m = new Map<string, number>(rows.map((x) => [x.profile_id, Number(x.views)] as [string, number]));
   const f = new Map<string, number>(((c.data || []) as { profile_id: string; favs: number }[]).map((x) => [x.profile_id, Number(x.favs)] as [string, number]));
-  ps.forEach((p) => { p.views = m.get(p.id) || 0; p.favs = f.get(p.id) || 0; p.specialties = (p.specialties || []).filter((x) => spec.includes(x)); });
+  ps.forEach((p) => { p.views = m.get(p.id) || 0; p.favs = f.get(p.id) || 0; p.specialties = (p.specialties || []).filter((x) => spec.includes(x)); proxyMedia(p); });
   return ps;
 }, ["public-profiles"], { revalidate: 300, tags: ["profiles"] });
 

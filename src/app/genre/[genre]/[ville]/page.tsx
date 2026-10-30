@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import Home from "@/components/Home";
 import { allProfiles, cityBySlug, cityFromSlug } from "@/lib/data";
-import { GFROM, GPATH, GTITLE } from "@/lib/site";
+import { GFROM, GPATH, GTITLE, MIN_INDEX } from "@/lib/site";
 import { cityList } from "@/lib/types";
 import CityIntro from "@/components/CityIntro";
 import CityAssos from "@/components/CityAssos";
@@ -12,8 +12,9 @@ import Ld, { crumbs, Crumbs, itemList } from "@/components/Ld";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { genre: string; ville: string } }): Promise<Metadata> {
-  const g = GFROM[params.genre]; const city = cityBySlug(await allProfiles(), params.ville); if (!g || !city) return {};
-  return { title: `Escortes ${GTITLE[g].toLowerCase()} à ${city}`, description: `Escortes ${GTITLE[g].toLowerCase()} à ${city} : photos, tarifs, disponibilités et agenda des passages. Profils majeurs et protégés des arnaqueurs.`, alternates: { canonical: `/genre/${GPATH[g]}/${params.ville}` } };
+  const ps = await allProfiles(); const g = GFROM[params.genre]; const city = cityBySlug(ps, params.ville); if (!g || !city) return {};
+  const n = ps.filter((p) => p.genre === g && cityList(p).includes(city)).length;
+  return { title: `Escortes ${GTITLE[g].toLowerCase()} à ${city}`, description: `Escortes ${GTITLE[g].toLowerCase()} à ${city} : photos, tarifs, disponibilités et agenda des passages. Profils majeurs et protégés des arnaqueurs.`, alternates: { canonical: `/genre/${GPATH[g]}/${params.ville}` }, ...(n < MIN_INDEX ? { robots: { index: false, follow: true } } : {}) };
 }
 export default async function Page({ params }: { params: { genre: string; ville: string } }) {
   const g = GFROM[params.genre]; const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville) || cityFromSlug(params.ville);

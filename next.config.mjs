@@ -1,4 +1,5 @@
 const host = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname : "localhost";
+const sbUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/$/, "");
 export default {
   images: { remotePatterns: [{ protocol: "https", hostname: host }] },
   /* Refus de l'entraînement d'IA sur les images et textes (les moteurs de recherche ne sont pas touchés). */
@@ -11,11 +12,18 @@ export default {
       { key: "Permissions-Policy", value: "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)" },
       { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
       { key: "Content-Security-Policy", value: "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'" }
-    ] }];
+    ] }, {
+      /* Photos et vidéos des profils : jamais dans Google Images ni réutilisées par une IA. */
+      source: "/media/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, noimageindex, noai, noimageai" }]
+    }];
   },
   /* IndexNow : le fichier de preuve /<clé>.txt est servi par une route (la clé est dans la variable INDEXNOW_KEY). */
   async rewrites() {
-    return [{ source: "/:k([a-f0-9]{16,64})\\.txt", destination: "/api/indexnow-key?k=:k" }];
+    return [
+      { source: "/:k([a-f0-9]{16,64})\\.txt", destination: "/api/indexnow-key?k=:k" },
+      /* Médias servis par sex-escorte.com (donc protégés par Cloudflare) au lieu de l'adresse Supabase. */
+      ...(sbUrl ? [{ source: "/media/:path*", destination: `${sbUrl}/storage/v1/object/public/media/:path*` }] : [])
+    ];
   },
   experimental: { serverActions: { bodySizeLimit: "10mb" } }
 };

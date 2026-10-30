@@ -24,6 +24,7 @@ import Comments from "@/components/Comments";
 import ReportBtn from "@/components/ReportBtn";
 import { TrackLink, TrackView } from "@/components/Track";
 import { GPATH, siteUrl, slug } from "@/lib/site";
+import { proxyMedia } from "@/lib/img";
 import Ld, { crumbs, Crumbs } from "@/components/Ld";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +43,7 @@ export const get = async (r: Ref) => {
   }
   const rows = (data || []) as Profile[];
   const p = rows.find((x) => !r.param || parseProfileParam(r.param).id || x.id.startsWith(parseProfileParam(r.param).prefix!)) || null; // ancienne adresse « jolie » : on garde le premier identifiant qui commence pareil
-  if (p) p.specialties = (p.specialties || []).filter((x) => spec.includes(x));
+  if (p) { p.specialties = (p.specialties || []).filter((x) => spec.includes(x)); proxyMedia(p); }
   return p;
 };
 export async function profileMetadata(r: Ref): Promise<Metadata> {

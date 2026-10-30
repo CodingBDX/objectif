@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: { params: { ville: string; sp
   return {
     title: `${label} à ${city} : escortes`,
     description: `${n} profil${n > 1 ? "s" : ""} proposant « ${label.toLowerCase()} » à ${city} : photos, tarifs, disponibilités. Profils majeurs, vérifiés et protégés des arnaqueurs.`,
-    alternates: { canonical: `/ville/${params.ville}/${params.spe}` }
+    alternates: { canonical: `/ville/${params.ville}/${params.spe}` },
+    /* Pages ville × spécialité : utiles pour naviguer, mais trop maigres pour Google (risque de « pages satellites »). */
+    robots: { index: false, follow: true }
   };
 }
 export default async function Page({ params }: { params: { ville: string; spe: string } }) {

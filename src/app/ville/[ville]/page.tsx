@@ -10,13 +10,13 @@ import CityNearby from "@/components/CityNearby";
 import { regionMap } from "@/lib/cityinfo";
 import Ld, { crumbs, Crumbs, itemList } from "@/components/Ld";
 import Link from "next/link";
-import { slug } from "@/lib/site";
+import { MIN_INDEX, slug } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: { ville: string } }): Promise<Metadata> {
   const ps = await allProfiles(); const city = cityBySlug(ps, params.ville); if (!city) return { robots: { index: false, follow: true } };
   const n = ps.filter((p) => p.genre !== "livecam" && cityList(p).includes(city)).length;
-  return { title: `Escortes à ${city}`, description: `${n} profil${n > 1 ? "s" : ""} à ${city} : photos, tarifs, disponibilités et agenda des passages. Profils majeurs, vérifiés et protégés des arnaqueurs.`, alternates: { canonical: `/ville/${params.ville}` }, ...(n === 0 ? { robots: { index: false, follow: true } } : {}) };
+  return { title: `Escortes à ${city}`, description: `${n} profil${n > 1 ? "s" : ""} à ${city} : photos, tarifs, disponibilités et agenda des passages. Profils majeurs, vérifiés et protégés des arnaqueurs.`, alternates: { canonical: `/ville/${params.ville}` }, ...(n < MIN_INDEX ? { robots: { index: false, follow: true } } : {}) };
 }
 export default async function Page({ params }: { params: { ville: string } }) {
   const profiles = await allProfiles(); const city = cityBySlug(profiles, params.ville) || cityFromSlug(params.ville); if (!city || !/^[a-z0-9-]+$/.test(params.ville)) notFound();
