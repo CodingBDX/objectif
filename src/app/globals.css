@@ -1598,3 +1598,10 @@ h1.pbn{margin:0}
 .gvid{margin:18px auto 22px;max-width:340px;display:grid;gap:10px;justify-items:center}
 .gvid video{width:100%;aspect-ratio:9/16;background:var(--soft);border:3px solid var(--line);border-radius:30px;box-shadow:var(--sh);display:block}
 .gvid figcaption{font-size:14px;color:var(--mut);text-align:center;font-weight:600}
+
+/* Ordinateur : les colonnes latérales collantes défilent toutes seules quand elles sont plus hautes que l'écran (tous les menus restent accessibles) */
+@media (min-width:701px){
+ .side,.aside{max-height:calc(100dvh - 76px - env(safe-area-inset-top,0px) - 10px);overflow-y:auto;overscroll-behavior:contain;align-content:start;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding:2px 4px 12px 2px;margin:-2px -4px -12px -2px}
+ .side::-webkit-scrollbar,.aside::-webkit-scrollbar{width:6px}
+ .side::-webkit-scrollbar-thumb,.aside::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+}
