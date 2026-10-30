@@ -1558,3 +1558,17 @@ h1.pbn{margin:0}
 .dside nav .ngrp>summary:hover{background:var(--soft)}
 .dside nav .ngrp>a{margin-left:6px}
 @media (max-width:900px){.dside nav{display:grid;gap:4px;width:100%}.dside nav .ngrp>a{display:flex;font-size:14px}}
+
+/* Modifier mon profil : cases à cocher → boutons interrupteurs */
+.dedit input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;position:relative;width:52px;height:30px;margin:0;border-radius:999px;background:var(--offbg,#f3e2ec);border:2px solid var(--line);cursor:pointer;transition:background .25s,border-color .25s;accent-color:auto}
+.dedit input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(92,26,67,.3);transition:transform .25s}
+.dedit input[type=checkbox]:checked{background:var(--btn);border-color:var(--btn)}
+.dedit input[type=checkbox]:checked::after{transform:translateX(22px)}
+.dedit input[type=checkbox]:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+.dedit input[type=checkbox]:disabled{opacity:.4;cursor:not-allowed}
+.dedit .chk,.dedit .ck,.dedit .h24{align-items:center;gap:12px}
+.dedit .chk input{margin-top:0;width:52px;height:30px}
+.dedit .ck input,.dedit .hf .d input[type=checkbox]{width:52px;height:30px}
+.dedit .hf .d label{gap:10px}
+@media (max-width:520px){.dedit .hf .d{grid-template-columns:1fr 1fr}.dedit .hf .d label{grid-column:1/-1}}
+@media (prefers-reduced-motion:reduce){.dedit input[type=checkbox],.dedit input[type=checkbox]::after{transition:none}}
