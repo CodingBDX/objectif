@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { Tr } from "@/lib/i18n";
 import { InstallLink } from "@/components/InstallBanner";
-import { cap } from "@/lib/types";
+import { slug } from "@/lib/site";
 
-/** Pied de page : bandeau d'invitation, marque, colonnes de liens, spécialités, bandeau 18+. */
-export default function SiteFooter({ escort, specs = [] }: { escort: boolean; specs?: string[] }) {
+/** Pied de page : bandeau d'invitation, marque, colonnes de liens, villes, guides de sécurité, bandeau 18+.
+ *  Les spécialités n'y figurent plus : elles restent sur les fiches et dans le panneau Filtres. */
+const SAFE: [string, string][] = [
+  ["securite-avant-pendant-apres-un-rendez-vous", "Sécurité en rendez-vous"],
+  ["reperer-arnaques-et-mauvais-clients", "Repérer les arnaques"],
+  ["sante-et-prevention", "Santé et prévention"],
+  ["cadre-legal-en-france", "Cadre légal en France"]
+];
+export default function SiteFooter({ escort, cities = [] }: { escort: boolean; cities?: string[] }) {
   return (
     <footer className="sf" id="foot">
       <div className="gut">
@@ -32,10 +39,14 @@ export default function SiteFooter({ escort, specs = [] }: { escort: boolean; sp
             <h2>Informations</h2>
             <Link href="/mentions-legales">Mentions légales</Link><Link href="/cgu">Conditions d’utilisation</Link><Link href="/confidentialite">Confidentialité</Link><Link href="/contact">Contact</Link>
           </nav>
-          {specs.length > 0 && <nav className="sf-col sf-specs" aria-label="Spécialités">
-            <h2>Spécialités</h2>
-            <div>{specs.map((t) => <Link key={t} href={`/?tag=${encodeURIComponent(t)}`}>{cap(t)}</Link>)}</div>
+          {cities.length > 0 && <nav className="sf-col" aria-label="Villes">
+            <h2>Villes</h2>
+            {cities.map((c) => <Link key={c} href={`/ville/${slug(c)}`}>{c}</Link>)}
           </nav>}
+          <nav className="sf-col" aria-label="Se protéger">
+            <h2>Se protéger</h2>
+            {SAFE.map(([s, t]) => <Link key={s} href={`/guides/${s}`}>{t}</Link>)}
+          </nav>
         </div>
         <div className="sf-bot">
           <span className="sf-18">18+</span>

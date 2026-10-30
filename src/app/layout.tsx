@@ -13,7 +13,7 @@ import RefCapture from "@/components/RefCapture";
 import AgeGate from "@/components/AgeGate";
 import Splash from "@/components/Splash";
 import NavProgress from "@/components/NavProgress";
-import { siteUrl } from "@/lib/site";
+import { siteUrl, MIN_INDEX } from "@/lib/site";
 import { publicProfiles } from "@/lib/public";
 import { lab } from "@/lib/types";
 const fredoka = Fredoka({ subsets: ["latin", "latin-ext"], weight: ["500", "600", "700"], display: "swap", variable: "--f-fd" });
@@ -59,7 +59,7 @@ export default async function Root({ children }: { children: React.ReactNode }) 
         {me && !me.vip && <VipBanner paused={me.paused} />}
         {children}
         <InstallBanner /><RefCapture />
-        <SiteFooter escort={escort} specs={index.t.slice(0, 12).map(([t]) => t)} />
+        <SiteFooter escort={escort} cities={index.c.filter(([, n]) => n >= MIN_INDEX).slice(0, 12).map(([c]) => c)} />
       </body>
     </html>
   );

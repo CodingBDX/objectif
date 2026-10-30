@@ -1341,7 +1341,7 @@ h1.pbn{margin:0}
 .sf-cta b{font:700 22px var(--fd)}
 .sf-cta p{margin:4px 0 0;font-size:15px;max-width:52ch;opacity:.95}
 .sf-btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:8px 22px;border-radius:999px;background:var(--card);color:var(--btn);font:700 16px var(--fb);text-decoration:none}
-.sf-in{display:grid;grid-template-columns:1.5fr .8fr 1fr 1fr 1.5fr;gap:28px 32px;padding-block:34px 22px}
+.sf-in{display:grid;grid-template-columns:1.4fr repeat(5,minmax(0,1fr));gap:28px 32px;padding-block:34px 22px}
 .sf-logo{display:inline-flex;align-items:center;gap:8px;font:700 26px var(--fd);color:var(--btn)}
 .sf-logo span{font-size:20px;color:var(--pink)}
 .sf-brand p{margin:10px 0 0;line-height:1.6;max-width:46ch}

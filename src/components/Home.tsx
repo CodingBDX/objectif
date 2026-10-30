@@ -284,6 +284,18 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
   const cnt = (t: string) => (t === "tous" ? inCity.length : inCity.filter((p) => p.genre === t).length);
   const tags = useMemo(() => { const tc: Record<string, number> = {}; inCity.filter((p) => type === "tous" || p.genre === type).forEach((p) => p.specialties.forEach((t) => { t = t.toLowerCase(); tc[t] = (tc[t] || 0) + 1; })); return Object.entries(tc).sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).slice(0, 8); }, [inCity, type]);
   useEffect(() => { if (tag && !tags.some(([t]) => t === tag)) setTag(""); }, [tags, tag]);
+  /** Filtres rapides de la colonne de gauche (à la place des spécialités, qui restent dans le panneau Filtres). */
+  const quick = useMemo(() => {
+    const base = inCity.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type));
+    const c = (f: (p: Profile) => unknown) => base.filter(f).length;
+    return ([
+      ["now", "Disponibles maintenant", c((p) => avail(p)?.on), now, () => setNow(!now)],
+      ["ver", "Profils vérifiés", c((p) => p.verified), ver, () => setVer(!ver)],
+      ["vid", "Avec vidéo", c((p) => p.video), vid, () => setVid(!vid)],
+      ["recv", "Reçoit", c((p) => p.receives), df.recv, () => upd("recv", !df.recv)],
+      ["trav", "Se déplace", c((p) => p.travels), df.trav, () => upd("trav", !df.trav)]
+    ] as [string, string, number, boolean, () => void][]).filter(([, , n, on]) => n > 0 || on);
+  }, [inCity, type, now, ver, vid, df]); // eslint-disable-line react-hooks/exhaustive-deps
   const nNow = useMemo(() => inCity.filter((p) => (type === "tous" ? p.genre !== "livecam" : p.genre === type) && avail(p)?.on).length, [inCity, type]);
   const sidx = useMemo(() => { // index de la recherche du panneau de droite (mêmes suggestions que le menu du haut)
     const cc: Record<string, number> = {}, tc: Record<string, number> = {};
@@ -335,8 +347,8 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         <div className="panel">
           <div>{ITEMS.map(([k, v, i]) => <Link key={k} className={`si${type === k && !fav ? " on" : ""}`} href={k === "tous" ? (city ? `/ville/${slug(city)}` : "/") : city ? `/genre/${GPATH[k]}/${slug(city)}` : `/genre/${GPATH[k]}`}><Ic n={i} />{tr(v)}<span className="n">{cnt(k)}</span></Link>)}</div>
           <hr className="sep" />
-          <p className="ph"><Ic n="tag" s={20} />Spécialités</p>
-          <div>{tags.map(([t, n]) => <button key={t} className={`si${tag === t ? " on" : ""}`} onClick={() => setTag(tag === t ? "" : t)}>{cap(t)}<span className="n">{n}</span></button>)}</div>
+          <p className="ph"><Ic n="sliders" s={20} />{tr("Affiner")}</p>
+          <div>{quick.map(([k, label, n, on, toggle]) => <button key={k} type="button" className={`si${on ? " on" : ""}`} aria-pressed={on} onClick={toggle}>{tr(label)}<span className="n">{n}</span></button>)}</div>
         </div>
       </aside>
 
@@ -353,6 +365,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         {sheet && <div className={`sheetbg${sheet === "closing" ? " out" : ""}`} onClick={closeSheet} />}
         <div className={`panel msearch${searchMode ? " on" : ""}${sheet ? ` sheet ${sheet}` : ""}`} id="recherche" role={sheet ? "dialog" : undefined} aria-modal={sheet ? true : undefined} aria-label={sheet ? tr("Rechercher") : undefined}>{sheet && <div className="sheethd"><i aria-hidden="true" /><b>{tr("Rechercher")}</b><button type="button" className="x" aria-label={tr("Fermer")} onClick={closeSheet}>✕</button></div>}<div className={sheet ? "sheetbody" : "sbc"}>{(searchMode || !!sheet) && <div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><SearchBox profiles={profiles} q={q} setQ={setQ} onCity={(c) => { if (sheet) { setPend((cur) => (cur.includes(c) || cur.length >= 5 ? cur : [...cur, c])); (document.activeElement as HTMLElement | null)?.blur(); } else setCity(c); }} onProfile={(id) => { if (sheet) { setPend([]); setSheet(""); } open(id); }} onTag={(t) => setTag(t)} /></div>}{sheet && pend.length > 0 && <div className="pendl">{pend.map((c) => <p key={c} className="pendc"><span>📍 {c}</span><button type="button" aria-label={tr("Retirer")} onClick={() => setPend((cur) => cur.filter((x) => x !== c))}>✕</button></p>)}</div>}{(searchMode || !!sheet) && <><h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
           <div className="row"><span>{tr("Profil")}</span><select aria-label={tr("Profil")} value={type} onChange={(e) => setType(e.target.value)}><option value="tous">{tr("Tous les profils")}</option><option value="fille">{tr("Filles")}</option><option value="homme">{tr("Hommes")}</option><option value="trans">{tr("Trans")}</option><option value="livecam">{tr("Livecam")}</option></select></div>
+          {tags.length > 0 && <div className="row"><span>{tr("Spécialité")}</span><select aria-label={tr("Spécialité")} value={tag} onChange={(e) => setTag(e.target.value)}><option value="">{tr("Toutes")}</option>{tags.map(([t, c]) => <option key={t} value={t}>{cap(t)} ({c})</option>)}</select></div>}
           <div className="row"><span>{tr("Trier par")}</span><select aria-label={tr("Tri")} value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">{tr("Plus récents")}</option><option value="az">{tr("Nom (A à Z)")}</option><option value="tarif">{tr("Tarif croissant (selon la durée)")}</option><option value="vus">{tr("Plus vus (30 jours)")}</option><option value="media">{tr("Plus de contenus")}</option></select></div>
           {city && <div className="row"><span>{tr("Passages dans {c}", { c: city })}</span><select aria-label={tr("Passages dans la ville")} value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>{tr("Profils de la ville")}</option><option value={7}>{tr("De passage cette semaine")}</option><option value={30}>{tr("De passage ce mois-ci")}</option></select></div>}
           <div className="row"><span>{tr("Durée")}</span><select aria-label={tr("Durée")} value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>{tr("1 heure")}</option><option value={30}>{tr("30 minutes")}</option></select></div>
@@ -422,6 +435,7 @@ export default function Home({ profiles, initialType = "tous", initialCity = "",
         <div className="panel dpanel"><div className="dsearch"><h2><Ic n="search" s={20} />{tr("Rechercher")}</h2><GlobalSearch index={sidx} onGo={(u) => r.push(u)} /></div>
           <h2 className="fh"><Ic n="sliders" s={20} />{tr("Filtres")}<button className="clear" onClick={clear}>{tr("Tout effacer")}</button></h2>
           <div className="row"><span>{tr("Profil")}</span><select aria-label={tr("Profil")} value={type} onChange={(e) => setType(e.target.value)}><option value="tous">{tr("Tous les profils")}</option><option value="fille">{tr("Filles")}</option><option value="homme">{tr("Hommes")}</option><option value="trans">{tr("Trans")}</option><option value="livecam">{tr("Livecam")}</option></select></div>
+          {tags.length > 0 && <div className="row"><span>{tr("Spécialité")}</span><select aria-label={tr("Spécialité")} value={tag} onChange={(e) => setTag(e.target.value)}><option value="">{tr("Toutes")}</option>{tags.map(([t, c]) => <option key={t} value={t}>{cap(t)} ({c})</option>)}</select></div>}
           <div className="row"><span>{tr("Trier par")}</span><select aria-label={tr("Tri")} value={sort} onChange={(e) => setSort(e.target.value)}><option value="rec">{tr("Plus récents")}</option><option value="az">{tr("Nom (A à Z)")}</option><option value="tarif">{tr("Tarif croissant (selon la durée)")}</option><option value="vus">{tr("Plus vus (30 jours)")}</option><option value="media">{tr("Plus de contenus")}</option></select></div>
           {city && <div className="row"><span>{tr("Passages dans {c}", { c: city })}</span><select aria-label={tr("Passages dans la ville")} value={visit} onChange={(e) => setVisit(Number(e.target.value))}><option value={0}>{tr("Profils de la ville")}</option><option value={7}>{tr("De passage cette semaine")}</option><option value={30}>{tr("De passage ce mois-ci")}</option></select></div>}
           <div className="row"><span>{tr("Durée")}</span><select aria-label={tr("Durée")} value={dur} onChange={(e) => { setDur(Number(e.target.value) as 30 | 60); setTar(0); }}><option value={60}>{tr("1 heure")}</option><option value={30}>{tr("30 minutes")}</option></select></div>
