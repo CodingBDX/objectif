@@ -1454,3 +1454,10 @@ h1.pbn{margin:0}
   .pbar .pbn,h1.pbn{font:700 30px/1.15 var(--fd);white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .pbar .pbadges{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 }
+
+/* Galerie du profil : la photo entière (plus de zoom ni de coupe), fond sombre autour */
+.stage{aspect-ratio:4/3;background:#111}
+.slide{transform:none;transition:opacity .6s ease}
+.slide.on{transform:none}
+.slide>img{object-fit:contain;object-position:center;background:#111}
+@media (max-width:700px){.stage{aspect-ratio:4/5}}
