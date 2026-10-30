@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import CountUp from "@/components/CountUp";
+import VipPlansAdmin from "@/components/VipPlansAdmin";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { CATS, SPECIALTIES } from "@/lib/types";
 import { refreshListings } from "@/app/actions";
@@ -285,6 +286,7 @@ export default function Admin() {
         </div>)}
 
         {tab === "paiements" && (<div style={{ display: "grid", gap: 10 }}>
+          <VipPlansAdmin />
           <p className="note" style={{ margin: 0 }}>Une escorte clique sur « J’ai payé » : vérifie sur Wero / PayPal que l’argent est arrivé (montant et référence), puis valide. Le VIP est activé et prolongé à partir de sa fin actuelle.</p>
           {ordErr && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>{ordErr}</p>}
           {orders.length === 0 && !ordErr && <p className="note">Aucun paiement pour le moment.</p>}

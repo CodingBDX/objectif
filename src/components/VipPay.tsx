@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { useT } from "@/lib/i18n";
-import { VIP_PLANS } from "@/components/VipPrices";
+import { useVipPlans } from "@/lib/vipPlans";
 import { notifyAdmin } from "@/lib/notifyAdmin";
 import Ic from "@/components/Ic";
 
@@ -13,7 +13,7 @@ type Order = { id: string; plan: string; amount: number; ref: string; status: "p
 /** Mon espace : choisir un forfait VIP, voir comment payer (Wero / PayPal), puis « J'ai payé » -> l'admin vérifie et valide. */
 export default function VipPay({ vip }: { vip: boolean }) {
   const { tr } = useT(); const sb = supabaseBrowser();
-  const [o, setO] = useState<Order | null>(null); const [plan, setPlan] = useState(VIP_PLANS[1][0]); const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [copied, setCopied] = useState(false); const [ready, setReady] = useState(false);
+  const [o, setO] = useState<Order | null>(null); const plans = useVipPlans(); const [plan, setPlan] = useState(""); const [busy, setBusy] = useState(false); const [err, setErr] = useState(""); const [copied, setCopied] = useState(false); const [ready, setReady] = useState(false);
   const load = useCallback(async () => {
     const { data, error } = await sb.from("vip_orders").select("id,plan,amount,ref,status").in("status", ["pending", "declared", "refused"]).order("created_at", { ascending: false }).limit(1);
     if (!error) setO((data && data[0]) as Order | null); setReady(true);
@@ -24,6 +24,7 @@ export default function VipPay({ vip }: { vip: boolean }) {
     if (error) { setErr(tr("Impossible pour le moment, réessaie dans un instant.")); return; } after?.(); load();
   };
   const copy = async () => { try { await navigator.clipboard.writeText(WERO); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch {} };
+  const cur = plan || (plans[1] || plans[0])?.id || "";
   if (!ready) return null;
 
   if (o && o.status === "declared") return (
@@ -47,8 +48,8 @@ export default function VipPay({ vip }: { vip: boolean }) {
       <summary><Ic n="crown" s={20} />{vip ? tr("Prolonger mon VIP") : tr("Passer en VIP")}<small>{tr("Choisis ton forfait · paiement Wero ou PayPal")}</small></summary>
       <div style={{ display: "grid", gap: 12, padding: "16px 18px" }}>
         {o && o.status === "refused" && <p className="note" role="alert" style={{ margin: 0, color: "var(--btn)", fontWeight: 700 }}>{tr("Ton dernier paiement n’a pas pu être confirmé. Contacte-nous si tu penses que c’est une erreur.")}</p>}
-        <div className="vplans" role="radiogroup" aria-label={tr("Forfait VIP")}>{VIP_PLANS.map(([d, p]) => <label key={d} className={`vplan${plan === d ? " on" : ""}`}><input type="radio" name="vplan" checked={plan === d} onChange={() => setPlan(d)} /><span>{tr(d)}</span><b>{p} €</b></label>)}</div>
-        <button type="button" className="btn" disabled={busy} onClick={() => call("vip_order_create", { p_plan: plan })}>{tr("Continuer vers le paiement")}</button>
+        <div className="vplans" role="radiogroup" aria-label={tr("Forfait VIP")}>{plans.map((x) => <label key={x.id} className={`vplan${cur === x.id ? " on" : ""}`}><input type="radio" name="vplan" checked={cur === x.id} onChange={() => setPlan(x.id)} /><span>{tr(x.label)}</span><b>{x.price} €</b></label>)}</div>
+        <button type="button" className="btn" disabled={busy} onClick={() => call("vip_order_create", { p_plan: cur })}>{tr("Continuer vers le paiement")}</button>
         {err && <small className="vpay-e" role="alert">{err}</small>}
       </div>
     </details>);
