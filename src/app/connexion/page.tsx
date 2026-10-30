@@ -1,4 +1,5 @@
 "use client";
+import { isDisposable } from "@/lib/disposable";
 import { Suspense, useState } from "react";
 import { Crumbs } from "@/components/Ld";
 import Link from "next/link";
@@ -35,9 +36,10 @@ function Form() {
     e.preventDefault(); setBusy(true); setMsg(null);
     const sb = supabaseBrowser();
     if (signup) {
+      if (isDisposable(email)) { setMsg({ t: tr("Les adresses e-mail temporaires ne sont pas acceptées. Utilise ta vraie adresse (Gmail, Outlook, iCloud…).") }); setBusy(false); setCap(""); setCapN((n) => n + 1); return; }
       const { data, error } = await sb.auth.signUp({ email, password: pw, options: { captchaToken: cap || undefined, emailRedirectTo: `${location.origin}${nx}`, data: { adult_confirmed_at: new Date().toISOString() } } });
       if (!error && data?.session) { location.href = nx; return; }
-      setMsg(error ? { t: error.message } : { t: tr("Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi."), ok: true });
+      setMsg(error ? { t: /email_jetable|Database error/i.test(error.message) ? tr("Les adresses e-mail temporaires ne sont pas acceptées. Utilise ta vraie adresse (Gmail, Outlook, iCloud…).") : error.message } : { t: tr("Compte créé ! Clique sur le lien reçu par e-mail pour confirmer, puis connecte-toi."), ok: true });
     } else {
       const { error } = await sb.auth.signInWithPassword({ email, password: pw, options: { captchaToken: cap || undefined } });
       if (error) { setMsg({ t: tr("E-mail ou mot de passe incorrect.") }); logSec("connexion_echec", error.message.slice(0, 60)); } else location.href = nx;
