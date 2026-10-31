@@ -68,7 +68,7 @@ export default function MyProfile() {
     if (mem) { setIsMember(true); setPseudo(mem.pseudo); setHasPhone(!!mem.phone_hash); }
     if (data) { setIsNewP(false); setOk18(true); setKind(data.genre === "livecam" ? "livecam" : "createur"); setVlink(data.vlink || "");
       const { data: ph } = await sb.from("profile_phones").select("phone").eq("profile_id", user.id).maybeSingle();
-      setF({ name: data.name, genre: data.genre, city: data.city, phone: ph?.phone || data.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
+      setF({ name: data.name, genre: data.genre, city: data.city, phone: ph?.phone || "", instagram: data.instagram || "", snapchat: data.snapchat || "", tiktok: data.tiktok || "", site: data.site || "" });
       setRecv(!!data.receives); setTrav(!!data.travels); setStreet(!!data.street); setZone(data.zone || ""); setZoneMap(!!data.zone_map); setTripPub(!!data.trip_public); setZBlocked(!!data.zone_map_blocked); setSHours(data.street_hours || ""); setZTouch(!!data.street);
       setHair(data.hair || ""); setEyes(data.eyes || ""); setBra(data.bra || ""); setSmoker(data.smoker || ""); setDrinker(data.drinker || "");
       setAge(data.age ? String(data.age) : ""); setHcm(data.height_cm ? String(data.height_cm) : ""); setWkg(data.weight_kg ? String(data.weight_kg) : ""); setEth(data.ethnicity || ""); setNat(data.nationality || ""); setDist(data.district || ""); setSlogan(data.slogan || ""); setFurl(!!data.friendly_url); setUslug(data.url_slug || ""); setWa(!!data.whatsapp); setSms(!!data.sms); setLangs(data.languages || []);
